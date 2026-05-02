@@ -1,0 +1,43 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@anthropic-ai/sdk", "@supabase/supabase-js"]
+
+[[redirects]]
+  from = "/api/auth/google/url"
+  to = "/.netlify/functions/auth-google-url"
+  status = 200
+
+[[redirects]]
+  from = "/api/auth/google/callback"
+  to = "/.netlify/functions/auth-google-callback"
+  status = 200
+
+[[redirects]]
+  from = "/api/google/files"
+  to = "/.netlify/functions/google-files"
+  status = 200
+
+[[redirects]]
+  from = "/api/google/file/:fileId"
+  to = "/.netlify/functions/google-file"
+  status = 200
+
+[[redirects]]
+  from = "/api/google/export-doc"
+  to = "/.netlify/functions/google-export-doc"
+  status = 200
+
+[[redirects]]
+  from = "/api/analyze"
+  to = "/.netlify/functions/analyze"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
