@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@theme inline {
+  --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Georgia', serif;
+  
+  --color-background: #F9F9F7;
+  --color-foreground: #1A1A1A;
+  
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1A1A1A;
+  
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #1A1A1A;
+  
+  --color-primary: #1A1A1A;
+  --color-primary-foreground: #FFFFFF;
+  
+  --color-secondary: #F0F0EE;
+  --color-secondary-foreground: #666666;
+  
+  --color-muted: #F0F0EE;
+  --color-muted-foreground: #666666;
+  
+  --color-accent: #FF6B6B;
+  --color-accent-foreground: #FFFFFF;
+  
+  --color-success: #6BCB77;
+  --color-warning: #FFD93D;
+  --color-info: #4D96FF;
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 6px;
+}
+
+@layer base {
+  * {
+    border-color: #E5E5E1;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(255, 107, 107, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(77, 150, 255, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(255, 217, 61, 0.08) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(107, 203, 119, 0.08) 0px, transparent 50%);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, .font-serif {
+    @apply font-serif;
+  }
+}
+
+.highlight {
+  background: rgba(255, 217, 61, 0.2);
+  border-bottom: 2px solid #FFD93D;
+  padding: 2px 0;
+  color: #1A1A1A;
+}
+
+.score-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 4px solid #F0F0EE;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  background: white;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.score-circle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #FF6B6B, #4D96FF, #FFD93D);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #E5E5E1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #D1D1CD;
+}
