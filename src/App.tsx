@@ -18,7 +18,7 @@ import { FrameworkDimension, DEFAULT_DIMENSIONS, BloomsLevel, BLOOMS_LEVELS } fr
 import { loadAssignments, saveAssignments, loadSettings, saveSettings, loadUser, saveUser, clearUser, AppSettings } from '@/src/lib/storage';
 import { supabaseEnabled, onAuthStateChange, fetchAssignmentsFromCloud, saveAssignmentToCloud, deleteAssignmentFromCloud, signOut } from '@/src/lib/supabase';
 import { loadProfile, saveProfile, clearProfile, TeacherProfile } from '@/src/lib/profile';
-import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'lucide-react';
+import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive, BookOpen, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
@@ -46,6 +46,8 @@ export default function App() {
   const [savedAssignments, setSavedAssignments] = useState<SavedAssignment[]>([]);
   const [hydrated, setHydrated] = useState(false);
   const [cloudSynced, setCloudSynced] = useState(false);
+  const [curriculumFramework, setCurriculumFramework] = useState('');
+  const [curriculumFrameworkName, setCurriculumFrameworkName] = useState('');
 
   useEffect(() => {
     const storedUser = loadUser();
@@ -57,6 +59,8 @@ export default function App() {
     setDefaultPreference(settings.defaultPreference);
     setBloomsLevel(settings.bloomsLevel);
     setDimensions(settings.dimensions);
+    setCurriculumFramework(settings.curriculumFramework || '');
+    setCurriculumFrameworkName(settings.curriculumFrameworkName || '');
     setSavedAssignments(loadAssignments());
     setHydrated(true);
     const hasShownSplash = sessionStorage.getItem('hasShownSplash');
@@ -83,8 +87,8 @@ export default function App() {
 
   useEffect(() => { if (hydrated) saveAssignments(savedAssignments); }, [savedAssignments, hydrated]);
   useEffect(() => {
-    if (hydrated) saveSettings({ activeFramework, defaultPreference, bloomsLevel, dimensions });
-  }, [activeFramework, defaultPreference, bloomsLevel, dimensions, hydrated]);
+    if (hydrated) saveSettings({ activeFramework, defaultPreference, bloomsLevel, dimensions, curriculumFramework, curriculumFrameworkName });
+  }, [activeFramework, defaultPreference, bloomsLevel, dimensions, curriculumFramework, curriculumFrameworkName, hydrated]);
 
   const handleLogin = (name: string, email: string, id?: string) => {
     const newUser = { name, email, id };
@@ -128,7 +132,7 @@ export default function App() {
   };
 
   const handleSaveSettings = () => {
-    saveSettings({ activeFramework, defaultPreference, bloomsLevel, dimensions });
+    saveSettings({ activeFramework, defaultPreference, bloomsLevel, dimensions, curriculumFramework, curriculumFrameworkName });
     setIsSettingsOpen(false); toast.success('Settings saved!');
   };
 
@@ -197,6 +201,7 @@ export default function App() {
                 defaultPreference={defaultPreference} dimensions={dimensions}
                 activeFramework={activeFramework} bloomsLevel={bloomsLevel}
                 subject={profile?.subject || ''} gradeLevel={profile?.gradeLevel || ''}
+                curriculumFramework={curriculumFramework}
                 onSave={handleSaveAssignment} onReset={() => setOpenedAssignment(null)}
                 initialText={openedAssignment?.fullText || ''}
               />
@@ -367,6 +372,61 @@ export default function App() {
                     </button>
                   ))}
                 </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-3.5 h-3.5 text-accent" />
+                    <h4 className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Curriculum Framework</h4>
+                  </div>
+                  {curriculumFramework && (
+                    <button onClick={() => { setCurriculumFramework(''); setCurriculumFrameworkName(''); }}
+                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-destructive transition-colors">
+                      <X className="w-3 h-3" />Clear
+                    </button>
+                  )}
+                </div>
+                <p className="text-[10px] text-muted-foreground leading-relaxed">
+                  Paste your school or district curriculum framework so Socrates can tailor every analysis to your specific standards. This is remembered across sessions.
+                </p>
+                {curriculumFrameworkName && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-accent/5 border border-accent/20 rounded-lg">
+                    <BookOpen className="w-3.5 h-3.5 text-accent flex-shrink-0" />
+                    <span className="text-[11px] font-medium text-accent truncate">{curriculumFrameworkName}</span>
+                  </div>
+                )}
+                <textarea
+                  className="w-full min-h-[100px] text-[11px] bg-secondary/30 border border-border rounded-lg p-3 focus:outline-none focus:ring-1 focus:ring-accent resize-y text-foreground placeholder:text-muted-foreground"
+                  placeholder="Paste your curriculum framework, state standards, learning objectives, or any guiding document here..."
+                  value={curriculumFramework}
+                  onChange={e => {
+                    setCurriculumFramework(e.target.value);
+                    if (!curriculumFrameworkName && e.target.value.trim()) {
+                      const firstLine = e.target.value.trim().split('\n')[0];
+                      setCurriculumFrameworkName(firstLine.substring(0, 60) || 'Custom Framework');
+                    }
+                  }}
+                />
+                <label className="block space-y-1">
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Or upload a document (PDF/DOCX/TXT)</span>
+                  <input
+                    type="file"
+                    accept=".txt,.pdf,.docx"
+                    className="block w-full text-[10px] text-muted-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-secondary file:text-foreground hover:file:bg-secondary/80 cursor-pointer"
+                    onChange={async e => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setCurriculumFrameworkName(file.name.replace(/\.[^.]+$/, ''));
+                      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+                        const text = await file.text();
+                        setCurriculumFramework(text);
+                      } else {
+                        setCurriculumFramework(`[Uploaded: ${file.name} — paste text version above for best results]`);
+                      }
+                      e.target.value = '';
+                    }}
+                  />
+                </label>
               </div>
             </div>
             <div className="flex justify-end">

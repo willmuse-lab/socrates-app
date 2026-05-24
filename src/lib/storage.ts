@@ -12,6 +12,8 @@ export interface AppSettings {
   defaultPreference: 'avoid' | 'augment' | 'embrace';
   bloomsLevel: BloomsLevel;
   dimensions: FrameworkDimension[];
+  curriculumFramework: string;
+  curriculumFrameworkName: string;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -19,6 +21,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   defaultPreference: 'avoid',
   bloomsLevel: 'Analyze',
   dimensions: DEFAULT_DIMENSIONS,
+  curriculumFramework: '',
+  curriculumFrameworkName: '',
 };
 
 export function loadAssignments(): SavedAssignment[] {
