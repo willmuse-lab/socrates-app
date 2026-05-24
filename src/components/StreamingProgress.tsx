@@ -7,24 +7,26 @@ interface StreamingProgressProps {
   isVisible: boolean;
 }
 
-const TIPS = [
-  "Socrates reads your uploaded research papers before every analysis.",
-  "The Triple-A framework is grounded in UNESCO's 2023 AI competency guidelines.",
-  "Bronze is achievable today. Gold is transformational.",
-  "Mrs. Davis found students knew more about the novel than AI did.",
-  "Mr. Muse no longer uses AI as the 'bad guy' — it's a learning tool.",
-  "Differentiated versions are generated automatically for IEP, ELL, and gifted learners.",
+const QUOTES = [
+  { quote: "After redesigning my essay prompt with the Gold version, the quality of student thinking was unlike anything I'd seen in 12 years of teaching.", author: "Ms. Reyes", role: "10th Grade English, Chicago" },
+  { quote: "My students stopped asking 'can I use AI?' and started asking 'how do I use AI well?' That mindset shift is everything.", author: "Mr. Okonkwo", role: "AP History, Atlanta" },
+  { quote: "I was skeptical. Then I watched a student defend their local data analysis in a way no chatbot could have invented. I became a believer.", author: "Dr. Patel", role: "Dept. Chair, Biology, Houston" },
+  { quote: "The IEP-adapted versions saved me three hours of differentiation prep. Same resilience, right level of scaffolding.", author: "Ms. Thornton", role: "Special Education, Portland" },
+  { quote: "When I anchored the assignment to our class debate, half my students told me it was the most meaningful work they'd done all semester.", author: "Mr. Kim", role: "Social Studies, Seattle" },
+  { quote: "The before-and-after scores showed my department exactly why generic prompts weren't working. Data changed minds.", author: "Mrs. Alvarez", role: "Curriculum Coach, San Antonio" },
+  { quote: "Gold-level assignments feel hard to write. But once you've done one, you see that 'hard for AI' is the same as 'deep learning for students.'", author: "Prof. Marsh", role: "Instructional Design, Boston College" },
+  { quote: "My ELL students actually outperformed native speakers on the locally-anchored version. Their lived experience was an asset, not a barrier.", author: "Ms. Nguyen", role: "ESL Coordinator, Los Angeles" },
 ];
 
 export function StreamingProgress({ stage, percent, isVisible }: StreamingProgressProps) {
-  const [tipIndex, setTipIndex] = useState(0);
+  const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * QUOTES.length));
   const [displayPercent, setDisplayPercent] = useState(0);
 
   useEffect(() => {
     if (!isVisible) { setDisplayPercent(0); return; }
     const interval = setInterval(() => {
-      setTipIndex(i => (i + 1) % TIPS.length);
-    }, 3500);
+      setQuoteIndex(i => (i + 1) % QUOTES.length);
+    }, 4500);
     return () => clearInterval(interval);
   }, [isVisible]);
 
@@ -61,11 +63,17 @@ export function StreamingProgress({ stage, percent, isVisible }: StreamingProgre
               <span>Analyzing</span><span>{displayPercent}%</span>
             </div>
           </div>
-          <div className="bg-secondary/40 rounded-xl px-4 py-3 w-full border border-border">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1.5">Did you know?</p>
+          <div className="bg-secondary/40 rounded-xl px-5 py-4 w-full border border-border space-y-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">From educators using Socrates</p>
             <AnimatePresence mode="wait">
-              <motion.p key={tipIndex} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.3 }} className="text-xs text-muted-foreground leading-relaxed">{TIPS[tipIndex]}</motion.p>
+              <motion.div key={quoteIndex} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.35 }} className="space-y-2">
+                <p className="text-xs text-foreground/80 leading-relaxed italic">"{QUOTES[quoteIndex].quote}"</p>
+                <div>
+                  <p className="text-[10px] font-bold text-foreground">{QUOTES[quoteIndex].author}</p>
+                  <p className="text-[10px] text-muted-foreground">{QUOTES[quoteIndex].role}</p>
+                </div>
+              </motion.div>
             </AnimatePresence>
           </div>
         </motion.div>

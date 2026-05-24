@@ -56,8 +56,12 @@ export async function analyzeAssignment(
   activeFramework: "triple-a" | "blooms" = "triple-a",
   bloomsLevel?: BloomsLevel,
   subject?: string,
-  gradeLevel?: string
+  gradeLevel?: string,
+  onProgress?: (stage: string, percent: number) => void,
+  curriculumFramework?: string,
+  userId?: string
 ): Promise<AnalysisResult> {
+  onProgress?.("Reading your assignment...", 10);
   const response = await fetch("/api/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -69,8 +73,11 @@ export async function analyzeAssignment(
       bloomsLevel: bloomsLevel || "Analyze",
       subject: subject || "",
       gradeLevel: gradeLevel || "",
+      curriculumFramework: curriculumFramework || "",
+      userId: userId || "",
     }),
   });
+  onProgress?.("Processing results...", 85);
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({ error: "Unknown error" }));

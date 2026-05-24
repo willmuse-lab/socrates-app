@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { analyzeAssignment, AnalysisResult, AIPreference, FrameworkDimension, DEFAULT_DIMENSIONS, BloomsLevel } from '@/src/lib/gemini';
+import { ResilienceGauge } from './ResilienceGauge';
 import { SavedAssignment } from '../App';
 import { FileUploader } from './FileUploader';
 import { GoogleDrivePicker } from './GoogleDrivePicker';
@@ -9,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Loader2, Shield, Zap, Sparkles, Share2, FileText, FileDown, Copy, Check, ThumbsUp, ThumbsDown, Replace, BookOpen, RotateCcw, Save, ExternalLink } from 'lucide-react';
+import { Loader2, Shield, Zap, Sparkles, Share2, FileText, FileDown, Copy, Check, ThumbsUp, ThumbsDown, Replace, BookOpen, RotateCcw, Save, ExternalLink, TrendingUp, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { exportToPDF, exportToDocx, exportToGoogleDocs } from '@/src/lib/export';
@@ -22,10 +23,11 @@ type FeedbackMap = Record<number, 'up' | 'down' | null>;
 
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
-  bloomsLevel = 'Analyze', subject = '', gradeLevel = '', onSave, onReset, initialText = ''
+  bloomsLevel = 'Analyze', subject = '', gradeLevel = '', curriculumFramework = '',
+  onSave, onReset, initialText = ''
 }: {
   defaultPreference?: AIPreference, dimensions?: FrameworkDimension[], activeFramework?: 'triple-a' | 'blooms',
-  bloomsLevel?: BloomsLevel, subject?: string, gradeLevel?: string,
+  bloomsLevel?: BloomsLevel, subject?: string, gradeLevel?: string, curriculumFramework?: string,
   onSave?: (assignment: Omit<SavedAssignment, 'id' | 'date'>) => void, onReset?: () => void, initialText?: string
 }) {
   const [text, setText] = useState(initialText);
@@ -43,6 +45,7 @@ export function AssignmentAnalyzer({
   const [showComparison, setShowComparison] = useState(false);
   const [showDifferentiation, setShowDifferentiation] = useState<number | null>(null);
   const [editedTexts, setEditedTexts] = useState<Record<number, string>>({});
+  const [previousScore, setPreviousScore] = useState<number | null>(null);
   const suggestionsRef = React.useRef<HTMLDivElement>(null);
 
   const getChangeSummary = (original: string, modified: string): string[] => {
@@ -59,14 +62,17 @@ export function AssignmentAnalyzer({
     if (!text.trim()) return;
     setIsAnalyzing(true); setFeedback({}); setApplied(null);
     try {
-      setProgressStage('Reading your assignment...'); setProgressPercent(5);
-      const analysis = await analyzeAssignment(text, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
-        (stage, pct) => { setProgressStage(stage); setProgressPercent(pct); });
+      setProgressStage('Reading your assignment...'); setProgressPercent(10);
+      const analysis = await analyzeAssignment(
+        text, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
+        (stage, pct) => { setProgressStage(stage); setProgressPercent(pct); },
+        curriculumFramework
+      );
       setResult(analysis); setActiveLevel('Bronze');
     } catch (error) {
       console.error('Analysis failed:', error);
       toast.error('Failed to analyze assignment. Please try again.');
-    } finally { setIsAnalyzing(false); }
+    } finally { setIsAnalyzing(false); setProgressPercent(100); }
   };
 
   const copyToClipboard = (content: string, index: number) => {
@@ -75,6 +81,7 @@ export function AssignmentAnalyzer({
   };
 
   const applyVersion = (content: string, index: number) => {
+    if (result) setPreviousScore(result.resilienceScore);
     setText(content); setApplied(index); setResult(null);
     toast.success('Version applied! Re-analyze to see the new score.', { action: { label: 'Analyze Now', onClick: () => handleAnalyze() } });
   };
@@ -116,7 +123,7 @@ export function AssignmentAnalyzer({
     onSave({ title: displayTitle, fullText: text, resilience: result.resilienceScore, status: activeLevel });
     toast.success('Assignment saved to your library!');
   };
-  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); onReset?.(); };
+  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousScore(null); onReset?.(); };
   const scoreColor = result ? result.resilienceScore >= 70 ? 'text-[#708D81]' : result.resilienceScore >= 40 ? 'text-[#D4A373]' : 'text-red-400' : '';
 
   return (
@@ -304,20 +311,38 @@ export function AssignmentAnalyzer({
                 ))}
               </Tabs>
             </Card>
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1 h-10 text-xs font-bold uppercase tracking-widest border-border hover:bg-secondary gap-2" onClick={handleNewAssignment}><RotateCcw className="w-3.5 h-3.5" />New Assignment</Button>
-              <Button className="flex-1 h-10 text-xs font-bold uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 gap-2" onClick={handleSaveToLibrary}><Save className="w-3.5 h-3.5" />Save to Library</Button>
+            <div className="space-y-2">
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1 h-10 text-xs font-bold uppercase tracking-widest border-border hover:bg-secondary gap-2" onClick={handleNewAssignment}><RotateCcw className="w-3.5 h-3.5" />New Assignment</Button>
+                <Button className="flex-1 h-10 text-xs font-bold uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 gap-2" onClick={handleSaveToLibrary}><Save className="w-3.5 h-3.5" />Save to Library</Button>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase tracking-wider gap-1.5 border-border hover:bg-secondary" onClick={handleExportPDF}><Download className="w-3 h-3" />PDF</Button>
+                <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase tracking-wider gap-1.5 border-border hover:bg-secondary" onClick={handleExportDocx}><FileText className="w-3 h-3" />DOCX</Button>
+                <Button variant="outline" size="sm" className="h-9 text-[10px] font-bold uppercase tracking-wider gap-1.5 border-green-200 text-green-700 hover:bg-green-50" onClick={handleExportGoogleDocs}><ExternalLink className="w-3 h-3" />Drive</Button>
+              </div>
             </div>
           </div>
           <aside className="bg-card border-b md:border-b-0 md:border-l border-border p-6 md:p-10 flex flex-col gap-8 overflow-y-auto order-1 md:order-2">
             <div className="text-center space-y-3">
-              <div className="score-circle mx-auto">
-                <span className={`text-3xl font-bold ${scoreColor}`}>{result.resilienceScore}</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Resilience</span>
-              </div>
+              <ResilienceGauge score={result.resilienceScore} />
               <p className="text-xs text-muted-foreground leading-relaxed">{result.summary}</p>
             </div>
-            {applied !== null && (
+            {previousScore !== null && (
+              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-3 px-4 py-3 rounded-lg bg-green-50 border border-green-200">
+                <TrendingUp className="w-4 h-4 text-green-600 flex-shrink-0" />
+                <div className="text-xs">
+                  <span className="font-bold text-green-700">Score improved: {previousScore} → {result.resilienceScore}</span>
+                  {result.resilienceScore > previousScore
+                    ? <span className="text-green-600"> (+{result.resilienceScore - previousScore} pts)</span>
+                    : result.resilienceScore === previousScore
+                    ? <span className="text-amber-600"> (unchanged)</span>
+                    : <span className="text-red-500"> ({result.resilienceScore - previousScore} pts)</span>}
+                </div>
+              </motion.div>
+            )}
+            {applied !== null && previousScore === null && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent font-medium">
                 <BookOpen className="w-4 h-4 flex-shrink-0" />Version applied — re-analyze to see updated score.
               </motion.div>
