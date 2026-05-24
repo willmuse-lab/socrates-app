@@ -301,7 +301,7 @@ export const handler: Handler = async (event: HandlerEvent) => {
         resilience_score: result.resilienceScore,
         ai_preference: aiPreference,
         created_at: new Date().toISOString(),
-      }).catch(() => {}); // Non-blocking
+      }).then(() => {}); // Non-blocking
     }
 
     return {
