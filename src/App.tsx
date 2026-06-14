@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AssignmentAnalyzer } from './components/AssignmentAnalyzer';
 import { LibraryView } from './components/LibraryView';
 import { AdminResearch } from './components/AdminResearch';
-import { DepartmentView } from './components/DepartmentView';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Onboarding } from './components/Onboarding';
 import { Pricing } from './components/Pricing';
@@ -22,7 +21,7 @@ import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'luci
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
-type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy' | 'departments';
+type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy';
 type AIPreference = 'avoid' | 'augment' | 'embrace';
 
 export interface SavedAssignment {
@@ -148,7 +147,6 @@ export default function App() {
           {[
             { label: 'Studio', view: 'studio' },
             { label: 'Library', view: 'library' },
-            { label: 'Departments', view: 'departments' },
             { label: 'Pricing', view: 'pricing' },
             { label: 'About', view: 'about' },
           ].map(({ label, view }) => (
@@ -176,7 +174,6 @@ export default function App() {
               onLogout={handleLogout}
               onViewLibrary={() => setViewMode('library')}
               onViewSettings={() => setIsSettingsOpen(true)}
-              onViewDepartments={() => setViewMode('departments')}
               onViewAdmin={() => setViewMode('admin-research')}
               onViewDashboard={() => setViewMode('admin-dashboard')}
             />
@@ -243,13 +240,6 @@ export default function App() {
                   if (supabaseEnabled && user?.id) await deleteAssignmentFromCloud(id);
                   toast.info('Removed from library');
                 }} />
-            </motion.div>
-          )}
-          {viewMode === 'departments' && (
-            <motion.div key="departments" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
-              <DepartmentView user={user} savedAssignments={savedAssignments}
-                onBack={() => setViewMode('studio')}
-                onOpenAssignment={a => { setOpenedAssignment(a); setViewMode('studio'); }} />
             </motion.div>
           )}
           {viewMode === 'admin-research' && (
