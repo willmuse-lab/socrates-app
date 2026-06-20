@@ -45,6 +45,7 @@ const RESEARCH_BASE = {
   [Ethics of care / student trust — research consensus] — Punitive AI detection erodes trust and is unreliable; redesign beats policing.
   [Sperber, MacArthur, Minnillo, Stillman & Whithaus, 2025 — PAIRR, Computers and Composition 76, 102921] — Peer and AI Review + Reflection: students get formative feedback from BOTH a peer and an AI on a draft, then write a reflection comparing and reconciling the two. Keeps revision human-centered, treats AI as one voice among many rather than the author, and makes the student's judgement (which feedback to accept and why) the assessed artifact.
   [Awadallah Alkouk & Khlaif, 2024 — AI-resistant assessments in higher education, Frontiers in Education 9:1499495] — Process-Product Assessment Approach: grade BOTH the final product AND the process behind it, including the quality of the student's interaction with AI and how they developed their prompts. Allow AI for brainstorming/proofreading but require a reflection that critiques the AI's output. Favor authentic, context-rich tasks; uses an AI-Resistance Assessment Scale (AIAS) to match task design to risk.
+  [Kharbach, 2026 — The AI Activities Guide for Teachers, educatorstechnology.com] — Subject-specific, hands-on design principle: let AI handle research logistics, content generation, and differentiation, while students do the interpretation, evaluation, and argument. Strong examples include using AI to generate multiple/biased perspectives that students then analyze, and giving struggling writers a starting point that removes blank-page paralysis without doing the thinking for them. Tailor moves to the subject (social studies, math, language, science).
 
   ADD NEW RESEARCH BELOW THIS LINE:
   `,
@@ -78,6 +79,7 @@ const RESEARCH_BASE = {
      - Compare two AI outputs and argue which is stronger and why.
      - Require students to find and document the AI's errors or blind spots on the topic.
      - PAIRR (Peer + AI Review + Reflection): students get feedback on a draft from BOTH a peer and an AI, then write a reflection reconciling the two and justifying which revisions they accepted — the reflection is the graded artifact.
+     - Bias/perspective mapping: students prompt AI for the same topic from several viewpoints (e.g. an event from four national perspectives), then map where the narratives conflict and analyze why — the AI makes the bias visible, the student does the thinking.
 
   F. RAISE THE COGNITIVE BAR (Bloom's)
      - Shift from summary/recall to synthesis, evaluation, design, or argument under constraints.
