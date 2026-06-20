@@ -44,6 +44,7 @@ const RESEARCH_BASE = {
   [Self-regulated learning — Zimmerman] — Require planning, monitoring, and reflection artifacts; the learning lives in the visible process.
   [Ethics of care / student trust — research consensus] — Punitive AI detection erodes trust and is unreliable; redesign beats policing.
   [Sperber, MacArthur, Minnillo, Stillman & Whithaus, 2025 — PAIRR, Computers and Composition 76, 102921] — Peer and AI Review + Reflection: students get formative feedback from BOTH a peer and an AI on a draft, then write a reflection comparing and reconciling the two. Keeps revision human-centered, treats AI as one voice among many rather than the author, and makes the student's judgement (which feedback to accept and why) the assessed artifact.
+  [Awadallah Alkouk & Khlaif, 2024 — AI-resistant assessments in higher education, Frontiers in Education 9:1499495] — Process-Product Assessment Approach: grade BOTH the final product AND the process behind it, including the quality of the student's interaction with AI and how they developed their prompts. Allow AI for brainstorming/proofreading but require a reflection that critiques the AI's output. Favor authentic, context-rich tasks; uses an AI-Resistance Assessment Scale (AIAS) to match task design to risk.
 
   ADD NEW RESEARCH BELOW THIS LINE:
   `,
@@ -60,6 +61,7 @@ const RESEARCH_BASE = {
      - Require a revision history, draft timeline, or version comparison.
      - Ask for a "prompt log" + reflection on where AI was wrong or unhelpful.
      - Require annotated sources or a research trail showing how conclusions were reached.
+     - Process-Product: grade the human-AI interaction itself — the quality of the student's prompts, the choices they made, and a reflection critiquing the AI's output — alongside the final product.
 
   C. MAKE IT PERSONAL & APPLIED
      - Connect to the student's own life, goals, community, or chosen career lens.
