@@ -43,6 +43,7 @@ const RESEARCH_BASE = {
   [Universal Design for Learning — CAST] — Offer multiple means of expression (audio, video, demonstration, build) so the deliverable itself resists text generation.
   [Self-regulated learning — Zimmerman] — Require planning, monitoring, and reflection artifacts; the learning lives in the visible process.
   [Ethics of care / student trust — research consensus] — Punitive AI detection erodes trust and is unreliable; redesign beats policing.
+  [Sperber, MacArthur, Minnillo, Stillman & Whithaus, 2025 — PAIRR, Computers and Composition 76, 102921] — Peer and AI Review + Reflection: students get formative feedback from BOTH a peer and an AI on a draft, then write a reflection comparing and reconciling the two. Keeps revision human-centered, treats AI as one voice among many rather than the author, and makes the student's judgement (which feedback to accept and why) the assessed artifact.
 
   ADD NEW RESEARCH BELOW THIS LINE:
   `,
@@ -74,6 +75,7 @@ const RESEARCH_BASE = {
      - Have students generate an AI draft, then critique, fact-check, and correct it with citations.
      - Compare two AI outputs and argue which is stronger and why.
      - Require students to find and document the AI's errors or blind spots on the topic.
+     - PAIRR (Peer + AI Review + Reflection): students get feedback on a draft from BOTH a peer and an AI, then write a reflection reconciling the two and justifying which revisions they accepted — the reflection is the graded artifact.
 
   F. RAISE THE COGNITIVE BAR (Bloom's)
      - Shift from summary/recall to synthesis, evaluation, design, or argument under constraints.
