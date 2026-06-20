@@ -27,13 +27,65 @@ const RESEARCH_BASE = {
    Level 5 — Full Human-AI Co-design: Full collaboration with documented interaction history.
   `,
   RESEARCH_NOTES: `
+  These are summarized findings from researchers and bodies working on AI and assessment.
+  (To add a source: copy a line below, paste it, and edit the bracket and the takeaway.)
+
   [UNESCO, 2023] — AI competency requires: human agency, ethics, inclusion, critical thinking, and creativity.
   [Bearman & Luckin, 2024] — Design for AI-evident tasks where AI use is visible and traceable.
   [Lodge et al., 2023] — Students who reflected on AI use performed significantly better on subsequent unaided tasks.
   [Mollick & Mollick, 2023] — Personal stakes are the single most effective AI-resilience strategy.
+  [Dawson, 2021 — Defending Assessment Security] — Security comes from authentic conditions and verification, not surveillance; design for "programmatic" assessment across a course, not one locked-down task.
+  [TEQSA / Lodge, 2024 — Two-Lane approach] — Use a mix: Lane 1 secures judgement of learning under controlled conditions (oral, in-class, supervised); Lane 2 openly integrates AI with documented process.
+  [Sarah Elaine Eaton, 2023 — postplagiarism] — In a hybrid human-AI writing world, shift from catching misuse to teaching transparent attribution and disclosure of AI use.
+  [Liu & others, Univ. Sydney, 2023] — Move assessment along a continuum from "AI-proof" secured tasks to "AI-assisted" tasks; match the security to the stakes.
+  [Bearman, Boud & Dawson — CRADLE] — Authentic assessment ties tasks to real-world performance, professional standards, and contexts a generic AI answer cannot satisfy.
+  [Bloom's Revised Taxonomy — Anderson & Krathwohl] — Push tasks up the cognitive ladder: evaluate, create, and critique rather than remember and summarize.
+  [Universal Design for Learning — CAST] — Offer multiple means of expression (audio, video, demonstration, build) so the deliverable itself resists text generation.
+  [Self-regulated learning — Zimmerman] — Require planning, monitoring, and reflection artifacts; the learning lives in the visible process.
+  [Ethics of care / student trust — research consensus] — Punitive AI detection erodes trust and is unreliable; redesign beats policing.
 
   ADD NEW RESEARCH BELOW THIS LINE:
   `,
+  STRATEGY_CATALOG: `
+  A palette of DISTINCT redesign moves. Draw from ACROSS these categories so suggestions vary —
+  do not default to the same two or three moves on every assignment.
+
+  A. LOCALIZE & ANCHOR
+     - Tie the task to this week's class discussion, a specific lecture, or a shared classroom text/handout.
+     - Require current/local data (this semester's, this town's, this year's) that postdates or sits outside training data.
+     - Reference a guest speaker, field trip, lab result, or in-class experiment.
+
+  B. SURFACE THE PROCESS
+     - Require a revision history, draft timeline, or version comparison.
+     - Ask for a "prompt log" + reflection on where AI was wrong or unhelpful.
+     - Require annotated sources or a research trail showing how conclusions were reached.
+
+  C. MAKE IT PERSONAL & APPLIED
+     - Connect to the student's own life, goals, community, or chosen career lens.
+     - Require an interview, primary observation, or original data the student collected.
+     - Ask students to apply a concept to a situation only they have access to.
+
+  D. CHANGE THE MEDIUM (UDL)
+     - Replace or supplement the essay with an oral defense, recorded explanation, build, demo, or visual.
+     - Require an in-class or live component (Socratic seminar, whiteboard work, peer teaching).
+     - Use a portfolio assembled over time rather than a single submission.
+
+  E. CRITIQUE & EVALUATE AI (embrace lane)
+     - Have students generate an AI draft, then critique, fact-check, and correct it with citations.
+     - Compare two AI outputs and argue which is stronger and why.
+     - Require students to find and document the AI's errors or blind spots on the topic.
+
+  F. RAISE THE COGNITIVE BAR (Bloom's)
+     - Shift from summary/recall to synthesis, evaluation, design, or argument under constraints.
+     - Add a counter-argument, trade-off analysis, or "defend the weaker position" requirement.
+     - Require transfer: apply the idea to a novel, unfamiliar context.
+
+  G. COLLABORATIVE & ITERATIVE
+     - Build in peer review with documented feedback the student must respond to.
+     - Stage the assignment across checkpoints with instructor touchpoints.
+     - Require a group artifact plus an individual reflection on their specific contribution.
+  `,
+
   SCORING_GUIDANCE: `
   - 0-30: Completable by AI with a single prompt.
   - 31-50: Some friction but still largely AI-completable.
@@ -182,6 +234,9 @@ ${uploadedResearch ? `\nADDITIONAL UPLOADED RESEARCH:\n${uploadedResearch}\n` : 
 SCORING GUIDANCE:
 ${RESEARCH_BASE.SCORING_GUIDANCE}
 
+REDESIGN STRATEGY CATALOG:
+${RESEARCH_BASE.STRATEGY_CATALOG}
+
 Ground every suggestion in the research above. Be concrete and classroom-ready: the modifiedAssignment text must be complete enough for a teacher to hand out as-is.`;
 
   const userMessage = `${frameworkContext}
@@ -198,6 +253,12 @@ Analyze this assignment and produce:
 2. aiFailureBreakdown: 3-5 specific ways a student could use AI to shortcut this assignment
 3. A score and explanation for each scoring dimension
 4. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational redesign) — each with a complete rewritten assignment and IEP/ELL/gifted differentiated versions tailored to the subject and grade level
+
+VARIETY REQUIREMENTS (important):
+- The three redesigns must each use a DIFFERENT strategy from the catalog — do not anchor all three on the same idea (e.g. do not make every tier "add personal reflection"). Pick from different lettered categories (A–G).
+- Tailor moves to THIS subject and grade level. A math task, a lab report, and an essay should get visibly different suggestions — not the same generic advice.
+- Favor strategies that fit the specific assignment over the most common ones. If you reach for a personal-narrative or local-context move, make sure it genuinely fits; otherwise choose another category.
+- In each redesign's description, name which strategy category (A–G) it draws on so the variety is visible.
 
 ASSIGNMENT TEXT:
 """
