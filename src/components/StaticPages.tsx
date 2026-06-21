@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Shield, BookOpen, Users, Award, Mail } from 'lucide-react';
+import { Shield, BookOpen, Users, Award, Mail, Gauge, MapPin, FileStack, Footprints, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface PageProps { onBack: () => void; }
@@ -45,6 +45,70 @@ export function AboutPage({ onBack }: PageProps) {
         <Button onClick={() => window.location.href = 'mailto:hello@socratesmuse.com'} className="gap-2">
           <Mail className="w-4 h-4" />hello@socratesmuse.com
         </Button>
+      </div>
+    </motion.div>
+  );
+}
+
+export function ScoringPage({ onBack }: PageProps) {
+  const bands = [
+    { range: '0–30', label: 'Highly vulnerable', desc: 'A student could complete it with a single AI prompt.', color: 'text-red-500' },
+    { range: '31–50', label: 'Vulnerable', desc: 'Some friction, but still largely AI-completable.', color: 'text-orange-500' },
+    { range: '51–70', label: 'Moderate', desc: 'Has one or two resilient elements, but gaps remain.', color: 'text-amber-500' },
+    { range: '71–85', label: 'Strong', desc: 'Multiple anchors, a process requirement, a personal element.', color: 'text-lime-600' },
+    { range: '86–100', label: 'Exceptional', desc: 'AI can assist, but cannot replace the student.', color: 'text-green-600' },
+  ];
+  const dimensions = [
+    { icon: MapPin, name: 'Anchor', desc: 'Is the task tied to local or current context AI cannot know — this class, this week, this community?' },
+    { icon: FileStack, name: 'Proprietary', desc: 'Does it require bespoke classroom material (handouts, a seminar debate, original data) that sits outside AI training sets?' },
+    { icon: Footprints, name: 'Audit', desc: 'Does it grade the process — drafts, revision notes, prompt logs — rather than only the final product?' },
+    { icon: User, name: 'Agency', desc: "Does it require the student's own voice, lived experience, or perspective that can't be faked?" },
+  ];
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-10">
+      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
+      <div className="space-y-3">
+        <div className="flex items-center gap-3"><Gauge className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">How scoring works</h1></div>
+        <p className="text-muted-foreground leading-relaxed">Every assignment gets a <strong>resilience score from 0 to 100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side: a low resilience score means high vulnerability.</p>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold">What produces the score</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. Socrates sends your assignment to its AI together with a research-based rubric and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold">The four dimensions it looks for</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four dimensions, each scored individually with an explanation. The more an assignment has, the higher it scores. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {dimensions.map(({ icon: Icon, name, desc }) => (
+            <div key={name} className="p-5 border border-border rounded-xl bg-card space-y-2">
+              <Icon className="w-5 h-5 text-accent" />
+              <p className="text-sm font-bold">{name}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold">The score bands</h2>
+        <div className="space-y-2">
+          {bands.map(({ range, label, desc, color }) => (
+            <div key={range} className="flex items-start gap-4 p-4 border border-border rounded-xl bg-card">
+              <span className={`text-sm font-bold w-16 shrink-0 ${color}`}>{range}</span>
+              <div>
+                <p className="text-sm font-bold">{label}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-accent/5 border border-accent/20 rounded-2xl p-6 space-y-2">
+        <h2 className="text-base font-bold">A note on what the score is — and isn't</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">Because the score is an expert AI judgment against a rubric rather than a fixed calculation, it is consistent in the ballpark but the exact number can shift a few points run to run. Treat it as a <strong>diagnostic guide, not a final grade</strong>. The real value is the breakdown of how an assignment could be shortcut — and the Bronze, Silver, and Gold redesigns that show you how to strengthen it.</p>
       </div>
     </motion.div>
   );

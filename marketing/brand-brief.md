@@ -65,5 +65,10 @@ Banning AI is impossible and counterproductive. Instead of fighting AI, Socrates
 
 ---
 
+## How the resilience score works (FAQ answer)
+*Use this when teachers ask "how is this scored?"*
+
+Every assignment gets a **resilience score from 0–100** (higher = harder for a student to complete with AI doing the thinking; "vulnerability" is the inverse). There's no fixed formula — Socrates asks its AI to judge the assignment against a research-based rubric and four dimensions: **Anchor** (tied to local/current context AI can't know), **Proprietary** (requires bespoke classroom material), **Audit** (grades the process, not just the product), and **Agency** (requires the student's own voice/experience). Bands: 0–30 highly vulnerable (one prompt does it) → 86–100 exceptional (AI can assist but can't replace the student). It's a **diagnostic guide, not a final grade** — the real value is the breakdown of how it could be shortcut and the Bronze/Silver/Gold redesigns that raise it.
+
 ## Marketing assets to ask Claude to create
 Landing-page copy, social posts (LinkedIn for admins, Instagram/Facebook for teachers), a one-page flyer/PDF handout for staff meetings, a pitch deck for school/district decision-makers, cold/launch emails, conference-booth signage, a short explainer-video script, and ad copy. Ask for them in the voice and palette above.

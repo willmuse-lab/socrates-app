@@ -5,7 +5,7 @@ import { AdminResearch } from './components/AdminResearch';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Onboarding } from './components/Onboarding';
 import { Pricing } from './components/Pricing';
-import { AboutPage, PrivacyPage } from './components/StaticPages';
+import { AboutPage, PrivacyPage, ScoringPage } from './components/StaticPages';
 import { Testimonials } from './components/Testimonials';
 import { SplashScreen } from './components/SplashScreen';
 import { UserMenu } from './components/UserMenu';
@@ -21,7 +21,7 @@ import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'luci
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
-type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy';
+type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy' | 'scoring';
 type AIPreference = 'avoid' | 'augment' | 'embrace';
 
 export interface SavedAssignment {
@@ -223,7 +223,7 @@ export default function App() {
                 <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
                   <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Socrates AI · Built for Educators</p>
                   <div className="flex gap-4">
-                    {[['Privacy', 'privacy'],['About', 'about'],['Pricing', 'pricing']].map(([l, v]) => (
+                    {[['How scoring works', 'scoring'],['Privacy', 'privacy'],['About', 'about'],['Pricing', 'pricing']].map(([l, v]) => (
                       <button key={v} onClick={() => setViewMode(v as ViewMode)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{l}</button>
                     ))}
                   </div>
@@ -265,6 +265,11 @@ export default function App() {
           {viewMode === 'privacy' && (
             <motion.div key="privacy" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
               <PrivacyPage onBack={() => setViewMode('studio')} />
+            </motion.div>
+          )}
+          {viewMode === 'scoring' && (
+            <motion.div key="scoring" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
+              <ScoringPage onBack={() => setViewMode('studio')} />
             </motion.div>
           )}
         </AnimatePresence>
