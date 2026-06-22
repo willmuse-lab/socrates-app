@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Loader2, Shield, Zap, Sparkles, Share2, FileText, FileDown, Copy, Check, ThumbsUp, ThumbsDown, Replace, BookOpen, RotateCcw, Save, ExternalLink } from 'lucide-react';
+import { Loader2, Shield, Zap, Sparkles, Share2, FileText, FileDown, Copy, Check, ThumbsUp, ThumbsDown, Replace, BookOpen, RotateCcw, Save, ExternalLink, HelpCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { exportToPDF, exportToDocx, exportToGoogleDocs } from '@/src/lib/export';
@@ -38,6 +39,7 @@ export function AssignmentAnalyzer({
   const [applied, setApplied] = useState<number | null>(null);
   const [progressStage, setProgressStage] = useState('Reading your assignment...');
   const [progressPercent, setProgressPercent] = useState(0);
+  const [showScoreInfo, setShowScoreInfo] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
@@ -316,6 +318,10 @@ export function AssignmentAnalyzer({
                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Resilience</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">{result.summary}</p>
+              <button onClick={() => setShowScoreInfo(true)}
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-accent transition-colors mx-auto">
+                <HelpCircle className="w-3 h-3" />How is this scored?
+              </button>
             </div>
             {applied !== null && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent font-medium">
@@ -366,6 +372,39 @@ export function AssignmentAnalyzer({
           </aside>
         </div>
       )}
+
+      <Dialog open={showScoreInfo} onOpenChange={setShowScoreInfo}>
+        <DialogContent className="sm:max-w-[480px] border-border bg-card p-8 max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold italic font-serif">How is this scored?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+            <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
+            <p>There's no fixed formula. Socrates weighs your assignment against a research-based rubric and four dimensions:</p>
+            <ul className="space-y-1.5 pl-1">
+              <li><strong className="text-foreground">Anchor</strong> — tied to local or current context AI can't know.</li>
+              <li><strong className="text-foreground">Proprietary</strong> — requires bespoke classroom material outside AI's training data.</li>
+              <li><strong className="text-foreground">Audit</strong> — grades the process (drafts, prompt logs), not just the product.</li>
+              <li><strong className="text-foreground">Agency</strong> — requires the student's own voice or experience.</li>
+            </ul>
+            <div className="space-y-1.5">
+              {[
+                ['0–30', 'Highly vulnerable — one AI prompt could do it', 'text-red-500'],
+                ['31–50', 'Vulnerable — still largely AI-completable', 'text-orange-500'],
+                ['51–70', 'Moderate — some resilient elements, gaps remain', 'text-amber-500'],
+                ['71–85', 'Strong — multiple anchors and a process trail', 'text-lime-600'],
+                ['86–100', 'Exceptional — AI can assist but not replace', 'text-green-600'],
+              ].map(([range, label, color]) => (
+                <div key={range} className="flex items-start gap-3">
+                  <span className={`font-bold w-14 shrink-0 ${color}`}>{range}</span>
+                  <span className="text-xs">{label}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut — and the Bronze/Silver/Gold redesigns that raise it.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
