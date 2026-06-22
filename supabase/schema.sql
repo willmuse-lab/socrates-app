@@ -22,19 +22,23 @@ create table if not exists public.assignments (
 alter table public.assignments enable row level security;
 
 -- A teacher can only see and manage their own assignments.
+drop policy if exists "assignments are owner-only (select)" on public.assignments;
 create policy "assignments are owner-only (select)"
   on public.assignments for select
   using (auth.uid() = user_id);
 
+drop policy if exists "assignments are owner-only (insert)" on public.assignments;
 create policy "assignments are owner-only (insert)"
   on public.assignments for insert
   with check (auth.uid() = user_id);
 
+drop policy if exists "assignments are owner-only (update)" on public.assignments;
 create policy "assignments are owner-only (update)"
   on public.assignments for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
 
+drop policy if exists "assignments are owner-only (delete)" on public.assignments;
 create policy "assignments are owner-only (delete)"
   on public.assignments for delete
   using (auth.uid() = user_id);
@@ -59,15 +63,18 @@ alter table public.research_papers enable row level security;
 -- NOTE: the in-app "admin password" is a convenience gate only — it is visible
 -- in the browser bundle and is NOT real security. For stricter control, add a
 -- dedicated admin role/claim and tighten the policies below.
+drop policy if exists "research papers are world-readable" on public.research_papers;
 create policy "research papers are world-readable"
   on public.research_papers for select
   using (true);
 
+drop policy if exists "signed-in users can add research" on public.research_papers;
 create policy "signed-in users can add research"
   on public.research_papers for insert
   to authenticated
   with check (true);
 
+drop policy if exists "signed-in users can delete research" on public.research_papers;
 create policy "signed-in users can delete research"
   on public.research_papers for delete
   to authenticated
