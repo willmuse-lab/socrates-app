@@ -138,3 +138,35 @@ export function PrivacyPage({ onBack }: PageProps) {
     </motion.div>
   );
 }
+
+export function TermsPage({ onBack }: PageProps) {
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
+      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
+      <div className="space-y-2">
+        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Terms of Service</h1></div>
+        <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+      </div>
+      {[
+        { title: '1. Agreement to these terms', content: 'These Terms of Service ("Terms") govern your access to and use of Socrates ("the Service"), operated by Socrates ("we," "us"). By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.' },
+        { title: '2. What Socrates does', content: 'Socrates helps educators analyze and redesign their own teaching assignments to be more resilient to AI completion. The Service uses artificial intelligence to generate scores, suggestions, and redesigned assignment text. These outputs are educational guidance, not professional, legal, or accreditation advice.' },
+        { title: '3. Eligibility and accounts', content: 'The Service is intended for educators and school staff aged 18 or older. You are responsible for the accuracy of your account information and for keeping your login credentials secure. You are responsible for all activity that occurs under your account.' },
+        { title: '4. Acceptable use', content: 'You agree to use Socrates only for lawful, educational purposes. You agree NOT to: submit content you do not have the right to submit; attempt to disrupt, reverse engineer, or gain unauthorized access to the Service; resell or redistribute the Service without our written permission; or use the Service to violate any applicable law or any third party’s rights.' },
+        { title: '5. Student data and your responsibility', content: 'Socrates is designed for teachers to analyze their own assignment prompts. You agree NOT to submit student names, student work, grades, or other personally identifiable student information. You are responsible for complying with your institution’s policies and applicable laws (including FERPA) when using the Service. See our Privacy page for how submitted text is handled.' },
+        { title: '6. AI-generated content', content: 'Scores and suggestions are produced by AI and are provided "as is." They are estimates intended to guide your professional judgment, not guarantees. The resilience score is a diagnostic indicator, not a certification that an assignment cannot be completed with AI. You are responsible for reviewing and adapting any generated material before classroom use.' },
+        { title: '7. Subscriptions and billing', content: 'Some features require a paid subscription. Pricing and any free allowance are described on our Pricing page. Where paid plans are offered, fees are billed in advance and are non-refundable except where required by law. You may cancel at any time; cancellation stops future charges and takes effect at the end of the current billing period. We may change pricing with reasonable notice.' },
+        { title: '8. Intellectual property', content: 'The Service, including its software, design, and content we provide, is owned by us and protected by law. Assignment text you submit remains yours. Redesigned assignments and suggestions generated for you are yours to use in your teaching. You grant us a limited license to process your submitted text solely to provide the Service.' },
+        { title: '9. Disclaimers', content: 'The Service is provided "as is" and "as available," without warranties of any kind, express or implied, including fitness for a particular purpose. We do not warrant that the Service will be uninterrupted, error-free, or that any suggestion will achieve a particular educational outcome.' },
+        { title: '10. Limitation of liability', content: 'To the maximum extent permitted by law, we are not liable for any indirect, incidental, or consequential damages arising from your use of the Service. Our total liability for any claim relating to the Service will not exceed the amount you paid us in the 12 months before the claim.' },
+        { title: '11. Termination', content: 'You may stop using the Service at any time. We may suspend or terminate access if you violate these Terms or use the Service in a way that could harm us or other users. Upon termination, your right to use the Service ends; sections that by their nature should survive (such as intellectual property, disclaimers, and limitation of liability) will continue to apply.' },
+        { title: '12. Changes to these terms', content: 'We may update these Terms from time to time. When we make material changes, we will update the date above and, where appropriate, notify you. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.' },
+        { title: '13. Contact', content: 'Questions about these Terms: hello@socratesmuse.com' },
+      ].map(({ title, content }) => (
+        <div key={title} className="space-y-3 pb-6 border-b border-border last:border-0">
+          <h2 className="text-lg font-bold">{title}</h2>
+          <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{content}</div>
+        </div>
+      ))}
+    </motion.div>
+  );
+}

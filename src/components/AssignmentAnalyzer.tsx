@@ -185,8 +185,10 @@ export function AssignmentAnalyzer({
                 <CardHeader><CardTitle className="text-lg font-serif italic">Upload Document</CardTitle><CardDescription>PDF, DOCX, or TXT files.</CardDescription></CardHeader>
                 <CardContent className="space-y-4">
                   <FileUploader onTextExtracted={setText} />
+                  {/* Hidden until the Google OAuth backend functions are built — re-enable to restore Drive import.
                   <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or</span></div></div>
                   <GoogleDrivePicker onFileSelected={setText} />
+                  */}
                 </CardContent>
               </Card>
               <Card className="border border-border shadow-sm flex flex-col">
@@ -214,7 +216,9 @@ export function AssignmentAnalyzer({
               <div className="ml-auto flex items-center gap-1 flex-wrap">
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleExportPDF}><FileDown className="w-3.5 h-3.5" />PDF</Button>
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleExportDocx}><FileText className="w-3.5 h-3.5" />DOCX</Button>
+                {/* Hidden until the Google OAuth backend is built — re-enable to restore Google Docs export.
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-green-600 gap-1.5 text-xs" onClick={handleExportGoogleDocs}><ExternalLink className="w-3.5 h-3.5" />Google Doc</Button>
+                */}
                 <div className="w-px h-4 bg-border mx-1" />
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleShare}><Share2 className="w-3.5 h-3.5" />Share</Button>
               </div>
