@@ -178,6 +178,13 @@ const ANALYSIS_SCHEMA = {
   additionalProperties: false,
 } as const;
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms)),
+  ]);
+}
+
 export default async function handler(req: Request) {
   const headers = {
     "Access-Control-Allow-Origin": "*",
@@ -206,7 +213,14 @@ export default async function handler(req: Request) {
     return new Response(JSON.stringify({ error: "ANTHROPIC_API_KEY is not configured" }), { status: 500, headers });
   }
 
-  const uploadedResearch = await fetchUploadedResearch();
+  console.log("analyze v3: start");
+  let uploadedResearch = "";
+  try {
+    uploadedResearch = await withTimeout(fetchUploadedResearch(), 6000, "Research lookup");
+    console.log("analyze v3: research ok");
+  } catch (e: any) {
+    console.warn("analyze v3: research lookup skipped:", e?.message || e);
+  }
 
   const dimensionList = (dimensions as { name: string; description: string }[])
     .map(d => `- ${d.name}: ${d.description}`)
@@ -262,7 +276,8 @@ ${text.substring(0, 24000)}
 """`;
 
   try {
-    const response = await client.messages.create({
+    console.log("analyze v3: calling model");
+    const response = await withTimeout(client.messages.create({
       model: "claude-haiku-4-5",
       max_tokens: 4000,
       output_config: {
@@ -270,7 +285,8 @@ ${text.substring(0, 24000)}
       },
       system,
       messages: [{ role: "user", content: userMessage }],
-    });
+    }), 22000, "Model request");
+    console.log("analyze v3: model returned");
 
     if (response.stop_reason === "refusal") {
       return new Response(JSON.stringify({ error: "The analysis was declined. Please check the assignment text and try again." }), { status: 422, headers });
