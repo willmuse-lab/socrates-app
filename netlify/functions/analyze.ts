@@ -168,18 +168,8 @@ const ANALYSIS_SCHEMA = {
           title: { type: "string" },
           description: { type: "string", description: "Why this redesign improves resilience" },
           modifiedAssignment: { type: "string", description: "The complete rewritten assignment text, ready to hand to students" },
-          differentiatedVersions: {
-            type: "object",
-            properties: {
-              iep: { type: "string", description: "IEP/504 version: scaffolded, sentence starters, simplified structure" },
-              ell: { type: "string", description: "ELL version: defined terms, reduced idioms, added context" },
-              gifted: { type: "string", description: "Gifted/advanced version: extended complexity, higher-order thinking" },
-            },
-            required: ["iep", "ell", "gifted"],
-            additionalProperties: false,
-          },
         },
-        required: ["level", "title", "description", "modifiedAssignment", "differentiatedVersions"],
+        required: ["level", "title", "description", "modifiedAssignment"],
         additionalProperties: false,
       },
     },
@@ -258,7 +248,7 @@ Analyze this assignment and produce:
 1. resilienceScore (0-100) and a summary
 2. aiFailureBreakdown: 3-5 specific ways a student could use AI to shortcut this assignment
 3. A score and explanation for each scoring dimension
-4. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational redesign) — each with a complete rewritten assignment and IEP/ELL/gifted differentiated versions tailored to the subject and grade level
+4. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational redesign) — each with a complete rewritten assignment tailored to the subject and grade level. Keep each rewritten assignment focused and classroom-ready (a prompt teachers can hand out), not an essay.
 
 VARIETY REQUIREMENTS (important):
 - The three redesigns must each use a DIFFERENT strategy from the catalog — do not anchor all three on the same idea (e.g. do not make every tier "add personal reflection"). Pick from different lettered categories (A–G).
@@ -273,10 +263,11 @@ ${text.substring(0, 24000)}
 
   try {
     const response = await client.messages.create({
-      model: "claude-opus-4-8",
-      max_tokens: 16000,
+      model: "claude-sonnet-4-6",
+      max_tokens: 6000,
+      thinking: { type: "disabled" },
       output_config: {
-        effort: "medium",
+        effort: "low",
         format: { type: "json_schema", schema: ANALYSIS_SCHEMA },
       },
       system,
