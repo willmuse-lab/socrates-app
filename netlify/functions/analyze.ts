@@ -273,16 +273,23 @@ VARIETY REQUIREMENTS (important):
 ASSIGNMENT TEXT:
 """
 ${text.substring(0, 24000)}
-"""`;
+"""
+
+OUTPUT FORMAT — return ONLY a single valid JSON object, no markdown, no code fences, no commentary before or after. Use exactly this shape:
+{
+  "resilienceScore": 0,
+  "summary": "2-3 sentence overview",
+  "aiFailureBreakdown": { "headline": "one sentence", "failures": [ { "type": "short name", "severity": "High|Medium|Low", "explanation": "what a student could do", "fix": "how to close the gap" } ] },
+  "dimensions": [ { "name": "dimension name", "score": 0, "explanation": "why" } ],
+  "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "why it improves resilience", "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]
+}
+Include 3-5 failures, one entry per scoring dimension, and exactly three suggestions (one Bronze, one Silver, one Gold).`;
 
   try {
     console.log("analyze v3: calling model");
     const response = await withTimeout(client.messages.create({
       model: "claude-haiku-4-5",
       max_tokens: 4000,
-      output_config: {
-        format: { type: "json_schema", schema: ANALYSIS_SCHEMA },
-      },
       system,
       messages: [{ role: "user", content: userMessage }],
     }), 22000, "Model request");
@@ -297,7 +304,22 @@ ${text.substring(0, 24000)}
       return new Response(JSON.stringify({ error: "Empty response from analysis model" }), { status: 502, headers });
     }
 
-    const result = JSON.parse(textBlock.text);
+    // The model returns JSON as text; strip any code fences and isolate the object.
+    let raw = textBlock.text.trim();
+    const fenceMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fenceMatch) raw = fenceMatch[1].trim();
+    const first = raw.indexOf("{");
+    const last = raw.lastIndexOf("}");
+    if (first !== -1 && last !== -1) raw = raw.slice(first, last + 1);
+
+    let result;
+    try {
+      result = JSON.parse(raw);
+    } catch {
+      console.error("analyze v3: JSON parse failed");
+      return new Response(JSON.stringify({ error: "The analysis came back in an unexpected format. Please try again." }), { status: 502, headers });
+    }
+    console.log("analyze v3: done");
     return new Response(JSON.stringify(result), { status: 200, headers });
   } catch (e: any) {
     const detail = e?.error?.error?.message || e?.message || String(e);
