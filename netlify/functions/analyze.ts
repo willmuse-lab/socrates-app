@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 24000, maxRetries: 1 });
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 27000, maxRetries: 0 });
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "";
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
@@ -289,10 +289,10 @@ Include 3-5 failures, one entry per scoring dimension, and exactly three suggest
     console.log("analyze v3: calling model");
     const response = await withTimeout(client.messages.create({
       model: "claude-haiku-4-5",
-      max_tokens: 4000,
+      max_tokens: 3000,
       system,
       messages: [{ role: "user", content: userMessage }],
-    }), 22000, "Model request");
+    }), 26000, "Model request");
     console.log("analyze v3: model returned");
 
     if (response.stop_reason === "refusal") {
