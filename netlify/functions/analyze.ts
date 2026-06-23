@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 24000, maxRetries: 1 });
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "";
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
@@ -263,11 +263,9 @@ ${text.substring(0, 24000)}
 
   try {
     const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 6000,
-      thinking: { type: "disabled" },
+      model: "claude-haiku-4-5",
+      max_tokens: 4000,
       output_config: {
-        effort: "low",
         format: { type: "json_schema", schema: ANALYSIS_SCHEMA },
       },
       system,
@@ -286,11 +284,15 @@ ${text.substring(0, 24000)}
     const result = JSON.parse(textBlock.text);
     return new Response(JSON.stringify(result), { status: 200, headers });
   } catch (e: any) {
-    console.error("Analysis failed:", e);
-    const status = e?.status === 429 ? 429 : 502;
-    const message = e?.status === 429
-      ? "The analysis service is busy. Please try again in a moment."
-      : "Analysis failed. Please try again.";
+    const detail = e?.error?.error?.message || e?.message || String(e);
+    console.error("Analysis failed:", detail);
+    const isTimeout = e?.name === "APIConnectionTimeoutError" || /timeout|timed out|aborted/i.test(detail);
+    const status = isTimeout ? 504 : e?.status === 429 ? 429 : e?.status || 502;
+    const message = isTimeout
+      ? "The analysis took too long and timed out. Please try again, or with a shorter assignment."
+      : e?.status === 429
+        ? "The analysis service is busy. Please try again in a moment."
+        : `Analysis error: ${detail}`;
     return new Response(JSON.stringify({ error: message }), { status, headers });
   }
 }

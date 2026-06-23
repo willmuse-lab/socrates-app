@@ -65,9 +65,9 @@ export function AssignmentAnalyzer({
       const analysis = await analyzeAssignment(text, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
         (stage, pct) => { setProgressStage(stage); setProgressPercent(pct); });
       setResult(analysis); setActiveLevel('Bronze');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Analysis failed:', error);
-      toast.error('Failed to analyze assignment. Please try again.');
+      toast.error(error?.message || 'Failed to analyze assignment. Please try again.', { duration: 12000 });
     } finally { setIsAnalyzing(false); }
   };
 

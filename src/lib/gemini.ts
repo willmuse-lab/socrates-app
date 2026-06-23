@@ -73,8 +73,12 @@ export async function analyzeAssignment(
   });
 
   if (!response.ok) {
-    const err = await response.json().catch(() => ({ error: "Unknown error" }));
-    throw new Error(err.error || `Server error: ${response.status}`);
+    let detail = `Server error: ${response.status}`;
+    try {
+      const err = await response.json();
+      if (err?.error) detail = err.error;
+    } catch {}
+    throw new Error(detail);
   }
 
   const result = await response.json();
