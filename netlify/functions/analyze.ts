@@ -258,17 +258,11 @@ TEACHER'S AI STRATEGY: ${PREFERENCE_CONTEXT[aiPreference] || PREFERENCE_CONTEXT.
 ${subject ? `SUBJECT: ${subject}` : ""}
 ${gradeLevel ? `GRADE LEVEL: ${gradeLevel}` : ""}
 
-Analyze this assignment and produce:
-1. resilienceScore (0-100) and a summary
-2. aiFailureBreakdown: 3-5 specific ways a student could use AI to shortcut this assignment
-3. A score and explanation for each scoring dimension
-4. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational redesign) — each with a complete rewritten assignment tailored to the subject and grade level. Keep each rewritten assignment focused and classroom-ready (a prompt teachers can hand out), not an essay.
-
-VARIETY REQUIREMENTS (important):
-- The three redesigns must each use a DIFFERENT strategy from the catalog — do not anchor all three on the same idea (e.g. do not make every tier "add personal reflection"). Pick from different lettered categories (A–G).
-- Tailor moves to THIS subject and grade level. A math task, a lab report, and an essay should get visibly different suggestions — not the same generic advice.
-- Favor strategies that fit the specific assignment over the most common ones. If you reach for a personal-narrative or local-context move, make sure it genuinely fits; otherwise choose another category.
-- In each redesign's description, name which strategy category (A–G) it draws on so the variety is visible.
+Analyze this assignment and produce a CONCISE result — brevity matters, long outputs time out:
+1. resilienceScore (0-100) and a 1-2 sentence summary
+2. aiFailureBreakdown: exactly 3 specific ways a student could shortcut this with AI (1-2 sentences each)
+3. A score and a one-sentence explanation for each scoring dimension
+4. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational) — each with a SHORT rewritten assignment (a redesigned prompt of roughly 3-6 sentences, NOT a long document) and a 1-2 sentence description. Each redesign must use a DIFFERENT strategy from the catalog and fit this subject and grade level; name the strategy category (A-G) in the description.
 
 ASSIGNMENT TEXT:
 """
@@ -283,13 +277,13 @@ OUTPUT FORMAT — return ONLY a single valid JSON object, no markdown, no code f
   "dimensions": [ { "name": "dimension name", "score": 0, "explanation": "why" } ],
   "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "why it improves resilience", "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]
 }
-Include 3-5 failures, one entry per scoring dimension, and exactly three suggestions (one Bronze, one Silver, one Gold).`;
+Include exactly 3 failures, one entry per scoring dimension, and exactly three suggestions (one Bronze, one Silver, one Gold). Keep every field concise.`;
 
   try {
     console.log("analyze v3: calling model");
     const stream = client.messages.stream({
       model: "claude-haiku-4-5",
-      max_tokens: 3000,
+      max_tokens: 2500,
       system,
       messages: [{ role: "user", content: userMessage }],
     });
