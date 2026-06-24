@@ -272,7 +272,7 @@ VARIETY REQUIREMENTS (important):
 
 ASSIGNMENT TEXT:
 """
-${text.substring(0, 24000)}
+${text.substring(0, 8000)}
 """
 
 OUTPUT FORMAT — return ONLY a single valid JSON object, no markdown, no code fences, no commentary before or after. Use exactly this shape:
@@ -287,12 +287,13 @@ Include 3-5 failures, one entry per scoring dimension, and exactly three suggest
 
   try {
     console.log("analyze v3: calling model");
-    const response = await withTimeout(client.messages.create({
+    const stream = client.messages.stream({
       model: "claude-haiku-4-5",
       max_tokens: 3000,
       system,
       messages: [{ role: "user", content: userMessage }],
-    }), 26000, "Model request");
+    });
+    const response = await withTimeout(stream.finalMessage(), 26000, "Model request");
     console.log("analyze v3: model returned");
 
     if (response.stop_reason === "refusal") {
