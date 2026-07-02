@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import * as pdfjs from 'pdfjs-dist';
+import { pdfjs } from '@/src/lib/pdf';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { fetchResearchPapers, saveResearchPaper, deleteResearchPaper, ResearchPaper, supabaseEnabled } from '@/src/lib/supabase';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'socrates2025';
 

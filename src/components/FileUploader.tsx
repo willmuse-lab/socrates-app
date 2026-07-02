@@ -2,9 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, X, Loader2 } from 'lucide-react';
 import mammoth from 'mammoth';
-import * as pdfjs from 'pdfjs-dist';
+import { pdfjs } from '@/src/lib/pdf';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 interface FileUploaderProps {
   onTextExtracted: (text: string) => void;
