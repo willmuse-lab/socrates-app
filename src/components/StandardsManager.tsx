@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import * as pdfjs from 'pdfjs-dist';
+import { pdfjs } from '@/src/lib/pdf';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,7 +15,6 @@ import {
 } from '@/src/lib/standards';
 import { supabaseEnabled } from '@/src/lib/supabase';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 interface StandardsManagerProps {
   userId: string;
