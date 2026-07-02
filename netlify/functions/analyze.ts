@@ -1,105 +1,20 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
+import {
+  FRAMEWORKS,
+  AIAS_SCALE,
+  PERMISSION_CATEGORIES,
+  RESEARCH_NOTES,
+  STRATEGY_CATALOG,
+  SCORING_GUIDANCE,
+} from "./_shared/research-base";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 27000, maxRetries: 0 });
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || "";
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
-const RESEARCH_BASE = {
-  FRAMEWORKS: `
-1. Triple-A Framework (Anchor, Audit, Agency)
-   - Anchor: Ground assignments in local/temporal context AI cannot replicate.
-   - Audit: Shift focus from final product to process — require revision memos, prompt histories, or failed logic reflections.
-   - Agency: Integrate the student's own narrative — professional lens, lived experience, or personal trajectory that is impossible to fake.
 
-2. Proprietary Material Principle
-   - Assignments referencing bespoke classroom artifacts exist outside AI training data and cannot be completed by AI alone.
-
-3. Process-Product Assessment
-   - Evaluate the steps taken, not just the final output.
-  `,
-  AIAS_SCALE: `
-   Level 1 — No AI: Entirely student-generated in a controlled environment.
-   Level 2 — AI Planning Only: AI for brainstorming/outlining only. Final submission 100% human.
-   Level 3 — AI Collaboration: AI for editing; students submit Appendix of Original Work.
-   Level 4 — AI Task Completion: AI completes core tasks; human provides critical evaluation.
-   Level 5 — Full Human-AI Co-design: Full collaboration with documented interaction history.
-  `,
-  RESEARCH_NOTES: `
-  These are summarized findings from researchers and bodies working on AI and assessment.
-  (To add a source: copy a line below, paste it, and edit the bracket and the takeaway.)
-
-  [UNESCO, 2023] — AI competency requires: human agency, ethics, inclusion, critical thinking, and creativity.
-  [Bearman & Luckin, 2024] — Design for AI-evident tasks where AI use is visible and traceable.
-  [Lodge et al., 2023] — Students who reflected on AI use performed significantly better on subsequent unaided tasks.
-  [Mollick & Mollick, 2023] — Personal stakes are the single most effective AI-resilience strategy.
-  [Dawson, 2021 — Defending Assessment Security] — Security comes from authentic conditions and verification, not surveillance; design for "programmatic" assessment across a course, not one locked-down task.
-  [TEQSA / Lodge, 2024 — Two-Lane approach] — Use a mix: Lane 1 secures judgement of learning under controlled conditions (oral, in-class, supervised); Lane 2 openly integrates AI with documented process.
-  [Sarah Elaine Eaton, 2023 — postplagiarism] — In a hybrid human-AI writing world, shift from catching misuse to teaching transparent attribution and disclosure of AI use.
-  [Liu & others, Univ. Sydney, 2023] — Move assessment along a continuum from "AI-proof" secured tasks to "AI-assisted" tasks; match the security to the stakes.
-  [Bearman, Boud & Dawson — CRADLE] — Authentic assessment ties tasks to real-world performance, professional standards, and contexts a generic AI answer cannot satisfy.
-  [Bloom's Revised Taxonomy — Anderson & Krathwohl] — Push tasks up the cognitive ladder: evaluate, create, and critique rather than remember and summarize.
-  [Universal Design for Learning — CAST] — Offer multiple means of expression (audio, video, demonstration, build) so the deliverable itself resists text generation.
-  [Self-regulated learning — Zimmerman] — Require planning, monitoring, and reflection artifacts; the learning lives in the visible process.
-  [Ethics of care / student trust — research consensus] — Punitive AI detection erodes trust and is unreliable; redesign beats policing.
-  [Sperber, MacArthur, Minnillo, Stillman & Whithaus, 2025 — PAIRR, Computers and Composition 76, 102921] — Peer and AI Review + Reflection: students get formative feedback from BOTH a peer and an AI on a draft, then write a reflection comparing and reconciling the two. Keeps revision human-centered, treats AI as one voice among many rather than the author, and makes the student's judgement (which feedback to accept and why) the assessed artifact.
-  [Awadallah Alkouk & Khlaif, 2024 — AI-resistant assessments in higher education, Frontiers in Education 9:1499495] — Process-Product Assessment Approach: grade BOTH the final product AND the process behind it, including the quality of the student's interaction with AI and how they developed their prompts. Allow AI for brainstorming/proofreading but require a reflection that critiques the AI's output. Favor authentic, context-rich tasks; uses an AI-Resistance Assessment Scale (AIAS) to match task design to risk.
-  [Kharbach, 2026 — The AI Activities Guide for Teachers, educatorstechnology.com] — Subject-specific, hands-on design principle: let AI handle research logistics, content generation, and differentiation, while students do the interpretation, evaluation, and argument. Strong examples include using AI to generate multiple/biased perspectives that students then analyze, and giving struggling writers a starting point that removes blank-page paralysis without doing the thinking for them. Tailor moves to the subject (social studies, math, language, science).
-
-  ADD NEW RESEARCH BELOW THIS LINE:
-  `,
-  STRATEGY_CATALOG: `
-  A palette of DISTINCT redesign moves. Draw from ACROSS these categories so suggestions vary —
-  do not default to the same two or three moves on every assignment.
-
-  A. LOCALIZE & ANCHOR
-     - Tie the task to this week's class discussion, a specific lecture, or a shared classroom text/handout.
-     - Require current/local data (this semester's, this town's, this year's) that postdates or sits outside training data.
-     - Reference a guest speaker, field trip, lab result, or in-class experiment.
-
-  B. SURFACE THE PROCESS
-     - Require a revision history, draft timeline, or version comparison.
-     - Ask for a "prompt log" + reflection on where AI was wrong or unhelpful.
-     - Require annotated sources or a research trail showing how conclusions were reached.
-     - Process-Product: grade the human-AI interaction itself — the quality of the student's prompts, the choices they made, and a reflection critiquing the AI's output — alongside the final product.
-
-  C. MAKE IT PERSONAL & APPLIED
-     - Connect to the student's own life, goals, community, or chosen career lens.
-     - Require an interview, primary observation, or original data the student collected.
-     - Ask students to apply a concept to a situation only they have access to.
-
-  D. CHANGE THE MEDIUM (UDL)
-     - Replace or supplement the essay with an oral defense, recorded explanation, build, demo, or visual.
-     - Require an in-class or live component (Socratic seminar, whiteboard work, peer teaching).
-     - Use a portfolio assembled over time rather than a single submission.
-
-  E. CRITIQUE & EVALUATE AI (embrace lane)
-     - Have students generate an AI draft, then critique, fact-check, and correct it with citations.
-     - Compare two AI outputs and argue which is stronger and why.
-     - Require students to find and document the AI's errors or blind spots on the topic.
-     - PAIRR (Peer + AI Review + Reflection): students get feedback on a draft from BOTH a peer and an AI, then write a reflection reconciling the two and justifying which revisions they accepted — the reflection is the graded artifact.
-     - Bias/perspective mapping: students prompt AI for the same topic from several viewpoints (e.g. an event from four national perspectives), then map where the narratives conflict and analyze why — the AI makes the bias visible, the student does the thinking.
-
-  F. RAISE THE COGNITIVE BAR (Bloom's)
-     - Shift from summary/recall to synthesis, evaluation, design, or argument under constraints.
-     - Add a counter-argument, trade-off analysis, or "defend the weaker position" requirement.
-     - Require transfer: apply the idea to a novel, unfamiliar context.
-
-  G. COLLABORATIVE & ITERATIVE
-     - Build in peer review with documented feedback the student must respond to.
-     - Stage the assignment across checkpoints with instructor touchpoints.
-     - Require a group artifact plus an individual reflection on their specific contribution.
-  `,
-
-  SCORING_GUIDANCE: `
-  - 0-30: Completable by AI with a single prompt.
-  - 31-50: Some friction but still largely AI-completable.
-  - 51-70: Moderate resilience. Has 1-2 Triple-A elements but gaps remain.
-  - 71-85: Strong resilience. Multiple anchors, process requirement, personal element.
-  - 86-100: Exceptional. AI can assist but cannot replace the student.
-  `,
-};
 
 async function fetchUploadedResearch(): Promise<string> {
   if (!supabase) return "";
@@ -233,19 +148,27 @@ export default async function handler(req: Request) {
   const system = `You are Socrates, an expert in AI-resilient assignment design for K-12 and college educators. You analyze assignments for vulnerability to AI completion and redesign them so AI cannot replace genuine student thinking.
 
 PEDAGOGICAL FRAMEWORKS:
-${RESEARCH_BASE.FRAMEWORKS}
+${FRAMEWORKS}
 
 AI ASSESSMENT SCALE (AIAS):
-${RESEARCH_BASE.AIAS_SCALE}
+${AIAS_SCALE}
 
 RESEARCH BASE:
-${RESEARCH_BASE.RESEARCH_NOTES}
+${RESEARCH_NOTES}
 ${uploadedResearch ? `\nADDITIONAL UPLOADED RESEARCH:\n${uploadedResearch}\n` : ""}
 SCORING GUIDANCE:
-${RESEARCH_BASE.SCORING_GUIDANCE}
+${SCORING_GUIDANCE}
 
 REDESIGN STRATEGY CATALOG:
-${RESEARCH_BASE.STRATEGY_CATALOG}
+${STRATEGY_CATALOG}
+
+${PERMISSION_CATEGORIES}
+
+FRAMEWORK LOCKING RULES — these are requirements, not suggestions:
+- Every dimension score's explanation must reference the specific framework criterion it measures (Triple-A pillar, Ai-RACE component, or Bloom's level) by name.
+- The overall resilienceScore must be consistent with the scoring guidance bands, and the summary must state which framework elements are present or missing.
+- Bronze redesigns primarily strengthen ONE Triple-A pillar (usually Anchor). Silver redesigns strengthen TWO pillars (typically Anchor + Audit). Gold redesigns engage all THREE pillars (Anchor + Audit + Agency) and should raise the Ai-RACE cost of using AI above the cost of doing the work.
+- Every aiFailureBreakdown fix must map to a named strategy category (A-G).
 
 Ground every suggestion in the research above. Be concrete and classroom-ready: the modifiedAssignment text must be complete enough for a teacher to hand out as-is.`;
 

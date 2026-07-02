@@ -196,6 +196,7 @@ export default function App() {
                 subject={profile?.subject || ''} gradeLevel={profile?.gradeLevel || ''}
                 onSave={handleSaveAssignment} onReset={() => setOpenedAssignment(null)}
                 initialText={openedAssignment?.fullText || ''}
+                userId={user?.id || ''}
               />
               <section id="how-to-use" className="py-20 px-6 md:px-10 bg-card border-t border-border">
                 <div className="max-w-4xl mx-auto space-y-12">
