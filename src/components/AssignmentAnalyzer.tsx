@@ -16,7 +16,6 @@ import { toast } from 'sonner';
 import { exportToPDF, exportToDocx, exportToGoogleDocs } from '@/src/lib/export';
 import { AIFailureBreakdown } from './AIFailureBreakdown';
 import { StreamingProgress } from './StreamingProgress';
-import { DifferentiationPanel } from './DifferentiationPanel';
 import { getTemplatesBySubject } from '@/src/lib/templates';
 
 type FeedbackMap = Record<number, 'up' | 'down' | null>;
@@ -43,7 +42,6 @@ export function AssignmentAnalyzer({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
-  const [showDifferentiation, setShowDifferentiation] = useState<number | null>(null);
   const [editedTexts, setEditedTexts] = useState<Record<number, string>>({});
   const suggestionsRef = React.useRef<HTMLDivElement>(null);
 
@@ -285,11 +283,6 @@ export function AssignmentAnalyzer({
                           onChange={e => setEditedTexts(prev => ({ ...prev, [i]: e.target.value }))} />
                       </div>
                     )}
-                    {suggestion.differentiatedVersions && (
-                      <div className="pt-2 border-t border-border/50">
-                        <DifferentiationPanel versions={suggestion.differentiatedVersions} level={suggestion.level} />
-                      </div>
-                    )}
                     <div className="flex flex-wrap items-center gap-3">
                       <Button variant="outline" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5" onClick={() => copyToClipboard(suggestion.modifiedAssignment, i)}>
                         {copiedIndex === i ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}{copiedIndex === i ? 'Copied' : 'Copy'}
@@ -384,13 +377,7 @@ export function AssignmentAnalyzer({
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
-            <p>There's no fixed formula. Socrates weighs your assignment against a research-based rubric and four dimensions:</p>
-            <ul className="space-y-1.5 pl-1">
-              <li><strong className="text-foreground">Anchor</strong> — tied to local or current context AI can't know.</li>
-              <li><strong className="text-foreground">Proprietary</strong> — requires bespoke classroom material outside AI's training data.</li>
-              <li><strong className="text-foreground">Audit</strong> — grades the process (drafts, prompt logs), not just the product.</li>
-              <li><strong className="text-foreground">Agency</strong> — requires the student's own voice or experience.</li>
-            </ul>
+            <p>There's no fixed formula. Socrates weighs your assignment against a proprietary, research-based rubric built on four dimensions — <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
             <div className="space-y-1.5">
               {[
                 ['0–30', 'Highly vulnerable — one AI prompt could do it', 'text-red-500'],

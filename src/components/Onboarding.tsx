@@ -22,16 +22,24 @@ const STEPS = [
 
 export function Onboarding({ userName, userEmail, onComplete }: OnboardingProps) {
   const [step, setStep] = useState(0);
-  const [subject, setSubject] = useState('');
-  const [gradeLevel, setGradeLevel] = useState('');
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [gradeLevels, setGradeLevels] = useState<string[]>([]);
   const [schoolName, setSchoolName] = useState('');
   const [schoolType, setSchoolType] = useState<TeacherProfile['schoolType']>('');
+
+  const toggleSubject = (s: string) => setSubjects(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  const toggleGrade = (g: string) => setGradeLevels(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
 
   const next = () => setStep(s => Math.min(s + 1, STEPS.length - 1));
   const back = () => setStep(s => Math.max(s - 1, 0));
 
   const handleComplete = () => {
-    const profile: TeacherProfile = { name: userName, email: userEmail, subject, gradeLevel, schoolName, schoolType, country: '', onboardingComplete: true };
+    const profile: TeacherProfile = {
+      name: userName, email: userEmail,
+      subjects, gradeLevels,
+      subject: subjects.join(', '), gradeLevel: gradeLevels.join(', '),
+      schoolName, schoolType, country: '', onboardingComplete: true,
+    };
     saveProfile(profile);
     onComplete(profile);
   };
@@ -72,20 +80,24 @@ export function Onboarding({ userName, userEmail, onComplete }: OnboardingProps)
                 <p className="text-sm text-muted-foreground">Socrates tailors every suggestion to your subject and students.</p></div>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">What subject do you teach?</Label>
+                  <Label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">What subjects do you teach? <span className="normal-case font-medium">(select all that apply)</span></Label>
                   <div className="grid grid-cols-2 gap-2">
                     {SUBJECTS.map(s => (
-                      <button key={s} onClick={() => setSubject(s)}
-                        className={`text-left px-3 py-2 rounded-lg border text-xs font-medium transition-all ${subject === s ? 'border-accent bg-accent/10 text-accent' : 'border-border hover:border-accent/40'}`}>{s}</button>
+                      <button key={s} onClick={() => toggleSubject(s)}
+                        className={`text-left px-3 py-2 rounded-lg border text-xs font-medium transition-all ${subjects.includes(s) ? 'border-accent bg-accent/10 text-accent' : 'border-border hover:border-accent/40'}`}>
+                        {subjects.includes(s) ? '✓ ' : ''}{s}
+                      </button>
                     ))}
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">What grade level?</Label>
+                  <Label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">What grade levels? <span className="normal-case font-medium">(select all that apply)</span></Label>
                   <div className="flex flex-wrap gap-2">
                     {GRADE_LEVELS.map(g => (
-                      <button key={g} onClick={() => setGradeLevel(g)}
-                        className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all ${gradeLevel === g ? 'border-accent bg-accent/10 text-accent' : 'border-border hover:border-accent/40'}`}>{g}</button>
+                      <button key={g} onClick={() => toggleGrade(g)}
+                        className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all ${gradeLevels.includes(g) ? 'border-accent bg-accent/10 text-accent' : 'border-border hover:border-accent/40'}`}>
+                        {gradeLevels.includes(g) ? '✓ ' : ''}{g}
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -107,7 +119,7 @@ export function Onboarding({ userName, userEmail, onComplete }: OnboardingProps)
               </div>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={back} className="gap-2"><ArrowLeft className="w-4 h-4" />Back</Button>
-                <Button className="flex-1 h-11 font-bold" onClick={next} disabled={!subject || !gradeLevel}>Continue <ArrowRight className="w-4 h-4 ml-1" /></Button>
+                <Button className="flex-1 h-11 font-bold" onClick={next} disabled={subjects.length === 0 || gradeLevels.length === 0}>Continue <ArrowRight className="w-4 h-4 ml-1" /></Button>
               </div>
             </motion.div>
           )}
@@ -139,7 +151,7 @@ export function Onboarding({ userName, userEmail, onComplete }: OnboardingProps)
             <motion.div key="demo" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6">
               <div><h2 className="text-2xl font-bold font-serif italic">See it in action</h2>
-                <p className="text-sm text-muted-foreground">How a typical {subject || 'assignment'} improves at each level.</p></div>
+                <p className="text-sm text-muted-foreground">How a typical {subjects[0] || 'assignment'} improves at each level.</p></div>
               <div className="space-y-3">
                 {[
                   { medal: '🥉', level: 'Bronze', color: 'border-orange-200 bg-orange-50', badge: 'bg-orange-100 text-orange-700', label: 'Quick fix — 5 minutes', after: 'Write a 500-word essay referencing a news article from this week and one change you\'ve personally observed in your local environment.' },
@@ -171,12 +183,12 @@ export function Onboarding({ userName, userEmail, onComplete }: OnboardingProps)
               </motion.div>
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold font-serif italic">You're all set!</h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">Socrates will now tailor every analysis for <strong>{subject}</strong> at the <strong>{gradeLevel}</strong> level.</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">Socrates will now tailor every analysis to <strong>{subjects.join(', ')}</strong> at the <strong>{gradeLevels.join(', ')}</strong> level{gradeLevels.length > 1 ? 's' : ''}.</p>
               </div>
               <div className="bg-secondary/40 rounded-xl p-4 text-left space-y-2">
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Your profile</p>
-                <p className="text-sm"><span className="font-medium">Subject:</span> {subject}</p>
-                <p className="text-sm"><span className="font-medium">Level:</span> {gradeLevel}</p>
+                <p className="text-sm"><span className="font-medium">Subject{subjects.length > 1 ? 's' : ''}:</span> {subjects.join(', ')}</p>
+                <p className="text-sm"><span className="font-medium">Level{gradeLevels.length > 1 ? 's' : ''}:</span> {gradeLevels.join(', ')}</p>
                 {schoolName && <p className="text-sm"><span className="font-medium">School:</span> {schoolName}</p>}
               </div>
               <Button className="w-full h-12 text-sm font-bold bg-accent hover:bg-accent/90" onClick={handleComplete}>
