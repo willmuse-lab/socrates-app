@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Shield, BookOpen, Users, Award, Mail, Gauge, MapPin, FileStack, Footprints, User } from 'lucide-react';
+import { Shield, BookOpen, Mail, Gauge, Quote, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TEACHER_COMMENTS } from '@/src/lib/comments';
 
 interface PageProps { onBack: () => void; }
 
@@ -13,7 +14,7 @@ export function AboutPage({ onBack }: PageProps) {
         <div className="space-y-5">
           <h1 className="text-4xl font-bold font-serif italic leading-tight">Built by educators,<br />for educators.</h1>
           <p className="text-muted-foreground leading-relaxed">Socrates was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI — which is both impossible and counterproductive — we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
-          <p className="text-muted-foreground leading-relaxed">The Triple-A Framework emerged from two years of classroom research, consultation with pedagogical experts, and analysis of UNESCO's AI in education guidelines.</p>
+          <p className="text-muted-foreground leading-relaxed">Our methodology emerged from classroom research, consultation with pedagogical experts, and analysis of international AI-in-education guidance.</p>
         </div>
         <div className="bg-secondary/50 rounded-2xl border border-border p-8 space-y-4">
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Our philosophy</p>
@@ -23,20 +24,17 @@ export function AboutPage({ onBack }: PageProps) {
       </div>
       <div className="space-y-6">
         <h2 className="text-2xl font-bold font-serif italic">The research behind Socrates</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
+        <p className="text-sm text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
+        <div className="flex flex-wrap gap-2">
           {[
-            { icon: BookOpen, title: 'UNESCO AI Competency Framework (2023)', desc: "Our five core dimensions map directly to UNESCO's guidelines for AI literacy in education." },
-            { icon: Award, title: 'Bearman & Luckin (2024)', desc: '"AI-proof" assignments are a myth. We design for "AI-evident" tasks where AI use is traceable.' },
-            { icon: Users, title: 'Mollick & Mollick (2023)', desc: 'Personal stakes are the single most effective AI-resilience strategy.' },
-            { icon: Shield, title: 'Lodge et al. (2023)', desc: 'Students who reflect on their own AI use perform significantly better on subsequent unaided tasks.' },
-          ].map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="p-5 border border-border rounded-xl bg-card space-y-2 hover:border-accent/30 transition-colors">
-              <Icon className="w-5 h-5 text-accent" />
-              <p className="text-sm font-bold">{title}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
-            </div>
+            'UNESCO (2023)', 'Bearman & Luckin (2024)', 'Mollick & Mollick (2023)', 'Lodge et al. (2023)',
+            'Dawson (2021)', 'TEQSA (2024)', 'Eaton (2023)', 'Perkins, Furze, Roe & MacVaugh (2024)',
+            'Awadallah Alkouk & Khlaif (2024)', 'Sperber et al. (2025)',
+          ].map(name => (
+            <span key={name} className="px-3 py-1.5 rounded-full bg-secondary/60 border border-border text-xs font-medium text-foreground/80">{name}</span>
           ))}
         </div>
+        <p className="text-xs text-muted-foreground italic">How these sources are combined into Socrates' scoring rubric and redesign engine is part of our proprietary methodology.</p>
       </div>
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
@@ -58,12 +56,6 @@ export function ScoringPage({ onBack }: PageProps) {
     { range: '71–85', label: 'Strong', desc: 'Multiple anchors, a process requirement, a personal element.', color: 'text-lime-600' },
     { range: '86–100', label: 'Exceptional', desc: 'AI can assist, but cannot replace the student.', color: 'text-green-600' },
   ];
-  const dimensions = [
-    { icon: MapPin, name: 'Anchor', desc: 'Is the task tied to local or current context AI cannot know — this class, this week, this community?' },
-    { icon: FileStack, name: 'Proprietary', desc: 'Does it require bespoke classroom material (handouts, a seminar debate, original data) that sits outside AI training sets?' },
-    { icon: Footprints, name: 'Audit', desc: 'Does it grade the process — drafts, revision notes, prompt logs — rather than only the final product?' },
-    { icon: User, name: 'Agency', desc: "Does it require the student's own voice, lived experience, or perspective that can't be faked?" },
-  ];
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-10">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
@@ -79,16 +71,13 @@ export function ScoringPage({ onBack }: PageProps) {
 
       <div className="space-y-4">
         <h2 className="text-lg font-bold">The four dimensions it looks for</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four dimensions, each scored individually with an explanation. The more an assignment has, the higher it scores. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
-        <div className="grid sm:grid-cols-2 gap-4">
-          {dimensions.map(({ icon: Icon, name, desc }) => (
-            <div key={name} className="p-5 border border-border rounded-xl bg-card space-y-2">
-              <Icon className="w-5 h-5 text-accent" />
-              <p className="text-sm font-bold">{name}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
-            </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four research-based dimensions, each scored individually with an explanation in your results. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
+        <div className="flex flex-wrap gap-2">
+          {['Anchor', 'Proprietary', 'Audit', 'Agency'].map(name => (
+            <span key={name} className="px-4 py-2 rounded-full bg-secondary/60 border border-border text-sm font-bold text-foreground/80">{name}</span>
           ))}
         </div>
+        <p className="text-xs text-muted-foreground italic">The detailed rubric behind each dimension is part of Socrates' proprietary methodology — your analysis results explain how each one applies to your specific assignment.</p>
       </div>
 
       <div className="space-y-4">
@@ -135,6 +124,38 @@ export function PrivacyPage({ onBack }: PageProps) {
           <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{content}</div>
         </div>
       ))}
+    </motion.div>
+  );
+}
+
+export function FeedbackPage({ onBack }: PageProps) {
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto p-6 md:p-10 space-y-10">
+      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
+      <div className="text-center space-y-3">
+        <div className="flex justify-center gap-1">
+          {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
+        </div>
+        <h1 className="text-4xl font-bold font-serif italic">Teacher feedback</h1>
+        <p className="text-muted-foreground">What teachers are telling us after using Socrates in their classrooms.</p>
+      </div>
+      <div className="grid sm:grid-cols-2 gap-4">
+        {TEACHER_COMMENTS.map((c, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+            className="bg-card border border-border rounded-2xl p-6 space-y-3 hover:border-accent/30 transition-colors">
+            <Quote className="w-5 h-5 text-accent opacity-40" />
+            <p className="text-sm font-serif italic leading-relaxed text-foreground">"{c.quote}"</p>
+            <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">— {c.role}</p>
+          </motion.div>
+        ))}
+      </div>
+      <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-3">
+        <h3 className="text-xl font-bold font-serif italic">Using Socrates in your classroom?</h3>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">We'd love to hear what's working. Send us your experience and it may appear here.</p>
+        <Button onClick={() => window.location.href = 'mailto:hello@socratesmuse.com?subject=My%20Socrates%20feedback'} className="gap-2">
+          <Mail className="w-4 h-4" />Share your feedback
+        </Button>
+      </div>
     </motion.div>
   );
 }

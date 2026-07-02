@@ -5,7 +5,7 @@ import { AdminResearch } from './components/AdminResearch';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Onboarding } from './components/Onboarding';
 import { Pricing } from './components/Pricing';
-import { AboutPage, PrivacyPage, ScoringPage, TermsPage } from './components/StaticPages';
+import { AboutPage, PrivacyPage, ScoringPage, TermsPage, FeedbackPage } from './components/StaticPages';
 import { Testimonials } from './components/Testimonials';
 import { SplashScreen } from './components/SplashScreen';
 import { UserMenu } from './components/UserMenu';
@@ -21,7 +21,7 @@ import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'luci
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
-type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy' | 'scoring' | 'terms';
+type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy' | 'scoring' | 'terms' | 'feedback';
 type AIPreference = 'avoid' | 'augment' | 'embrace';
 
 export interface SavedAssignment {
@@ -147,6 +147,7 @@ export default function App() {
           {[
             { label: 'Studio', view: 'studio' },
             { label: 'Library', view: 'library' },
+            { label: 'Feedback', view: 'feedback' },
             { label: 'Pricing', view: 'pricing' },
             { label: 'About', view: 'about' },
           ].map(({ label, view }) => (
@@ -157,11 +158,17 @@ export default function App() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          {profile?.subject && (
-            <span className="hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-secondary text-muted-foreground border border-border">
-              {profile.subject.split('/')[0].trim()} · {profile.gradeLevel.split('(')[0].trim()}
-            </span>
-          )}
+          {profile?.subject && (() => {
+            const subs = profile.subjects?.length ? profile.subjects : [profile.subject];
+            const grades = profile.gradeLevels?.length ? profile.gradeLevels : [profile.gradeLevel];
+            const subLabel = subs[0].split('/')[0].trim() + (subs.length > 1 ? ` +${subs.length - 1}` : '');
+            const gradeLabel = grades[0].split('(')[0].trim() + (grades.length > 1 ? ` +${grades.length - 1}` : '');
+            return (
+              <span className="hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-secondary text-muted-foreground border border-border">
+                {subLabel} · {gradeLabel}
+              </span>
+            );
+          })()}
           {user && (
             <span title={cloudSynced ? 'Cloud synced' : 'Local only'}
               className={`hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${cloudSynced ? 'bg-green-50 text-green-600 border-green-200' : 'bg-secondary text-muted-foreground border-border'}`}>
@@ -224,7 +231,7 @@ export default function App() {
                 <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
                   <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Socrates AI · Built for Educators</p>
                   <div className="flex gap-4">
-                    {[['How scoring works', 'scoring'],['Privacy', 'privacy'],['Terms', 'terms'],['About', 'about'],['Pricing', 'pricing']].map(([l, v]) => (
+                    {[['How scoring works', 'scoring'],['Teacher feedback', 'feedback'],['Privacy', 'privacy'],['Terms', 'terms'],['About', 'about'],['Pricing', 'pricing']].map(([l, v]) => (
                       <button key={v} onClick={() => setViewMode(v as ViewMode)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{l}</button>
                     ))}
                   </div>
@@ -276,6 +283,11 @@ export default function App() {
           {viewMode === 'terms' && (
             <motion.div key="terms" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
               <TermsPage onBack={() => setViewMode('studio')} />
+            </motion.div>
+          )}
+          {viewMode === 'feedback' && (
+            <motion.div key="feedback" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
+              <FeedbackPage onBack={() => setViewMode('studio')} />
             </motion.div>
           )}
         </AnimatePresence>

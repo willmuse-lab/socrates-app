@@ -32,9 +32,11 @@ export const TEMPLATES: AssignmentTemplate[] = [
 
 export function getTemplatesBySubject(subject: string): AssignmentTemplate[] {
   if (!subject) return TEMPLATES.slice(0, 6);
-  const match = TEMPLATES.filter(t =>
-    t.subject.toLowerCase().includes(subject.toLowerCase().split('/')[0].trim()) ||
-    subject.toLowerCase().includes(t.subject.toLowerCase().split('/')[0].trim())
-  );
+  // Teachers can select multiple subjects (comma-separated) — match templates for any of them.
+  const wanted = subject.split(',').map(s => s.toLowerCase().split('/')[0].trim()).filter(Boolean);
+  const match = TEMPLATES.filter(t => {
+    const tKey = t.subject.toLowerCase().split('/')[0].trim();
+    return wanted.some(w => tKey.includes(w) || w.includes(tKey));
+  });
   return match.length > 0 ? match : TEMPLATES.slice(0, 6);
 }

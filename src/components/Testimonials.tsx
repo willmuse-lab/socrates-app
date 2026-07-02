@@ -8,9 +8,7 @@ interface TestimonialProps {
 
 const TESTIMONIALS = [
   {
-    name: 'Mrs. Davis',
-    role: '10th Grade English Teacher',
-    avatar: 'MD',
+    role: 'Pilot program teacher',
     color: 'bg-accent',
     quote: "Socrates is a tool that helps teachers reduce students' ability to use AI to do the work for them. It also suggests ways to incorporate class time and discussion into assessments, which encouraged my students to engage with each other more.",
     highlight: 'Students caught AI giving incorrect information — and it became a major teaching moment about critical thinking.',
@@ -18,24 +16,20 @@ const TESTIMONIALS = [
     result: 'Students used multiple AI sources to compare information, turning AI limitations into learning opportunities.',
   },
   {
-    name: 'Mrs. Davis',
-    role: '10th Grade English Teacher',
-    avatar: 'MD',
+    role: 'High school teacher',
     color: 'bg-accent',
-    quote: "One surprising result was how often students caught AI giving incorrect information, which gave me the opportunity to applaud students for how much more they knew about the book than AI did. That was really eye-opening for students who said they usually just trust what AI says.",
+    quote: "One surprising result was how often students caught AI giving incorrect information, which gave me the opportunity to applaud students for how much more they knew about the material than AI did. That was really eye-opening for students who said they usually just trust what AI says.",
     highlight: "Students in lower-level classes thrived — it wasn't HARD, it just forced them to THINK.",
     feature: 'Level redesigns',
-    result: 'A character analysis assignment became a multi-source AI critique project. Major success especially for lower-level classes.',
+    result: 'One assignment became a multi-source AI critique project. Major success especially for lower-level classes.',
   },
   {
-    name: 'Mr. Muse',
-    role: 'Middle & High School Math Teacher',
-    avatar: 'MM',
+    role: 'Pilot program teacher',
     color: 'bg-purple-600',
     quote: 'A program with the ability to evaluate your premade lessons for AI vulnerabilities and then patch those holes with your choice of AI usage. I do not use AI as the "bad guy" any longer — it is now a tool we use to facilitate learning.',
-    highlight: 'Students are not afraid of using AI as long as they journal the assignment and can use the "find the mistake" quick assignment.',
+    highlight: 'Students are not afraid of using AI as long as they journal the assignment along the way.',
     feature: 'Quick-start examples',
-    result: 'Improved teaching of rational functions in NC Math 3 — more productive outcomes, students journaling AI use.',
+    result: 'More productive outcomes, with students journaling their AI use as they work.',
   },
 ];
 
@@ -53,11 +47,8 @@ export function Testimonials({ compact = false }: TestimonialProps) {
             <Quote className="w-4 h-4 text-accent opacity-50" />
             <p className="text-sm text-foreground leading-relaxed italic">"{t.quote}"</p>
             <div className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-full ${t.color} flex items-center justify-center text-[10px] font-bold text-white`}>{t.avatar}</div>
-              <div>
-                <p className="text-xs font-bold">{t.name}</p>
-                <p className="text-[10px] text-muted-foreground">{t.role}</p>
-              </div>
+              <div className={`w-7 h-7 rounded-full ${t.color} flex items-center justify-center text-white`}><Quote className="w-3 h-3" /></div>
+              <p className="text-xs font-bold">{t.role}</p>
             </div>
           </div>
         ))}
@@ -96,11 +87,8 @@ export function Testimonials({ compact = false }: TestimonialProps) {
               </div>
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center text-sm font-bold text-white`}>{t.avatar}</div>
-                  <div>
-                    <p className="text-sm font-bold">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.role}</p>
-                  </div>
+                  <div className={`w-10 h-10 rounded-full ${t.color} flex items-center justify-center text-white`}><Quote className="w-4 h-4" /></div>
+                  <p className="text-sm font-bold">{t.role}</p>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={prev} className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"><ChevronLeft className="w-4 h-4" /></button>
