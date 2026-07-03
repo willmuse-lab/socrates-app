@@ -30,6 +30,19 @@ export async function signInWithEmail(email: string, password: string) {
   return await sb.auth.signInWithPassword({ email, password });
 }
 
+export async function signInWithProvider(provider: 'google' | 'azure') {
+  const sb = await getClient();
+  if (!sb) return { error: new Error('Supabase not configured') };
+  return await sb.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: window.location.origin,
+      // Microsoft/Azure needs the scopes spelled out to return the user's email + name.
+      ...(provider === 'azure' ? { scopes: 'email openid profile' } : {}),
+    },
+  });
+}
+
 export async function signOut() {
   const sb = await getClient();
   if (!sb) return;
