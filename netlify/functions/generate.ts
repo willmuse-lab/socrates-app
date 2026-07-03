@@ -23,6 +23,28 @@ function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise
   ]);
 }
 
+// Repair the most common model-JSON defect: literal control characters
+// (raw newlines/tabs) inside string values, which JSON.parse rejects.
+function repairJSON(raw: string): string {
+  let out = "";
+  let inString = false;
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw[i];
+    if (inString) {
+      if (ch === "\\") { out += ch + (raw[i + 1] ?? ""); i++; continue; }
+      if (ch === '"') { inString = false; out += ch; continue; }
+      if (ch === "\n") { out += "\\n"; continue; }
+      if (ch === "\r") continue;
+      if (ch === "\t") { out += "\\t"; continue; }
+      out += ch;
+    } else {
+      if (ch === '"') inString = true;
+      out += ch;
+    }
+  }
+  return out;
+}
+
 function extractJSON(text: string): any {
   let raw = text.trim();
   const fenceMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -30,7 +52,19 @@ function extractJSON(text: string): any {
   const first = raw.indexOf("{");
   const last = raw.lastIndexOf("}");
   if (first !== -1 && last !== -1) raw = raw.slice(first, last + 1);
-  return JSON.parse(raw);
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return JSON.parse(repairJSON(raw));
+  }
+}
+
+// A response cut off by max_tokens is guaranteed-broken JSON — surface a
+// clear, retryable message instead of "unexpected format".
+function requireComplete(response: any, label: string) {
+  if (response.stop_reason === "max_tokens") {
+    throw new Error(`The ${label} ran long and was cut off. Please try again.`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -77,7 +111,8 @@ Return ONLY a single valid JSON object, no markdown, no commentary:
     system,
     messages: [{ role: "user", content: userMessage }],
   });
-  const response = await withTimeout(stream.finalMessage(), 24000, "Alignment request");
+  const response = await withTimeout(stream.finalMessage(), 26000, "Alignment request");
+  requireComplete(response, "standards alignment");
   const textBlock = response.content.find(b => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("Empty response from alignment model");
   return extractJSON(textBlock.text);
@@ -126,7 +161,7 @@ Requirements:
   responsibility under it, per the framework definitions.
 - Section V must apply the tiered AI disclosure framework (Baule Shift 5).
 - Section VI formative check must cover BOTH subject AND AI-tool understanding.
-- Keep each section concise and classroom-ready. Total length: what fits on ~2 pages.
+- BE CONCISE — this matters: each section is 3-6 tight sentences (Section IV may use short numbered steps). Total under 700 words. Long plans get cut off and fail.
 
 Return ONLY a single valid JSON object, no markdown fences, no commentary:
 {
@@ -144,11 +179,12 @@ Use \\n for line breaks inside content strings.`;
 
   const stream = client.messages.stream({
     model: "claude-haiku-4-5",
-    max_tokens: 2200,
+    max_tokens: 3000,
     system,
     messages: [{ role: "user", content: userMessage }],
   });
-  const response = await withTimeout(stream.finalMessage(), 24000, "Lesson plan request");
+  const response = await withTimeout(stream.finalMessage(), 26000, "Lesson plan request");
+  requireComplete(response, "lesson plan");
   const textBlock = response.content.find(b => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("Empty response from lesson plan model");
   return extractJSON(textBlock.text);
@@ -200,7 +236,8 @@ Return ONLY a single valid JSON object:
     system,
     messages: [{ role: "user", content: userMessage }],
   });
-  const response = await withTimeout(stream.finalMessage(), 24000, "Directions request");
+  const response = await withTimeout(stream.finalMessage(), 26000, "Directions request");
+  requireComplete(response, "student directions");
   const textBlock = response.content.find(b => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("Empty response from directions model");
   return extractJSON(textBlock.text);
