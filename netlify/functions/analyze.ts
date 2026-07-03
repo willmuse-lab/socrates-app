@@ -311,8 +311,29 @@ Include exactly 3 failures, one entry per scoring dimension, and exactly three s
     try {
       result = JSON.parse(raw);
     } catch {
-      console.error("analyze v3: JSON parse failed");
-      return new Response(JSON.stringify({ error: "The analysis came back in an unexpected format. Please try again." }), { status: 502, headers });
+      try {
+        // Repair literal control characters inside string values, the most
+        // common cause of model-JSON parse failures.
+        let repaired = "", inString = false;
+        for (let i = 0; i < raw.length; i++) {
+          const ch = raw[i];
+          if (inString) {
+            if (ch === "\\") { repaired += ch + (raw[i + 1] ?? ""); i++; continue; }
+            if (ch === '"') { inString = false; repaired += ch; continue; }
+            if (ch === "\n") { repaired += "\\n"; continue; }
+            if (ch === "\r") continue;
+            if (ch === "\t") { repaired += "\\t"; continue; }
+            repaired += ch;
+          } else {
+            if (ch === '"') inString = true;
+            repaired += ch;
+          }
+        }
+        result = JSON.parse(repaired);
+      } catch {
+        console.error("analyze v3: JSON parse failed");
+        return new Response(JSON.stringify({ error: "The analysis came back in an unexpected format. Please try again." }), { status: 502, headers });
+      }
     }
     console.log("analyze v3: done");
     return new Response(JSON.stringify(result), { status: 200, headers });
