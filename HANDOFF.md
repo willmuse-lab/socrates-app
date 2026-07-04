@@ -96,10 +96,15 @@ every dashboard task with exact click paths, one step per message, and wait.
 - **Social login (Google + Microsoft):** "Continue with Google/Microsoft"
   buttons are LIVE on the login dialog (`LoginDialog.tsx`), backed by Supabase
   `signInWithOAuth` (`signInWithProvider` in `supabase.ts`, provider `google` /
-  `azure`). Code is complete but the buttons DO NOTHING until Will enables the
-  two providers in Supabase — see "Social login setup" below. Login only; no
-  Drive access. The existing `onAuthStateChange` listener completes the session
-  on redirect back (redirectTo = window.location.origin).
+  `azure`). Login only; no Drive access. The existing `onAuthStateChange`
+  listener completes the session on redirect back (redirectTo =
+  window.location.origin).
+  - **GOOGLE = DONE & TESTED LIVE (July 4 2026).** Provider enabled in Supabase
+    with real Client ID/Secret; verified end-to-end (Will logged in with Google
+    on the live site).
+  - **MICROSOFT = NOT YET.** Button is live but the Azure provider is not
+    enabled in Supabase — see "Social login setup" step 2. Same process as
+    Google. Do this next.
 - Standards (SCOS) upload appears in: onboarding profile step, Settings
   dialog, and the post-analysis results card (where the doc is SELECTED for
   alignment). Requires login + Supabase.
@@ -124,13 +129,32 @@ localhost) — OAuth needs the real web address.
    both, Save.
 - Reuse the SAME Google Cloud project when the Drive feature returns — Drive
   just needs extra scopes added to it (which then triggers Google verification,
-  the slow part — see task 10).
+  the slow part — see task 10). Google project is named "Socrates", owned by
+  socratesaiedu@gmail.com; OAuth client "Socrates Web" already created.
+
+**Gotchas hit during Google setup (apply to Microsoft too):**
+- After entering Client ID + Secret in the Supabase provider panel, the toggle
+  AND a **Save** must both stick. A first save didn't persist → login threw
+  `provider is not enabled`. Re-opening the panel and saving again fixed it.
+- **Supabase Site URL was `http://localhost:3000`** (dev default). After OAuth,
+  Supabase returns the user to the Site URL / an allow-listed Redirect URL; the
+  localhost value dead-ended at "site can't be reached" even though login
+  succeeded (access_token was in the URL). FIX (done): Authentication → URL
+  Configuration → Site URL = `https://brilliant-mandazi-3937f4.netlify.app`,
+  and add Redirect URL `https://brilliant-mandazi-3937f4.netlify.app/**`.
+- The Google consent screen shows "Sign in to llvtiuhtjpprtwlvnauu.supabase.co"
+  (the Supabase project domain), not "Socrates". Purely cosmetic; login works.
+  To brand it you need Supabase's paid Custom Domain add-on (run auth on
+  auth.<yourdomain>) — bundle with the custom-domain task (#6) and Google
+  verification (#10). Do NOT chase this standalone.
 
 ## Parked tasks (Will's backlog, roughly by priority)
 
 1. Test the full SCOS → lesson plan flow on deploy-preview-2 (in progress;
    fixes for timeout/format just pushed).
-2. Trigger deploy of main (live site is behind).
+2. Trigger deploy of main — DONE July 4 2026 (shipped the pending pricing/
+   testimonials/feedback/profile batch + Google login). Re-do after future
+   main pushes; auto-deploy still doesn't fire.
 3. **Rotate the Anthropic API key** — Will pasted screenshots showing the full
    key in chat. Create new key in console.anthropic.com, swap in Netlify,
    delete old. Walk him through it.
@@ -150,8 +174,8 @@ localhost) — OAuth needs the real web address.
     early. Drive UI already built (`GoogleDrivePicker.tsx`, commented out) and
     netlify.toml already has the /api/google/* redirects; the 5 functions and
     OAuth token refresh are what's missing.
-11b. Enable Google + Microsoft social login providers in Supabase (code done;
-    see "Social login setup" above). Buttons are live but inert until enabled.
+11b. **NEXT UP:** Enable MICROSOFT (Azure) social login in Supabase — Google is
+    done/tested. Follow "Social login setup" step 2. Button already live.
 11. `marketing/brand-brief.md` exists for Claude.ai marketing Projects.
 
 ## Working conventions
