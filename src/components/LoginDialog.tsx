@@ -33,7 +33,7 @@ function MicrosoftIcon() {
 
 interface LoginDialogProps {
   isOpen: boolean;
-  onLogin: (name: string, email: string) => void;
+  onLogin: (name: string, email: string, id?: string) => void;
 }
 
 type Mode = 'login' | 'signup';
@@ -65,13 +65,13 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
       if (mode === 'signup') {
         const { data, error: err } = await signUpWithEmail(email, password, name);
         if (err) { setError(err.message); return; }
-        if (data?.user) { onLogin(name, email); }
+        if (data?.user) { onLogin(name, email, data.user.id); }
         else { toast.info('Check your email to confirm your account, then log in.'); }
       } else {
         const { data, error: err } = await signInWithEmail(email, password);
         if (err) { setError('Invalid email or password.'); return; }
         const displayName = data?.user?.user_metadata?.name || email.split('@')[0];
-        onLogin(displayName, email);
+        onLogin(displayName, email, data?.user?.id);
       }
     } catch (err: any) {
       setError(err.message || 'Something went wrong.');

@@ -16,17 +16,20 @@ import { toast } from 'sonner';
 import { exportToPDF, exportToDocx, exportToGoogleDocs } from '@/src/lib/export';
 import { AIFailureBreakdown } from './AIFailureBreakdown';
 import { StreamingProgress } from './StreamingProgress';
+import { StandardsManager } from './StandardsManager';
+import { LessonPlanPanel } from './LessonPlanPanel';
+import { StandardsDocument } from '@/src/lib/standards';
 import { getTemplatesBySubject } from '@/src/lib/templates';
 
 type FeedbackMap = Record<number, 'up' | 'down' | null>;
 
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
-  bloomsLevel = 'Analyze', subject = '', gradeLevel = '', onSave, onReset, initialText = ''
+  bloomsLevel = 'Analyze', subject = '', gradeLevel = '', onSave, onReset, initialText = '', userId = ''
 }: {
   defaultPreference?: AIPreference, dimensions?: FrameworkDimension[], activeFramework?: 'triple-a' | 'blooms',
   bloomsLevel?: BloomsLevel, subject?: string, gradeLevel?: string,
-  onSave?: (assignment: Omit<SavedAssignment, 'id' | 'date'>) => void, onReset?: () => void, initialText?: string
+  onSave?: (assignment: Omit<SavedAssignment, 'id' | 'date'>) => void, onReset?: () => void, initialText?: string, userId?: string
 }) {
   const [text, setText] = useState(initialText);
   const [aiPreference, setAiPreference] = useState<AIPreference>(defaultPreference);
@@ -39,6 +42,7 @@ export function AssignmentAnalyzer({
   const [progressStage, setProgressStage] = useState('Reading your assignment...');
   const [progressPercent, setProgressPercent] = useState(0);
   const [showScoreInfo, setShowScoreInfo] = useState(false);
+  const [standardsDoc, setStandardsDoc] = useState<StandardsDocument | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
@@ -303,6 +307,26 @@ export function AssignmentAnalyzer({
                 ))}
               </Tabs>
             </Card>
+            {(() => {
+              const activeIdx = result.suggestions.findIndex(s => s.level === activeLevel);
+              const lessonText = activeIdx >= 0
+                ? (editedTexts[activeIdx] ?? result.suggestions[activeIdx].modifiedAssignment)
+                : text;
+              return (
+                <Card className="p-6 md:p-8 border border-border shadow-sm bg-card rounded-xl space-y-6">
+                  <div className="space-y-1">
+                    <h2 className="text-2xl font-bold">Standards & Lesson Plan</h2>
+                    <p className="text-sm text-muted-foreground">Align the <strong>{activeLevel}</strong> redesign to your standards, then generate a complete lesson plan and student directions.</p>
+                  </div>
+                  {userId ? (
+                    <StandardsManager userId={userId} onSelect={setStandardsDoc} selectedId={standardsDoc?.id} />
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground italic">Sign in with a real account to save and reuse your standards documents.</p>
+                  )}
+                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} />
+                </Card>
+              );
+            })()}
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1 h-10 text-xs font-bold uppercase tracking-widest border-border hover:bg-secondary gap-2" onClick={handleNewAssignment}><RotateCcw className="w-3.5 h-3.5" />New Assignment</Button>
               <Button className="flex-1 h-10 text-xs font-bold uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 gap-2" onClick={handleSaveToLibrary}><Save className="w-3.5 h-3.5" />Save to Library</Button>

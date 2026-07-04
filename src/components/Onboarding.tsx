@@ -5,10 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { TeacherProfile, SUBJECTS, GRADE_LEVELS, saveProfile } from '@/src/lib/profile';
 import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { StandardsManager } from './StandardsManager';
+import { supabaseEnabled } from '@/src/lib/supabase';
 
 interface OnboardingProps {
   userName: string;
   userEmail: string;
+  userId?: string;
   onComplete: (profile: TeacherProfile) => void;
 }
 
@@ -20,7 +23,7 @@ const STEPS = [
   { id: 'ready', title: "You're Ready" },
 ];
 
-export function Onboarding({ userName, userEmail, onComplete }: OnboardingProps) {
+export function Onboarding({ userName, userEmail, userId = '', onComplete }: OnboardingProps) {
   const [step, setStep] = useState(0);
   const [subjects, setSubjects] = useState<string[]>([]);
   const [gradeLevels, setGradeLevels] = useState<string[]>([]);
@@ -75,7 +78,7 @@ export function Onboarding({ userName, userEmail, onComplete }: OnboardingProps)
           )}
           {step === 1 && (
             <motion.div key="profile" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
-              className="bg-card border border-border rounded-2xl p-8 space-y-6">
+              className="bg-card border border-border rounded-2xl p-8 space-y-6 max-h-[85vh] overflow-y-auto">
               <div><h2 className="text-2xl font-bold font-serif italic">Tell us about your teaching</h2>
                 <p className="text-sm text-muted-foreground">Socrates tailors every suggestion to your subject and students.</p></div>
               <div className="space-y-4">
@@ -116,6 +119,12 @@ export function Onboarding({ userName, userEmail, onComplete }: OnboardingProps)
                     </div>
                   </div>
                 </div>
+                {userId && supabaseEnabled && (
+                  <div className="space-y-2 pt-2 border-t border-border">
+                    <StandardsManager userId={userId} onSelect={() => {}} />
+                    <p className="text-[10px] text-muted-foreground italic">Optional — used to align your assignments and lesson plans to your standards. You can add or change this anytime in Settings.</p>
+                  </div>
+                )}
               </div>
               <div className="flex gap-3">
                 <Button variant="outline" onClick={back} className="gap-2"><ArrowLeft className="w-4 h-4" />Back</Button>

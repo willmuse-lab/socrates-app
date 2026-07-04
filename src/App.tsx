@@ -17,6 +17,7 @@ import { FrameworkDimension, DEFAULT_DIMENSIONS, BloomsLevel, BLOOMS_LEVELS } fr
 import { loadAssignments, saveAssignments, loadSettings, saveSettings, loadUser, saveUser, clearUser, AppSettings } from '@/src/lib/storage';
 import { supabaseEnabled, onAuthStateChange, fetchAssignmentsFromCloud, saveAssignmentToCloud, deleteAssignmentFromCloud, signOut } from '@/src/lib/supabase';
 import { loadProfile, saveProfile, clearProfile, TeacherProfile } from '@/src/lib/profile';
+import { StandardsManager } from './components/StandardsManager';
 import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
@@ -135,7 +136,7 @@ export default function App() {
     <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
       <AnimatePresence>{showSplash && <SplashScreen onComplete={handleSplashComplete} />}</AnimatePresence>
       <AnimatePresence>{showOnboarding && user && (
-        <Onboarding userName={user.name} userEmail={user.email} onComplete={handleOnboardingComplete} />
+        <Onboarding userName={user.name} userEmail={user.email} userId={user.id || ''} onComplete={handleOnboardingComplete} />
       )}</AnimatePresence>
       <LoginDialog isOpen={isLoginOpen && !showSplash && !showOnboarding} onLogin={handleLogin} />
 
@@ -203,6 +204,7 @@ export default function App() {
                 subject={profile?.subject || ''} gradeLevel={profile?.gradeLevel || ''}
                 onSave={handleSaveAssignment} onReset={() => setOpenedAssignment(null)}
                 initialText={openedAssignment?.fullText || ''}
+                userId={user?.id || ''}
               />
               <section id="how-to-use" className="py-20 px-6 md:px-10 bg-card border-t border-border">
                 <div className="max-w-4xl mx-auto space-y-12">
@@ -292,7 +294,7 @@ export default function App() {
         </AnimatePresence>
 
         <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-          <DialogContent className="sm:max-w-[520px] border-border bg-card p-8">
+          <DialogContent className="sm:max-w-[520px] border-border bg-card p-8 max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <div className="flex items-center gap-3 mb-2">
                 <Settings className="w-5 h-5 text-accent" />
@@ -314,6 +316,12 @@ export default function App() {
                       Update
                     </Button>
                   </div>
+                </div>
+              )}
+              {user?.id && supabaseEnabled && (
+                <div className="space-y-2 p-4 bg-secondary/30 rounded-xl border border-border">
+                  <StandardsManager userId={user.id} onSelect={() => {}} />
+                  <p className="text-[10px] text-muted-foreground italic">Your standards are used to align assignments and lesson plans. Select one at analysis time.</p>
                 </div>
               )}
               <div className="space-y-3">
