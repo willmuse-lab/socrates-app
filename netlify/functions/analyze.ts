@@ -214,7 +214,7 @@ OUTPUT FORMAT — return ONLY a single valid JSON object, no markdown, no code f
   "dimensions": [ { "name": "dimension name", "score": 0, "explanation": "why" } ],
   "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "how it applies the teacher's chosen AI strategy", "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]
 }
-Include exactly 3 failures, one entry per scoring dimension, and exactly three suggestions (one Bronze, one Silver, one Gold). Keep every field concise.`;
+Include exactly 3 failures, one entry per scoring dimension, and exactly three suggestions (one Bronze, one Silver, one Gold). Keep every field concise. Do NOT use double-quote characters (") inside any string value — use single quotes (') instead.`;
 
   try {
     console.log("analyze v3: calling model");
@@ -256,10 +256,20 @@ Include exactly 3 failures, one entry per scoring dimension, and exactly three s
           const ch = raw[i];
           if (inString) {
             if (ch === "\\") { repaired += ch + (raw[i + 1] ?? ""); i++; continue; }
-            if (ch === '"') { inString = false; repaired += ch; continue; }
             if (ch === "\n") { repaired += "\\n"; continue; }
             if (ch === "\r") continue;
             if (ch === "\t") { repaired += "\\t"; continue; }
+            if (ch === '"') {
+              // Close the string only if the next non-space char is a
+              // structural delimiter; otherwise escape a stray inner quote.
+              let j = i + 1;
+              while (j < raw.length && (raw[j] === " " || raw[j] === "\n" || raw[j] === "\r" || raw[j] === "\t")) j++;
+              const next = raw[j];
+              if (next === undefined || next === "," || next === "}" || next === "]" || next === ":") {
+                inString = false; repaired += ch; continue;
+              }
+              repaired += '\\"'; continue;
+            }
             repaired += ch;
           } else {
             if (ch === '"') inString = true;

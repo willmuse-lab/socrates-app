@@ -66,9 +66,12 @@ every dashboard task with exact click paths, one step per message, and wait.
    (`console.log("analyze v3: ...")`). Debug via Netlify → Logs & metrics →
    Functions → analyze. Structured outputs (json_schema) caused timeouts — the
    functions ask for plain JSON and parse it leniently instead.
-2. **Model JSON sometimes has literal newlines inside strings** → parse
-   failure ("unexpected format"). Both functions have a repairJSON pass —
-   keep it when editing.
+2. **Model JSON sometimes malformed** → parse failure ("unexpected format").
+   Both functions have a repairJSON pass — keep it when editing. Hardened
+   July 4 2026 to also escape STRAY INNER DOUBLE-QUOTES (a quote only closes a
+   string if the next non-space char is a structural delimiter `, } ] :`),
+   plus prompts now tell the model to avoid `"` inside string values. This was
+   the cause of a live lesson-plan "unexpected format" failure.
 3. **pdf.js worker must come from the bundle** (`src/lib/pdf.ts`, Vite `?url`
    import). CDN workerSrc 404s (v4 ships .mjs). All three uploaders
    (FileUploader, AdminResearch, StandardsManager) import from pdf.ts.

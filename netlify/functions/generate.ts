@@ -32,10 +32,21 @@ function repairJSON(raw: string): string {
     const ch = raw[i];
     if (inString) {
       if (ch === "\\") { out += ch + (raw[i + 1] ?? ""); i++; continue; }
-      if (ch === '"') { inString = false; out += ch; continue; }
       if (ch === "\n") { out += "\\n"; continue; }
       if (ch === "\r") continue;
       if (ch === "\t") { out += "\\t"; continue; }
+      if (ch === '"') {
+        // A quote closes the string only if the next non-space char is a
+        // structural delimiter; otherwise it's a stray unescaped quote inside
+        // the value (the #1 cause of unrepairable model JSON) — escape it.
+        let j = i + 1;
+        while (j < raw.length && (raw[j] === " " || raw[j] === "\n" || raw[j] === "\r" || raw[j] === "\t")) j++;
+        const next = raw[j];
+        if (next === undefined || next === "," || next === "}" || next === "]" || next === ":") {
+          inString = false; out += ch; continue;
+        }
+        out += '\\"'; continue;
+      }
       out += ch;
     } else {
       if (ch === '"') inString = true;
@@ -103,7 +114,8 @@ Return ONLY a single valid JSON object, no markdown, no commentary:
   "alignedStandards": [ { "code": "exact code from document", "text": "standard text from document", "connection": "one sentence" } ],
   "gaps": "one sentence, or empty string",
   "nearMisses": [ { "code": "...", "text": "...", "suggestion": "small modification that would address it" } ]
-}`;
+}
+Do NOT use double-quote characters (") inside any string value — use single quotes (') instead.`;
 
   const stream = client.messages.stream({
     model: "claude-haiku-4-5",
@@ -175,7 +187,7 @@ Return ONLY a single valid JSON object, no markdown fences, no commentary:
     "teacherReflection": "..."
   }
 }
-Use \\n for line breaks inside content strings.`;
+Use \\n for line breaks inside content strings. Do NOT use double-quote characters (") inside any content value — if you need quotation marks, use single quotes (') instead.`;
 
   const stream = client.messages.stream({
     model: "claude-haiku-4-5",
@@ -228,7 +240,8 @@ Return ONLY a single valid JSON object:
     "aiRules": "the Using AI section as one string",
     "grading": "the How you'll be graded section as one string"
   }
-}`;
+}
+Use \\n for line breaks. Do NOT use double-quote characters (") inside any string value — use single quotes (') instead.`;
 
   const stream = client.messages.stream({
     model: "claude-haiku-4-5",
