@@ -1,7 +1,7 @@
 # SOCRATES — Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: July 2026.
+session. Read this whole file before making changes. Last updated: July 4 2026.
 
 ## What this is
 
@@ -93,9 +93,38 @@ every dashboard task with exact click paths, one step per message, and wait.
   methodology" notes (About/Scoring pages). Full research/prompts live
   server-side only. Departments/sharing feature was removed entirely.
   Google Drive/Docs buttons are commented out (no backend functions exist).
+- **Social login (Google + Microsoft):** "Continue with Google/Microsoft"
+  buttons are LIVE on the login dialog (`LoginDialog.tsx`), backed by Supabase
+  `signInWithOAuth` (`signInWithProvider` in `supabase.ts`, provider `google` /
+  `azure`). Code is complete but the buttons DO NOTHING until Will enables the
+  two providers in Supabase — see "Social login setup" below. Login only; no
+  Drive access. The existing `onAuthStateChange` listener completes the session
+  on redirect back (redirectTo = window.location.origin).
 - Standards (SCOS) upload appears in: onboarding profile step, Settings
   dialog, and the post-analysis results card (where the doc is SELECTED for
   alignment). Requires login + Supabase.
+
+## Social login setup (Google + Microsoft) — Will's dashboard steps
+
+Code is done; these are the one-time dashboard tasks to make the buttons work.
+Walk Will through them one step at a time. Test on the LIVE/preview site (not
+localhost) — OAuth needs the real web address.
+
+0. **Get the callback URL:** Supabase → Authentication → Providers → click
+   Google (or Microsoft) → copy the "Callback URL (redirect URI)"
+   (`https://llvtiuhtjpprtwlvnauu.supabase.co/auth/v1/callback`). Same URL for both.
+1. **Google:** console.cloud.google.com → project → APIs & Services →
+   Credentials → Create Credentials → OAuth client ID → type "Web application"
+   → paste callback URL under Authorized redirect URIs → copy Client ID +
+   Secret → Supabase → Providers → Google → toggle on, paste both, Save.
+2. **Microsoft:** portal.azure.com → "App registrations" → New registration →
+   Redirect URI type "Web" + paste callback URL → copy Application (client) ID
+   → Certificates & secrets → New client secret → copy the Value → Supabase →
+   Providers → **Azure** (Microsoft = Azure in Supabase) → toggle on, paste
+   both, Save.
+- Reuse the SAME Google Cloud project when the Drive feature returns — Drive
+  just needs extra scopes added to it (which then triggers Google verification,
+  the slow part — see task 10).
 
 ## Parked tasks (Will's backlog, roughly by priority)
 
@@ -116,6 +145,13 @@ every dashboard task with exact click paths, one step per message, and wait.
 9. Four-role buyer review exercise (teacher/principal/head/acquirer) was
    paused at the Principal's questions.
 10. Google Drive/Docs backend (five functions) if that feature returns.
+    NOTE: reading Drive is a Google "sensitive scope" → requires Google app
+    verification (privacy policy + review, days-to-weeks). Start that clock
+    early. Drive UI already built (`GoogleDrivePicker.tsx`, commented out) and
+    netlify.toml already has the /api/google/* redirects; the 5 functions and
+    OAuth token refresh are what's missing.
+11b. Enable Google + Microsoft social login providers in Supabase (code done;
+    see "Social login setup" above). Buttons are live but inert until enabled.
 11. `marketing/brand-brief.md` exists for Claude.ai marketing Projects.
 
 ## Working conventions
