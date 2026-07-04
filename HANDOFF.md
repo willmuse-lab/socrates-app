@@ -51,13 +51,11 @@ every dashboard task with exact click paths, one step per message, and wait.
 - `main` = the live site.
 - `feature/scos-lesson-plan` = SCOS standards + lesson plan + student
   directions pipeline. **MERGED INTO main on July 4 2026** at Will's explicit
-  request ("publish straight to live now"), overriding the earlier hold. NOTE:
-  this shipped BEFORE the full lesson-plan flow was confirmed-tested — Will
-  chose to publish anyway. Frontend build + generate.ts esbuild bundle both
-  passed pre-merge; needs `ANTHROPIC_API_KEY` only (already set). WATCH the
-  live lesson-plan flow for timeouts/format errors (see lesson #1/#4) and be
-  ready to help Will if teachers hit issues. The old Draft PR #2 / deploy-
-  preview-2 is now superseded.
+  request ("publish straight to live now"), overriding the earlier hold.
+  TESTED: Will ran 3 assignments end-to-end through the deploy preview before
+  publishing — all completed with no timeouts. Frontend build + generate.ts
+  esbuild bundle both passed pre-merge; needs `ANTHROPIC_API_KEY` only (already
+  set). The old Draft PR #2 / deploy-preview-2 is now superseded.
 
 ## Hard-won technical lessons (do not regress these)
 
@@ -165,10 +163,9 @@ localhost) — OAuth needs the real web address.
 
 ## Parked tasks (Will's backlog, roughly by priority)
 
-1. **VERIFY the SCOS → lesson plan flow ON THE LIVE SITE** — it was published
-   live July 4 2026 without a confirmed end-to-end test (Will's call). Run a
-   real assignment through align → lesson plan → directions on the live site
-   and confirm no timeout/format errors before relying on it for the demo.
+1. SCOS → lesson plan flow: tested 3x on preview (no timeouts) and published
+   live July 4 2026. Optional: one confirmation run on the LIVE site after the
+   Netlify deploy, just to be sure the production build behaves like preview.
 2. Trigger deploy of main — DONE July 4 2026 (shipped the pending pricing/
    testimonials/feedback/profile batch + Google login). Re-do after future
    main pushes; auto-deploy still doesn't fire.
