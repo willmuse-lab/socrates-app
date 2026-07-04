@@ -34,6 +34,19 @@ const PREFERENCE_CONTEXT: Record<string, string> = {
   embrace: "EMBRACE AI. Have students critique AI outputs or refine AI drafts. Document the collaboration.",
 };
 
+// The three redesigns (Bronze/Silver/Gold) are levels of INTENSITY, but their
+// GOAL must follow the teacher's chosen strategy. Without this, every strategy
+// produced the same "make it AI-proof" output. Bronze = light, Silver =
+// substantial, Gold = transformational — all pursuing the strategy's goal.
+const STRATEGY_GUIDANCE: Record<string, string> = {
+  avoid:
+    "GOAL: make the assignment resistant to AI completion so students must do genuine thinking AI cannot replicate. Bronze = a small practical tweak that closes the easiest AI shortcut. Silver = a substantial restructure that requires personal, local, or in-class evidence. Gold = a transformational redesign where using AI costs more effort than doing the work honestly (process artifacts, oral defense, in-class synthesis).",
+  augment:
+    "GOAL: openly PERMIT AI as a tool for brainstorming, research, or drafting, while requiring the student's own synthesis, judgment, and reflection for the final product. Do NOT try to block AI. Bronze = allow AI for one early step and require students to document and build on it. Silver = require AI-assisted research plus a human synthesis that clearly goes beyond what AI produced. Gold = a full workflow where students use AI as a thinking partner and are assessed on their reasoning, choices, and written reflection about that collaboration.",
+  embrace:
+    "GOAL: make AI a central object of study — students critique, fact-check, and improve AI outputs and document the collaboration. Do NOT try to block AI. Bronze = add a step where students evaluate an AI-generated answer for errors or bias. Silver = students iteratively refine an AI draft and justify each change. Gold = students produce and defend a final work that explicitly compares their own thinking to AI's, assessed on AI literacy and critical judgment.",
+};
+
 const ANALYSIS_SCHEMA = {
   type: "object",
   properties: {
@@ -167,7 +180,7 @@ ${PERMISSION_CATEGORIES}
 FRAMEWORK LOCKING RULES — these are requirements, not suggestions:
 - Every dimension score's explanation must reference the specific framework criterion it measures (Triple-A pillar, Ai-RACE component, or Bloom's level) by name.
 - The overall resilienceScore must be consistent with the scoring guidance bands, and the summary must state which framework elements are present or missing.
-- Bronze redesigns primarily strengthen ONE Triple-A pillar (usually Anchor). Silver redesigns strengthen TWO pillars (typically Anchor + Audit). Gold redesigns engage all THREE pillars (Anchor + Audit + Agency) and should raise the Ai-RACE cost of using AI above the cost of doing the work.
+- Bronze, Silver, and Gold are levels of INTENSITY (light tweak, substantial restructure, transformational), and every redesign must pursue the TEACHER'S AI STRATEGY stated in the user message — do NOT default to maximizing AI-resistance unless the strategy is "Avoid". Bronze engages roughly ONE framework dimension, Silver about TWO, and Gold engages all THREE at the strategy's fullest expression.
 - Every aiFailureBreakdown fix must map to a named strategy category (A-G).
 
 Ground every suggestion in the research above. Be concrete and classroom-ready: the modifiedAssignment text must be complete enough for a teacher to hand out as-is.`;
@@ -177,7 +190,8 @@ Ground every suggestion in the research above. Be concrete and classroom-ready: 
 SCORING DIMENSIONS (score each one individually):
 ${dimensionList || "- Anchor\n- Proprietary\n- Audit\n- Agency"}
 
-TEACHER'S AI STRATEGY: ${PREFERENCE_CONTEXT[aiPreference] || PREFERENCE_CONTEXT.avoid}
+TEACHER'S AI STRATEGY — "${aiPreference}": ${PREFERENCE_CONTEXT[aiPreference] || PREFERENCE_CONTEXT.avoid}
+HOW THE THREE REDESIGNS MUST APPLY THIS STRATEGY: ${STRATEGY_GUIDANCE[aiPreference] || STRATEGY_GUIDANCE.avoid}
 ${subject ? `SUBJECT: ${subject}` : ""}
 ${gradeLevel ? `GRADE LEVEL: ${gradeLevel}` : ""}
 
@@ -185,7 +199,7 @@ Analyze this assignment and produce a CONCISE result — brevity matters, long o
 1. resilienceScore (0-100) and a 1-2 sentence summary
 2. aiFailureBreakdown: exactly 3 specific ways a student could shortcut this with AI (1-2 sentences each)
 3. A score and a one-sentence explanation for each scoring dimension
-4. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational) — each with a SHORT rewritten assignment (a redesigned prompt of roughly 3-6 sentences, NOT a long document) and a 1-2 sentence description. Each redesign must use a DIFFERENT strategy from the catalog and fit this subject and grade level; name the strategy category (A-G) in the description.
+4. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational) — each with a SHORT rewritten assignment (a redesigned prompt of roughly 3-6 sentences, NOT a long document) and a 1-2 sentence description. Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy from the catalog and fit this subject and grade level; name the strategy category (A-G) in the description.
 
 ASSIGNMENT TEXT:
 """
@@ -198,7 +212,7 @@ OUTPUT FORMAT — return ONLY a single valid JSON object, no markdown, no code f
   "summary": "2-3 sentence overview",
   "aiFailureBreakdown": { "headline": "one sentence", "failures": [ { "type": "short name", "severity": "High|Medium|Low", "explanation": "what a student could do", "fix": "how to close the gap" } ] },
   "dimensions": [ { "name": "dimension name", "score": 0, "explanation": "why" } ],
-  "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "why it improves resilience", "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]
+  "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "how it applies the teacher's chosen AI strategy", "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]
 }
 Include exactly 3 failures, one entry per scoring dimension, and exactly three suggestions (one Bronze, one Silver, one Gold). Keep every field concise.`;
 
