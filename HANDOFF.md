@@ -102,9 +102,22 @@ every dashboard task with exact click paths, one step per message, and wait.
   - **GOOGLE = DONE & TESTED LIVE (July 4 2026).** Provider enabled in Supabase
     with real Client ID/Secret; verified end-to-end (Will logged in with Google
     on the live site).
-  - **MICROSOFT = NOT YET.** Button is live but the Azure provider is not
-    enabled in Supabase — see "Social login setup" step 2. Same process as
-    Google. Do this next.
+  - **MICROSOFT = BLOCKED (July 4 2026), parked.** Button is live but the Azure
+    provider is NOT enabled in Supabase. Will created a personal Microsoft
+    account (logs in via `socratesaiedu@gmail.com`, uses a PASSKEY, no
+    password). Could NOT reach the Azure portal to register the app: every
+    sign-in to portal.azure.com / entra.microsoft.com returned tenant errors
+    (`AADSTS16000` / `50058` — "account from identity provider live.com does
+    not exist in tenant 'Microsoft Services'"). ROOT CAUSE: a brand-new
+    consumer Microsoft account has no Azure AD / Entra tenant ("Default
+    Directory") provisioned yet — common in the first ~hour, sometimes never
+    auto-creates. RESUME PLAN: wait, then in a NORMAL (non-incognito, non-Edge)
+    window sign in fresh at entra.microsoft.com; if a directory now exists,
+    go to App registrations → New registration and follow "Social login setup"
+    step 2. If it STILL errors, the account may need a directory created
+    manually (Entra ID → Manage tenants → Create) or a different owner account.
+    The passkey is fine — not the cause. Google login already covers most
+    teachers, so this is low priority.
 - Standards (SCOS) upload appears in: onboarding profile step, Settings
   dialog, and the post-analysis results card (where the doc is SELECTED for
   alignment). Requires login + Supabase.
