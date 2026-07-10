@@ -5,7 +5,16 @@ session. Read this whole file before making changes. Last updated: July 4 2026.
 
 ## What this is
 
-Socrates (socratesmuse.com brand) helps teachers redesign assignments so AI
+**RENAMED July 4 2026: the product is now "SocratesIQ"** (was Socrates /
+Socrates Studio). All visible UI, tab title, and PDF/DOCX export headers say
+SocratesIQ; internal code identifiers, localStorage keys, model personas
+("You are Socrates"), and the hello@socratesmuse.com email were deliberately
+NOT renamed. **Domain: socratesiq.com** — bought via Netlify July 4 2026, set
+as primary (www redirects to apex), DNS/HTTPS were still propagating at
+purchase. Supabase auth updated: Site URL = https://socratesiq.com, redirect
+list has BOTH https://socratesiq.com/** and the old netlify.app/** entry.
+
+SocratesIQ helps teachers redesign assignments so AI
 can't do the work for students. Teacher pastes/uploads an assignment → gets a
 0–100 "resilience" score, an AI-failure breakdown, and Bronze/Silver/Gold
 redesigns → (feature branch) aligns to uploaded SCOS standards → generates a

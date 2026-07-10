@@ -104,7 +104,7 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
               <GraduationCap className="w-7 h-7 text-primary" />
             </div>
-            <span className="text-white font-serif italic text-xl font-bold tracking-tight">Socrates Studio</span>
+            <span className="text-white font-serif italic text-xl font-bold tracking-tight">SocratesIQ</span>
           </div>
         </div>
         <div className="p-8 space-y-6">

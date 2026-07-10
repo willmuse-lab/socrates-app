@@ -102,7 +102,7 @@ export function AssignmentAnalyzer({
   const handleExportDocx = async () => { if (!result) return; try { await exportToDocx(result, text); toast.success('DOCX exported!'); } catch { toast.error('Failed to export DOCX.'); } };
   const handleExportGoogleDocs = async () => {
     if (!result) return;
-    const title = `Socrates Analysis — ${text.trim().split('\n')[0].substring(0, 40)}`;
+    const title = `SocratesIQ Analysis — ${text.trim().split('\n')[0].substring(0, 40)}`;
     try {
       const res = await exportToGoogleDocs(result, text, title);
       if (res?.docUrl) { window.open(res.docUrl, '_blank'); toast.success('Opened in Google Docs!'); }
@@ -131,7 +131,7 @@ export function AssignmentAnalyzer({
             <div className="grid md:grid-cols-[1fr_2fr] gap-10 items-center">
               <div className="relative group hidden md:flex">
                 <div className="relative w-full aspect-square flex items-center justify-center rounded-full border-8 border-white shadow-2xl bg-white overflow-hidden">
-                  <img src="/logo.png" alt="Socrates Logo" className="w-full h-full object-cover" />
+                  <img src="/logo.png" alt="SocratesIQ Logo" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="space-y-6">
@@ -401,7 +401,7 @@ export function AssignmentAnalyzer({
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
-            <p>There's no fixed formula. Socrates weighs your assignment against a proprietary, research-based rubric built on four dimensions — <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
+            <p>There's no fixed formula. SocratesIQ weighs your assignment against a proprietary, research-based rubric built on four dimensions — <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
             <div className="space-y-1.5">
               {[
                 ['0–30', 'Highly vulnerable — one AI prompt could do it', 'text-red-500'],

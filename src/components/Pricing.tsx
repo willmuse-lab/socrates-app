@@ -5,7 +5,7 @@ import { Check, X, ArrowRight, Zap, Mail } from 'lucide-react';
 
 interface PricingProps { onBack: () => void; }
 
-const CONTACT_MAILTO = 'mailto:hello@socratesmuse.com?subject=Socrates%20school%20%2F%20district%20pricing';
+const CONTACT_MAILTO = 'mailto:hello@socratesmuse.com?subject=SocratesIQ%20school%20%2F%20district%20pricing';
 
 export function Pricing({ onBack }: PricingProps) {
   const [billing, setBilling] = useState<'annual' | 'monthly'>('annual');
@@ -93,7 +93,7 @@ export function Pricing({ onBack }: PricingProps) {
       <div className="max-w-2xl mx-auto space-y-4">
         <h2 className="text-xl font-bold text-center font-serif italic">Common questions</h2>
         {[
-          { q: 'Is there a free trial?', a: 'Yes — sign up and use Socrates free for 14 days with no credit card required.' },
+          { q: 'Is there a free trial?', a: 'Yes — sign up and use SocratesIQ free for 14 days with no credit card required.' },
           { q: 'How does school and district pricing work?', a: "Every school is different, so we price school and district plans individually. Email hello@socratesmuse.com and we'll put together a quote for your size and needs." },
           { q: 'Is student work sent to AI companies?', a: "Assignment text is sent to Anthropic's Claude API for analysis only — it is not stored or used for training. We never collect student PII." },
           { q: 'Do you offer discounts for Title I schools?', a: 'Yes. Email hello@socratesmuse.com and we\'ll work something out.' },

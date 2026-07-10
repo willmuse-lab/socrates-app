@@ -13,7 +13,7 @@ export function AboutPage({ onBack }: PageProps) {
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-5">
           <h1 className="text-4xl font-bold font-serif italic leading-tight">Built by educators,<br />for educators.</h1>
-          <p className="text-muted-foreground leading-relaxed">Socrates was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI — which is both impossible and counterproductive — we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
+          <p className="text-muted-foreground leading-relaxed">SocratesIQ was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI — which is both impossible and counterproductive — we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
           <p className="text-muted-foreground leading-relaxed">Our methodology emerged from classroom research, consultation with pedagogical experts, and analysis of international AI-in-education guidance.</p>
         </div>
         <div className="bg-secondary/50 rounded-2xl border border-border p-8 space-y-4">
@@ -23,7 +23,7 @@ export function AboutPage({ onBack }: PageProps) {
         </div>
       </div>
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold font-serif italic">The research behind Socrates</h2>
+        <h2 className="text-2xl font-bold font-serif italic">The research behind SocratesIQ</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
         <div className="flex flex-wrap gap-2">
           {[
@@ -34,7 +34,7 @@ export function AboutPage({ onBack }: PageProps) {
             <span key={name} className="px-3 py-1.5 rounded-full bg-secondary/60 border border-border text-xs font-medium text-foreground/80">{name}</span>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground italic">How these sources are combined into Socrates' scoring rubric and redesign engine is part of our proprietary methodology.</p>
+        <p className="text-xs text-muted-foreground italic">How these sources are combined into SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
       </div>
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
@@ -66,7 +66,7 @@ export function ScoringPage({ onBack }: PageProps) {
 
       <div className="space-y-4">
         <h2 className="text-lg font-bold">What produces the score</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. Socrates sends your assignment to its AI together with a research-based rubric and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. SocratesIQ sends your assignment to its AI together with a research-based rubric and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
       </div>
 
       <div className="space-y-4">
@@ -77,7 +77,7 @@ export function ScoringPage({ onBack }: PageProps) {
             <span key={name} className="px-4 py-2 rounded-full bg-secondary/60 border border-border text-sm font-bold text-foreground/80">{name}</span>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground italic">The detailed rubric behind each dimension is part of Socrates' proprietary methodology — your analysis results explain how each one applies to your specific assignment.</p>
+        <p className="text-xs text-muted-foreground italic">The detailed rubric behind each dimension is part of SocratesIQ's proprietary methodology — your analysis results explain how each one applies to your specific assignment.</p>
       </div>
 
       <div className="space-y-4">
@@ -113,8 +113,8 @@ export function PrivacyPage({ onBack }: PageProps) {
       </div>
       {[
         { title: 'What data we collect', content: 'We collect the minimum necessary: your name and email address, assignment text you submit for analysis, your saved assignments and analysis results, and basic usage metadata.\n\nWe do NOT collect student names, student work, grades, or any personally identifiable student information.' },
-        { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers Socrates.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded — it is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
-        { title: 'FERPA compliance', content: 'Socrates is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at hello@socratesmuse.com to request a DPA.' },
+        { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers SocratesIQ.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded — it is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
+        { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at hello@socratesmuse.com to request a DPA.' },
         { title: 'Google Drive & Docs', content: 'When you connect Google Drive, we request the minimum permissions needed: read access to your Google Docs and write access to create new Google Docs for export.\n\nWe do not access any other files in your Drive. Your Google OAuth token is stored in a secure, HttpOnly cookie and is never logged or stored in our database.' },
         { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email hello@socratesmuse.com. We will process deletion requests within 14 days.' },
         { title: 'Contact', content: 'Data privacy questions: hello@socratesmuse.com\nWe aim to respond within 2 business days.' },
@@ -137,7 +137,7 @@ export function FeedbackPage({ onBack }: PageProps) {
           {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
         </div>
         <h1 className="text-4xl font-bold font-serif italic">Teacher feedback</h1>
-        <p className="text-muted-foreground">What teachers are telling us after using Socrates in their classrooms.</p>
+        <p className="text-muted-foreground">What teachers are telling us after using SocratesIQ in their classrooms.</p>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
         {TEACHER_COMMENTS.map((c, i) => (
@@ -150,7 +150,7 @@ export function FeedbackPage({ onBack }: PageProps) {
         ))}
       </div>
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-3">
-        <h3 className="text-xl font-bold font-serif italic">Using Socrates in your classroom?</h3>
+        <h3 className="text-xl font-bold font-serif italic">Using SocratesIQ in your classroom?</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">We'd love to hear what's working. Send us your experience and it may appear here.</p>
         <Button onClick={() => window.location.href = 'mailto:hello@socratesmuse.com?subject=My%20Socrates%20feedback'} className="gap-2">
           <Mail className="w-4 h-4" />Share your feedback
@@ -169,11 +169,11 @@ export function TermsPage({ onBack }: PageProps) {
         <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
       </div>
       {[
-        { title: '1. Agreement to these terms', content: 'These Terms of Service ("Terms") govern your access to and use of Socrates ("the Service"), operated by Socrates ("we," "us"). By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.' },
-        { title: '2. What Socrates does', content: 'Socrates helps educators analyze and redesign their own teaching assignments to be more resilient to AI completion. The Service uses artificial intelligence to generate scores, suggestions, and redesigned assignment text. These outputs are educational guidance, not professional, legal, or accreditation advice.' },
+        { title: '1. Agreement to these terms', content: 'These Terms of Service ("Terms") govern your access to and use of SocratesIQ ("the Service"), operated by SocratesIQ ("we," "us"). By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.' },
+        { title: '2. What SocratesIQ does', content: 'SocratesIQ helps educators analyze and redesign their own teaching assignments to be more resilient to AI completion. The Service uses artificial intelligence to generate scores, suggestions, and redesigned assignment text. These outputs are educational guidance, not professional, legal, or accreditation advice.' },
         { title: '3. Eligibility and accounts', content: 'The Service is intended for educators and school staff aged 18 or older. You are responsible for the accuracy of your account information and for keeping your login credentials secure. You are responsible for all activity that occurs under your account.' },
-        { title: '4. Acceptable use', content: 'You agree to use Socrates only for lawful, educational purposes. You agree NOT to: submit content you do not have the right to submit; attempt to disrupt, reverse engineer, or gain unauthorized access to the Service; resell or redistribute the Service without our written permission; or use the Service to violate any applicable law or any third party’s rights.' },
-        { title: '5. Student data and your responsibility', content: 'Socrates is designed for teachers to analyze their own assignment prompts. You agree NOT to submit student names, student work, grades, or other personally identifiable student information. You are responsible for complying with your institution’s policies and applicable laws (including FERPA) when using the Service. See our Privacy page for how submitted text is handled.' },
+        { title: '4. Acceptable use', content: 'You agree to use SocratesIQ only for lawful, educational purposes. You agree NOT to: submit content you do not have the right to submit; attempt to disrupt, reverse engineer, or gain unauthorized access to the Service; resell or redistribute the Service without our written permission; or use the Service to violate any applicable law or any third party’s rights.' },
+        { title: '5. Student data and your responsibility', content: 'SocratesIQ is designed for teachers to analyze their own assignment prompts. You agree NOT to submit student names, student work, grades, or other personally identifiable student information. You are responsible for complying with your institution’s policies and applicable laws (including FERPA) when using the Service. See our Privacy page for how submitted text is handled.' },
         { title: '6. AI-generated content', content: 'Scores and suggestions are produced by AI and are provided "as is." They are estimates intended to guide your professional judgment, not guarantees. The resilience score is a diagnostic indicator, not a certification that an assignment cannot be completed with AI. You are responsible for reviewing and adapting any generated material before classroom use.' },
         { title: '7. Subscriptions and billing', content: 'Some features require a paid subscription. Pricing and any free allowance are described on our Pricing page. Where paid plans are offered, fees are billed in advance and are non-refundable except where required by law. You may cancel at any time; cancellation stops future charges and takes effect at the end of the current billing period. We may change pricing with reasonable notice.' },
         { title: '8. Intellectual property', content: 'The Service, including its software, design, and content we provide, is owned by us and protected by law. Assignment text you submit remains yours. Redesigned assignments and suggestions generated for you are yours to use in your teaching. You grant us a limited license to process your submitted text solely to provide the Service.' },

@@ -59,10 +59,10 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
           {step === 0 && (
             <motion.div key="welcome" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6 text-center">
-              <div className="w-20 h-20 mx-auto"><img src="/logo.png" alt="Socrates" className="w-full h-full object-contain" /></div>
+              <div className="w-20 h-20 mx-auto"><img src="/logo.png" alt="SocratesIQ" className="w-full h-full object-contain" /></div>
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold font-serif italic">Welcome, {userName.split(' ')[0]}.</h1>
-                <p className="text-muted-foreground leading-relaxed">Socrates helps you design assignments that <strong>AI cannot shortcut</strong>. This takes 90 seconds to set up.</p>
+                <p className="text-muted-foreground leading-relaxed">SocratesIQ helps you design assignments that <strong>AI cannot shortcut</strong>. This takes 90 seconds to set up.</p>
               </div>
               <div className="grid grid-cols-3 gap-4 text-left">
                 {[{ icon: '🎯', label: 'Analyze', desc: 'Score any assignment for AI resilience' }, { icon: '✏️', label: 'Redesign', desc: 'Get three improved versions instantly' }, { icon: '📚', label: 'Research', desc: 'Backed by the latest pedagogy research' }].map(item => (
@@ -80,7 +80,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
             <motion.div key="profile" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6 max-h-[85vh] overflow-y-auto">
               <div><h2 className="text-2xl font-bold font-serif italic">Tell us about your teaching</h2>
-                <p className="text-sm text-muted-foreground">Socrates tailors every suggestion to your subject and students.</p></div>
+                <p className="text-sm text-muted-foreground">SocratesIQ tailors every suggestion to your subject and students.</p></div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">What subjects do you teach? <span className="normal-case font-medium">(select all that apply)</span></Label>
@@ -136,7 +136,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
             <motion.div key="framework" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6">
               <div><h2 className="text-2xl font-bold font-serif italic">The Triple-A Framework</h2>
-                <p className="text-sm text-muted-foreground">The three principles behind every Socrates suggestion.</p></div>
+                <p className="text-sm text-muted-foreground">The three principles behind every SocratesIQ suggestion.</p></div>
               <div className="space-y-3">
                 {[
                   { color: 'bg-accent', label: 'Anchor', icon: '⚓', desc: "Ground assignments in local, personal, or current context that AI cannot access — your classroom, this week's news, your students' own community." },
@@ -192,7 +192,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
               </motion.div>
               <div className="space-y-2">
                 <h2 className="text-2xl font-bold font-serif italic">You're all set!</h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">Socrates will now tailor every analysis to <strong>{subjects.join(', ')}</strong> at the <strong>{gradeLevels.join(', ')}</strong> level{gradeLevels.length > 1 ? 's' : ''}.</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">SocratesIQ will now tailor every analysis to <strong>{subjects.join(', ')}</strong> at the <strong>{gradeLevels.join(', ')}</strong> level{gradeLevels.length > 1 ? 's' : ''}.</p>
               </div>
               <div className="bg-secondary/40 rounded-xl p-4 text-left space-y-2">
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Your profile</p>

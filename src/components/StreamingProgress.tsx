@@ -39,7 +39,7 @@ export function StreamingProgress({ percent, isVisible }: StreamingProgressProps
           <div className="relative">
             <div className="absolute inset-0 rounded-full bg-accent/20 animate-ping" />
             <div className="relative w-16 h-16 rounded-full border-2 border-accent/30 flex items-center justify-center bg-card">
-              <img src="/logo.png" alt="Socrates" className="w-10 h-10 object-contain" />
+              <img src="/logo.png" alt="SocratesIQ" className="w-10 h-10 object-contain" />
             </div>
           </div>
 

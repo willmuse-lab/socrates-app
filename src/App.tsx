@@ -142,7 +142,7 @@ export default function App() {
 
       <header className="h-16 md:h-20 px-4 md:px-10 flex items-center justify-between border-b border-border bg-card sticky top-0 z-40">
         <button onClick={() => setViewMode('studio')} className="flex items-center gap-2">
-          <img src="/logo.png" alt="Socrates" className="h-10 md:h-[60px] w-auto object-contain" />
+          <img src="/logo.png" alt="SocratesIQ" className="h-10 md:h-[60px] w-auto object-contain" />
         </button>
         <nav className="hidden md:flex items-center gap-6">
           {[
@@ -209,7 +209,7 @@ export default function App() {
               <section id="how-to-use" className="py-20 px-6 md:px-10 bg-card border-t border-border">
                 <div className="max-w-4xl mx-auto space-y-12">
                   <div className="text-center space-y-4">
-                    <h2 className="text-3xl font-bold font-serif italic">How to Use Socrates</h2>
+                    <h2 className="text-3xl font-bold font-serif italic">How to Use SocratesIQ</h2>
                     <p className="text-muted-foreground">Three steps to AI-resilient assignments.</p>
                   </div>
                   <div className="grid sm:grid-cols-3 gap-8">
@@ -230,7 +230,7 @@ export default function App() {
               <Testimonials />
               <footer className="py-8 px-6 border-t border-border">
                 <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
-                  <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} Socrates AI · Built for Educators</p>
+                  <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} SocratesIQ · Built for Educators</p>
                   <div className="flex gap-4">
                     {[['How scoring works', 'scoring'],['Teacher feedback', 'feedback'],['Privacy', 'privacy'],['Terms', 'terms'],['About', 'about'],['Pricing', 'pricing']].map(([l, v]) => (
                       <button key={v} onClick={() => setViewMode(v as ViewMode)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{l}</button>

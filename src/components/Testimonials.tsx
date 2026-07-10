@@ -10,7 +10,7 @@ const TESTIMONIALS = [
   {
     role: 'Pilot program teacher',
     color: 'bg-accent',
-    quote: "Socrates is a tool that helps teachers reduce students' ability to use AI to do the work for them. It also suggests ways to incorporate class time and discussion into assessments, which encouraged my students to engage with each other more.",
+    quote: "SocratesIQ is a tool that helps teachers reduce students' ability to use AI to do the work for them. It also suggests ways to incorporate class time and discussion into assessments, which encouraged my students to engage with each other more.",
     highlight: 'Students caught AI giving incorrect information — and it became a major teaching moment about critical thinking.',
     feature: 'Quick-start examples',
     result: 'Students used multiple AI sources to compare information, turning AI limitations into learning opportunities.',

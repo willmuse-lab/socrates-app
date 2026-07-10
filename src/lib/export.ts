@@ -12,7 +12,7 @@ export async function exportToPDF(result: AnalysisResult, originalText: string) 
 
   doc.setFontSize(22);
   doc.setTextColor(79, 70, 229);
-  doc.text('Socrates Analysis Report', margin, y);
+  doc.text('SocratesIQ Analysis Report', margin, y);
   y += 15;
 
   doc.setFontSize(14);
@@ -72,7 +72,7 @@ export async function exportToDocx(result: AnalysisResult, originalText: string)
     sections: [{
       properties: {},
       children: [
-        new Paragraph({ text: "Socrates Analysis Report", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+        new Paragraph({ text: "SocratesIQ Analysis Report", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
         new Paragraph({ children: [new TextRun({ text: `Resilience Score: ${result.resilienceScore}/100`, bold: true, size: 28 })], spacing: { before: 400, after: 200 } }),
         new Paragraph({ text: result.summary, spacing: { after: 400 } }),
         new Paragraph({ text: "Analysis Dimensions", heading: HeadingLevel.HEADING_2, spacing: { before: 400, after: 200 } }),
