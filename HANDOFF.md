@@ -133,6 +133,14 @@ every dashboard task with exact click paths, one step per message, and wait.
 - Standards (SCOS) upload appears in: onboarding profile step, Settings
   dialog, and the post-analysis results card (where the doc is SELECTED for
   alignment). Requires login + Supabase.
+- **Password reset (added July 4 2026):** "Forgot password?" on the login
+  dialog → `requestPasswordReset` (redirectTo = window.location.origin) →
+  Supabase emails a link → returning visit fires the PASSWORD_RECOVERY auth
+  event (surfaced via onAuthStateChange's second arg) → App shows
+  `ResetPasswordDialog` → `updatePassword`. Uses Supabase's BUILT-IN mailer
+  (generic sender, low hourly rate limit — don't mass-test; custom SMTP on
+  @socratesiq.com is a later task). Google-only users have no password; the
+  sent-confirmation copy points them back to the Google button.
 
 ## Social login setup (Google + Microsoft) — Will's dashboard steps
 

@@ -10,6 +10,7 @@ import { Testimonials } from './components/Testimonials';
 import { SplashScreen } from './components/SplashScreen';
 import { UserMenu } from './components/UserMenu';
 import { LoginDialog } from './components/LoginDialog';
+import { ResetPasswordDialog } from './components/ResetPasswordDialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
@@ -36,6 +37,7 @@ export default function App() {
   const [user, setUser] = useState<{ name: string; email: string; id?: string } | null>(null);
   const [profile, setProfile] = useState<TeacherProfile | null>(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('studio');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [openedAssignment, setOpenedAssignment] = useState<SavedAssignment | null>(null);
@@ -69,7 +71,10 @@ export default function App() {
   useEffect(() => {
     if (!supabaseEnabled) return;
     let unsub = () => {};
-    onAuthStateChange(async (sbUser: any) => {
+    onAuthStateChange(async (sbUser: any, event?: string) => {
+      // Arriving via a password-reset email link fires this event; show the
+      // choose-a-new-password form on top of the (now signed-in) session.
+      if (event === 'PASSWORD_RECOVERY') setShowPasswordReset(true);
       if (sbUser) {
         const name = sbUser.user_metadata?.name || sbUser.email?.split('@')[0] || 'Teacher';
         const newUser = { name, email: sbUser.email, id: sbUser.id };
@@ -139,6 +144,7 @@ export default function App() {
         <Onboarding userName={user.name} userEmail={user.email} userId={user.id || ''} onComplete={handleOnboardingComplete} />
       )}</AnimatePresence>
       <LoginDialog isOpen={isLoginOpen && !showSplash && !showOnboarding} onLogin={handleLogin} />
+      <ResetPasswordDialog isOpen={showPasswordReset} onDone={() => setShowPasswordReset(false)} />
 
       <header className="h-16 md:h-20 px-4 md:px-10 flex items-center justify-between border-b border-border bg-card sticky top-0 z-40">
         <button onClick={() => setViewMode('studio')} className="flex items-center gap-2">

@@ -43,17 +43,31 @@ export async function signInWithProvider(provider: 'google' | 'azure') {
   });
 }
 
+export async function requestPasswordReset(email: string) {
+  const sb = await getClient();
+  if (!sb) return { error: new Error('Supabase not configured') };
+  // The email link returns the user to whatever address they're on
+  // (netlify.app or socratesiq.com); both are in the Supabase allow-list.
+  return await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+}
+
+export async function updatePassword(password: string) {
+  const sb = await getClient();
+  if (!sb) return { error: new Error('Supabase not configured') };
+  return await sb.auth.updateUser({ password });
+}
+
 export async function signOut() {
   const sb = await getClient();
   if (!sb) return;
   await sb.auth.signOut();
 }
 
-export async function onAuthStateChange(callback: (user: any) => void) {
+export async function onAuthStateChange(callback: (user: any, event?: string) => void) {
   const sb = await getClient();
   if (!sb) return () => {};
-  const { data: { subscription } } = sb.auth.onAuthStateChange((_event: any, session: any) => {
-    callback(session?.user ?? null);
+  const { data: { subscription } } = sb.auth.onAuthStateChange((event: any, session: any) => {
+    callback(session?.user ?? null, event);
   });
   return () => subscription.unsubscribe();
 }

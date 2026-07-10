@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { GraduationCap, Lock, User, Mail, Loader2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { supabaseEnabled, signInWithEmail, signUpWithEmail, signInWithProvider } from '@/src/lib/supabase';
+import { supabaseEnabled, signInWithEmail, signUpWithEmail, signInWithProvider, requestPasswordReset } from '@/src/lib/supabase';
 import { toast } from 'sonner';
 
 // Brand marks kept inline as SVG so they render without external assets.
@@ -36,7 +36,7 @@ interface LoginDialogProps {
   onLogin: (name: string, email: string, id?: string) => void;
 }
 
-type Mode = 'login' | 'signup';
+type Mode = 'login' | 'signup' | 'forgot';
 
 export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
   const [mode, setMode] = useState<Mode>('login');
@@ -45,6 +45,7 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [resetSent, setResetSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +58,20 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
         onLogin(name, demoEmail);
         setIsSubmitting(false);
       }, 800);
+      return;
+    }
+    if (mode === 'forgot') {
+      if (!email) return;
+      setIsSubmitting(true);
+      try {
+        const { error: err } = await requestPasswordReset(email);
+        if (err) { setError(err.message || 'Could not send the reset email. Please try again.'); return; }
+        setResetSent(true);
+      } catch (err: any) {
+        setError(err.message || 'Something went wrong.');
+      } finally {
+        setIsSubmitting(false);
+      }
       return;
     }
     if (!email || !password || (mode === 'signup' && !name)) return;
@@ -110,15 +125,16 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
         <div className="p-8 space-y-6">
           <DialogHeader className="space-y-2">
             <DialogTitle className="text-2xl font-bold tracking-tight text-center">
-              {isDemo ? 'Demo Gateway' : mode === 'login' ? 'Welcome Back' : 'Create Account'}
+              {isDemo ? 'Demo Gateway' : mode === 'login' ? 'Welcome Back' : mode === 'forgot' ? 'Reset Password' : 'Create Account'}
             </DialogTitle>
             <DialogDescription className="text-center text-muted-foreground">
               {isDemo ? 'Enter any name and password to access the studio.'
                 : mode === 'login' ? 'Sign in to access your assignments and settings.'
+                : mode === 'forgot' ? "Enter your email and we'll send you a link to reset your password."
                 : 'Create an account to save your work across devices.'}
             </DialogDescription>
           </DialogHeader>
-          {!isDemo && (
+          {!isDemo && mode !== 'forgot' && (
             <div className="space-y-3">
               <Button type="button" variant="outline" onClick={() => handleProvider('google')} disabled={isSubmitting}
                 className="w-full h-11 gap-2.5 text-sm font-semibold border-border hover:bg-secondary">
@@ -155,14 +171,29 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
                 </div>
               </div>
             )}
-            <div className="space-y-2">
-              <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                <Input type="password" placeholder="••••••••" className="pl-10 h-10 border-border focus-visible:ring-accent"
-                  value={password} onChange={(e) => setPassword(e.target.value)} required />
+            {mode !== 'forgot' && (
+              <div className="space-y-2">
+                <Label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Input type="password" placeholder="••••••••" className="pl-10 h-10 border-border focus-visible:ring-accent"
+                    value={password} onChange={(e) => setPassword(e.target.value)} required />
+                </div>
               </div>
-            </div>
+            )}
+            {!isDemo && mode === 'login' && (
+              <div className="text-right -mt-1">
+                <button type="button" onClick={() => { setMode('forgot'); setError(''); setResetSent(false); }}
+                  className="text-xs text-accent font-semibold hover:underline">
+                  Forgot password?
+                </button>
+              </div>
+            )}
+            {mode === 'forgot' && resetSent && (
+              <div className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                Check your email — if an account exists for that address, a reset link is on its way. It expires in about an hour. (Signed up with Google? Use the 'Continue with Google' button instead.)
+              </div>
+            )}
             <AnimatePresence>
               {error && (
                 <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -172,13 +203,14 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
               )}
             </AnimatePresence>
             <Button type="submit" className="w-full h-11 text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90"
-              disabled={isSubmitting || (isDemo ? !name || !password : !email || !password || (mode === 'signup' && !name))}>
-              {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Authenticating...</> : 'Access Studio'}
+              disabled={isSubmitting || (isDemo ? !name || !password : mode === 'forgot' ? !email || resetSent : !email || !password || (mode === 'signup' && !name))}>
+              {isSubmitting ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />{mode === 'forgot' ? 'Sending...' : 'Authenticating...'}</>
+                : mode === 'forgot' ? (resetSent ? 'Link Sent' : 'Send Reset Link') : 'Access Studio'}
             </Button>
             {!isDemo && (
               <p className="text-xs text-center text-muted-foreground">
-                {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-                <button type="button" onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }}
+                {mode === 'login' ? "Don't have an account? " : mode === 'forgot' ? 'Remembered your password? ' : 'Already have an account? '}
+                <button type="button" onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setResetSent(false); }}
                   className="text-accent font-bold hover:underline">
                   {mode === 'login' ? 'Sign up' : 'Log in'}
                 </button>
