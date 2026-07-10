@@ -191,3 +191,86 @@ export function TermsPage({ onBack }: PageProps) {
     </motion.div>
   );
 }
+
+const HELP_TOPICS = [
+  {
+    title: 'Getting started: what SocratesIQ does',
+    content: 'SocratesIQ analyzes your assignments for how easily a student could complete them with AI, then helps you redesign them.\n\nThe basic flow: paste or upload an assignment → pick your AI strategy → click Analyze. You get a resilience score (0–100), a breakdown of exactly how AI could shortcut the assignment, and three ready-to-use redesigns (Bronze, Silver, Gold).\n\nSet up your teaching profile when you first sign in (subjects and grade levels) — every analysis is tailored to what you teach.',
+  },
+  {
+    title: 'Adding an assignment (paste, upload, or template)',
+    content: 'Three ways to get an assignment in:\n\n1. PASTE — copy your assignment text into the "Paste Text" box.\n2. UPLOAD — drop a PDF, Word (.docx), or plain-text file into the "Upload Document" card. The text is extracted automatically.\n3. TEMPLATE — click "Start from a template" to begin from a sample assignment for your subject.\n\nIf a PDF won\'t read (some scanned PDFs are images, not text), try the Word version, or copy-paste the text instead.',
+  },
+  {
+    title: 'The three AI strategies (Avoid, Augment, Embrace)',
+    content: 'Before analyzing, choose how YOU want AI to fit into this assignment. Your choice changes the redesigns you get:\n\nAVOID AI — you want work AI cannot do for the student. Redesigns make the assignment AI-resistant (personal evidence, in-class steps, process artifacts).\n\nAUGMENT WITH AI — you allow AI as a tool (brainstorming, research, drafting) but the final thinking must be the student\'s. Redesigns build AI in as a helper and grade the student\'s own synthesis and reflection.\n\nEMBRACE AI — AI becomes part of the lesson. Redesigns have students critique, fact-check, and improve AI\'s work, and document the collaboration.\n\nThere is no wrong choice — pick per assignment. You can set your usual default in Settings.',
+  },
+  {
+    title: 'Understanding your results',
+    content: 'RESILIENCE SCORE (0–100): how hard it is for a student to complete your ORIGINAL assignment using AI. Higher = harder to shortcut. The score always measures AI-resistance, whatever strategy you chose.\n\nAI FAILURE BREAKDOWN: three specific ways a student could use AI to shortcut the assignment, each with a severity and a fix.\n\nBRONZE / SILVER / GOLD REDESIGNS: three rewritten versions of your assignment, from a light tweak (Bronze) to a substantial restructure (Silver) to a transformational redesign (Gold) — all following your chosen AI strategy. Use "Compare levels" to see them side by side. Each is written to be handed out as-is, but always apply your own professional judgment.',
+  },
+  {
+    title: 'Standards alignment and lesson plans',
+    content: 'You can align results to your state standards and generate a full lesson plan:\n\n1. UPLOAD YOUR STANDARDS once — during onboarding, or anytime in Settings. PDF, Word, or text.\n2. After an analysis, choose a redesign level, select your standards document on the results screen, and run alignment. You\'ll see which standards the assignment addresses, any gaps, and near-misses.\n3. Generate the LESSON PLAN — a structured Section I–VI plan (standards, objectives, AI tool integration, procedure, ethics & integrity, assessment) built around your redesigned assignment.\n4. Generate STUDENT DIRECTIONS — a student-facing handout with steps, AI rules, and grading expectations.\n\nStandards upload requires being signed in.',
+  },
+  {
+    title: 'Saving, the Library, and syncing',
+    content: 'Click Save on any analysis to keep it. Your saved assignments live in the Library (top navigation).\n\nWhen you\'re signed in, saved assignments sync to the cloud — you\'ll see a cloud icon and can access them from any device. You can reopen, review, or delete saved assignments from the Library at any time.',
+  },
+  {
+    title: 'Exporting and sharing results',
+    content: 'From any analysis you can export:\n\nPDF — a formatted analysis report.\nDOCX — the same report as a Word document you can edit.\nSHARE — copies a summary to share with a colleague.\n\nExports include your score, the failure breakdown, and the redesigns.',
+  },
+  {
+    title: 'Signing in: email, Google, and Microsoft',
+    content: 'Two ways to sign in today:\n\nEMAIL + PASSWORD — create an account with any email address.\nGOOGLE — click "Continue with Google" and use your Google account. No separate password needed.\n\n"Continue with Microsoft" is visible but not yet active — it\'s coming soon.\n\nIf you signed up with Google, always use the Google button — your account has no password.',
+  },
+  {
+    title: 'Forgot your password?',
+    content: 'On the sign-in screen, click "Forgot password?" (under the password box), enter your email, and click Send Reset Link.\n\nCheck your inbox for the reset email and click the link — it brings you back to SocratesIQ to choose a new password. You\'ll be signed in immediately after saving it.\n\nTips:\n• The link expires after about an hour — request a fresh one if needed.\n• No email? Check your spam folder, and wait a minute or two.\n• Signed up with Google? There\'s no password to reset — use "Continue with Google" instead.',
+  },
+  {
+    title: 'Settings and your teaching profile',
+    content: 'Open Settings (gear icon) to change:\n\n• Your subjects and grade levels (multi-select — analyses are tailored to these)\n• Your standards documents\n• The analysis framework: Triple-A (Anchor, Audit, Agency) or Bloom\'s Taxonomy with a target level\n• Your default AI strategy (Avoid / Augment / Embrace)\n\nChanges apply to your next analysis.',
+  },
+  {
+    title: 'Troubleshooting common errors',
+    content: '"This step took too long and timed out" — the AI hit a time limit. Just try again; if it keeps happening on one assignment, try slightly shorter text.\n\n"The result came back in an unexpected format" — a rare formatting hiccup in the AI\'s response. Click the same button again; it almost always succeeds on retry.\n\nA PDF uploads but no text appears — the PDF is probably a scanned image. Use the Word version or paste the text.\n\nGoogle sign-in doesn\'t finish — make sure you complete the Google permission screen, and try a regular (non-private) browser window.\n\nStill stuck? Email us — see Contact support below.',
+  },
+  {
+    title: 'Contact support',
+    content: 'We\'re a small team of educators and we read everything.\n\nEmail: hello@socratesmuse.com\nWe aim to respond within 2 business days.\n\nWhen reporting a problem, it helps to include: what you clicked, what you expected, what happened instead, and roughly what time it happened.',
+  },
+];
+
+export function HelpPage({ onBack }: PageProps) {
+  const [query, setQuery] = React.useState('');
+  const q = query.trim().toLowerCase();
+  const topics = q
+    ? HELP_TOPICS.filter(t => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
+    : HELP_TOPICS;
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
+      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
+      <div className="space-y-2">
+        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Help & How-To</h1></div>
+        <p className="text-muted-foreground">Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:hello@socratesmuse.com" className="text-accent font-semibold hover:underline">hello@socratesmuse.com</a>.</p>
+      </div>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search help topics…"
+        className="w-full h-10 px-4 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+      />
+      {topics.length === 0 && (
+        <p className="text-sm text-muted-foreground">No topics match "{query}". Try another word, or email <a href="mailto:hello@socratesmuse.com" className="text-accent font-semibold hover:underline">hello@socratesmuse.com</a>.</p>
+      )}
+      {topics.map(({ title, content }) => (
+        <div key={title} className="space-y-3 pb-6 border-b border-border last:border-0">
+          <h2 className="text-lg font-bold">{title}</h2>
+          <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{content}</div>
+        </div>
+      ))}
+    </motion.div>
+  );
+}

@@ -5,7 +5,7 @@ import { AdminResearch } from './components/AdminResearch';
 import { AdminDashboard } from './components/AdminDashboard';
 import { Onboarding } from './components/Onboarding';
 import { Pricing } from './components/Pricing';
-import { AboutPage, PrivacyPage, ScoringPage, TermsPage, FeedbackPage } from './components/StaticPages';
+import { AboutPage, PrivacyPage, ScoringPage, TermsPage, FeedbackPage, HelpPage } from './components/StaticPages';
 import { Testimonials } from './components/Testimonials';
 import { SplashScreen } from './components/SplashScreen';
 import { UserMenu } from './components/UserMenu';
@@ -23,7 +23,7 @@ import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'luci
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
-type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy' | 'scoring' | 'terms' | 'feedback';
+type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy' | 'scoring' | 'terms' | 'feedback' | 'help';
 type AIPreference = 'avoid' | 'augment' | 'embrace';
 
 export interface SavedAssignment {
@@ -238,7 +238,7 @@ export default function App() {
                 <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
                   <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} SocratesIQ · Built for Educators</p>
                   <div className="flex gap-4">
-                    {[['How scoring works', 'scoring'],['Teacher feedback', 'feedback'],['Privacy', 'privacy'],['Terms', 'terms'],['About', 'about'],['Pricing', 'pricing']].map(([l, v]) => (
+                    {[['Help', 'help'],['How scoring works', 'scoring'],['Teacher feedback', 'feedback'],['Privacy', 'privacy'],['Terms', 'terms'],['About', 'about'],['Pricing', 'pricing']].map(([l, v]) => (
                       <button key={v} onClick={() => setViewMode(v as ViewMode)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{l}</button>
                     ))}
                   </div>
@@ -275,6 +275,11 @@ export default function App() {
           {viewMode === 'about' && (
             <motion.div key="about" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
               <AboutPage onBack={() => setViewMode('studio')} />
+            </motion.div>
+          )}
+          {viewMode === 'help' && (
+            <motion.div key="help" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
+              <HelpPage onBack={() => setViewMode('studio')} />
             </motion.div>
           )}
           {viewMode === 'privacy' && (

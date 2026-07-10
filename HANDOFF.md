@@ -181,6 +181,13 @@ localhost) — OAuth needs the real web address.
   auth.<yourdomain>) — bundle with the custom-domain task (#6) and Google
   verification (#10). Do NOT chase this standalone.
 
+- **Help page (added July 4 2026):** searchable in-app Help & How-To
+  (`HelpPage` in StaticPages.tsx, viewMode 'help', first footer link). Covers
+  all features incl. strategies, lesson plans, password reset, troubleshooting.
+  DECISION: a support CHATBOT was considered and deliberately DEFERRED until
+  real support volume exists — the Help page content is written to become the
+  bot's knowledge base later. Keep the Help page updated when features change.
+
 ## Parked tasks (Will's backlog, roughly by priority)
 
 1. SCOS → lesson plan flow: tested 3x on preview (no timeouts) and published
