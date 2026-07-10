@@ -46,6 +46,8 @@ export interface AlignmentResult {
 export interface LessonPlanSection { title: string; content: string; }
 
 export interface LessonPlan {
+  lessonTitle?: string;
+  aiFramework?: string;
   sectionI: LessonPlanSection;
   sectionII: LessonPlanSection;
   sectionIII: LessonPlanSection;
@@ -160,6 +162,8 @@ export async function generateStudentDirections(
 export function lessonPlanToText(plan: LessonPlan): string {
   const s = (sec: LessonPlanSection, num: string) => `${num}: ${sec.title}\n${sec.content}`;
   return [
+    // Header matches the school template: title, teacher/date blanks, framework.
+    `${plan.lessonTitle || '[Lesson Title]'}\nTeacher: ________ | Date: ________ | Grade/Subject: ________\nAI Framework: ${plan.aiFramework || 'TeachAI Toolkit'}`,
     s(plan.sectionI, 'Section I'),
     s(plan.sectionII, 'Section II'),
     s(plan.sectionIII, 'Section III'),

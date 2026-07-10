@@ -59,12 +59,17 @@ export function AssignmentAnalyzer({
   React.useEffect(() => { if (!text && !result) setAiPreference(defaultPreference); }, [defaultPreference]);
   React.useEffect(() => { if (initialText) { setText(initialText); setResult(null); } }, [initialText]);
 
-  const handleAnalyze = async () => {
-    if (!text.trim()) return;
+  // overrideText lets callers analyze text that was JUST set in state (React
+  // state updates land asynchronously, so reading `text` right after setText
+  // returns the old value — the cause of the "analyze twice" bug). Guarded by
+  // typeof because button onClick passes a click event, not a string.
+  const handleAnalyze = async (overrideText?: unknown) => {
+    const input = typeof overrideText === 'string' ? overrideText : text;
+    if (!input.trim()) return;
     setIsAnalyzing(true); setFeedback({}); setApplied(null);
     try {
       setProgressStage('Reading your assignment...'); setProgressPercent(5);
-      const analysis = await analyzeAssignment(text, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
+      const analysis = await analyzeAssignment(input, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
         (stage, pct) => { setProgressStage(stage); setProgressPercent(pct); });
       setResult(analysis); setActiveLevel('Bronze');
     } catch (error: any) {
@@ -80,7 +85,7 @@ export function AssignmentAnalyzer({
 
   const applyVersion = (content: string, index: number) => {
     setText(content); setApplied(index); setResult(null);
-    toast.success('Version applied! Re-analyze to see the new score.', { action: { label: 'Analyze Now', onClick: () => handleAnalyze() } });
+    toast.success('Version applied! Re-analyze to see the new score.', { action: { label: 'Analyze Now', onClick: () => handleAnalyze(content) } });
   };
 
   const handleFeedback = (index: number, vote: 'up' | 'down') => {

@@ -87,6 +87,24 @@ every dashboard task with exact click paths, one step per message, and wait.
 4. Analysis quality was deliberately traded down (Haiku, ~short outputs) to
    fit the timeout. "Quality tuning" is a parked task — any attempt must be
    tested against the 30s ceiling on a deploy preview first.
+5. **Analyze is SPLIT into two parallel calls (July 4 2026):** the client
+   (gemini.ts) fires `part: "diagnosis"` (score/summary/failures/dimensions,
+   max_tokens 1100) and `part: "redesigns"` (three suggestions, max_tokens
+   1700) simultaneously and merges them. This halved wall time (~25s → ~13s)
+   and fixed timeouts on page-long assignments (incl. re-analyzing redesigns,
+   which are longer than what teachers first paste). No `part` = full response
+   (backward compat). Keep BOTH halves small when editing prompts.
+6. **"Analyze twice" bug (fixed):** applyVersion's toast action called
+   handleAnalyze() which read stale React state — first click re-analyzed the
+   OLD text. handleAnalyze now takes an optional overrideText; keep that
+   pattern for any analyze-right-after-setText flow.
+7. **Lesson plan is template-locked to Will's SCHOOL template** (he supplied
+   the PDF/DOCX July 4 2026): each section's content must be exactly the
+   labeled lines (Section I: "National Teaching Standards:" / "AI Competency
+   Block:" / "Progression Level:", etc.) — see LESSON_PLAN_TEMPLATE in
+   _shared/research-base.ts and the JSON spec in generate.ts (which now also
+   returns lessonTitle + aiFramework, rendered in LessonPlanPanel and included
+   in lessonPlanToText's header). Do not loosen the labeled-line requirement.
 
 ## Product decisions already made (don't relitigate)
 

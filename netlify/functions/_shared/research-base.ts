@@ -212,23 +212,48 @@ SCORING — every score MUST be justified against named framework criteria
 `;
 
 export const LESSON_PLAN_TEMPLATE = `
-AI-INTEGRATED LESSON PLAN TEMPLATE — every Socrates lesson plan MUST contain exactly
-these sections, in this order, with these names:
-  Section I: Standards Alignment — the specific standards this assignment addresses
-    (use provided SCOS/standards codes verbatim when available), an AI competency
-    block, and a progression level (Acquire / Deepen / Create).
-  Section II: Learning Objectives — a subject mastery statement PLUS an explicit
-    AI Literacy Goal (e.g., critically reflect on AI limitations).
-  Section III: AI Tool Integration — tool(s) selected, purpose of AI in this task,
-    and a human-in-the-loop description. MUST reflect the teacher's chosen AI
-    permission category and its student responsibility.
-  Section IV: Instructional Procedure — Direct Instruction, Guided Practice, and
-    Critical Reflection phases. MUST be built around the redesigned assignment text.
-  Section V: Ethics & Integrity — data privacy reminder, citation format for AI
-    assistance (per the tiered disclosure framework), student agreement reference.
-  Section VI: Assessment — formative check covering BOTH subject understanding AND
-    AI tool understanding; summative assessment focused on original thought and
-    critical evaluation.
-  Teacher Reflection — prompts: How did the AI tool enhance or hinder learning?
-    Any unexpected ethical dilemmas?
+AI-INTEGRATED LESSON PLAN TEMPLATE — this is the school's official template. Every
+lesson plan MUST reproduce this structure EXACTLY: same sections, same order, and the
+same LABELED LINES inside each section. Each labeled line starts with the label
+verbatim (same wording and colon) followed by the filled-in content. Never merge,
+rename, reorder, or omit a labeled line.
+
+Header: a lesson title, plus the AI framework used (UNESCO AI CFT or TeachAI Toolkit).
+
+Section I: Standards Alignment — exactly these three labeled lines:
+  "National Teaching Standards:" (the aligned standards codes VERBATIM when provided,
+    e.g. state SCOS codes or ISTE Educators)
+  "AI Competency Block:" (e.g., Human-centred mindset, Ethics of AI, AI pedagogy)
+  "Progression Level:" (exactly one of: Acquire / Deepen / Create)
+
+Section II: Learning Objectives — exactly these two labeled lines:
+  "Subject Mastery:" (starts "Students will be able to...")
+  "AI Literacy Goal:" (e.g., critically reflect on AI limitations)
+
+Section III: AI Tool Integration — exactly these three labeled lines:
+  "Tool(s) Selected:" (e.g., Gemini, ChatGPT, Canva AI)
+  "Purpose of AI:" (brainstorming, feedback, differentiation, or research — MUST
+    reflect the teacher's chosen AI permission category)
+  "Human-in-the-Loop:" (how human judgment reviews AI outputs)
+
+Section IV: Instructional Procedure — exactly these three numbered lines, built
+around the redesigned assignment text:
+  "1. Direct Instruction:" (introduce the core concept and model safe/ethical AI use)
+  "2. Guided Practice:" (students use AI tools with supervision)
+  "3. Critical Reflection:" (students evaluate the AI's output for bias/inaccuracies)
+
+Section V: Ethics & Integrity — exactly these three labeled lines:
+  "Data Privacy:" (remind students not to enter personally identifiable information)
+  "Citations:" (required format for disclosing AI assistance, per tiered disclosure)
+  "Student Agreement:" (reference the signed AI Responsible Use agreement)
+
+Section VI: Assessment — exactly these two labeled lines:
+  "Formative:" (checks BOTH subject-matter AND AI-tool understanding)
+  "Summative:" (final product evaluation focused on original thought and critical
+    evaluation of AI-aided work)
+
+Teacher Reflection — exactly these two questions verbatim, each answered briefly for
+this specific lesson:
+  "How did the AI tool enhance or hinder student learning?"
+  "Were there any unexpected ethical dilemmas or technical issues?"
 `;

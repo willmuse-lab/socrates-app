@@ -175,6 +175,12 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
               </button>
             </div>
             <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
+              {(plan.lessonTitle || plan.aiFramework) && (
+                <div className="p-3 bg-teal-50/50">
+                  <div className="text-xs font-bold">{plan.lessonTitle || 'Lesson Plan'}</div>
+                  {plan.aiFramework && <div className="text-[10px] text-muted-foreground mt-0.5">AI Framework: {plan.aiFramework}</div>}
+                </div>
+              )}
               {sections.map(sec => (
                 <div key={sec.num} className="p-3 bg-card">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-teal-700">Section {sec.num}: {sec.title}</div>

@@ -168,23 +168,29 @@ ${subject ? `SUBJECT: ${subject}` : ""}
 ${gradeLevel ? `GRADE LEVEL: ${gradeLevel}` : ""}
 
 Requirements:
-- Follow the Section I-VI template EXACTLY, including the closing Teacher Reflection.
-- Section III must name the chosen permission category and state the student's
-  responsibility under it, per the framework definitions.
-- Section V must apply the tiered AI disclosure framework (Baule Shift 5).
-- Section VI formative check must cover BOTH subject AND AI-tool understanding.
-- BE CONCISE — this matters: each section is 3-6 tight sentences (Section IV may use short numbered steps). Total under 700 words. Long plans get cut off and fail.
+- Follow the template EXACTLY: every section's content must consist ONLY of the
+  template's labeled lines for that section, one per line, label verbatim with its
+  colon, then the filled-in content (e.g. Section I content is exactly three lines
+  starting "National Teaching Standards:", "AI Competency Block:", "Progression Level:").
+- Section III's "Purpose of AI:" line must name the chosen permission category and
+  the student's responsibility under it, per the framework definitions.
+- Section V's "Citations:" line must apply the tiered AI disclosure framework (Baule Shift 5).
+- Section VI's "Formative:" line must cover BOTH subject AND AI-tool understanding.
+- BE CONCISE — this matters: each labeled line is 1-2 tight sentences. Total under
+  700 words. Long plans get cut off and fail.
 
 Return ONLY a single valid JSON object, no markdown fences, no commentary:
 {
   "lessonPlan": {
-    "sectionI":  { "title": "Standards Alignment", "content": "..." },
-    "sectionII": { "title": "Learning Objectives", "content": "..." },
-    "sectionIII":{ "title": "AI Tool Integration", "content": "..." },
-    "sectionIV": { "title": "Instructional Procedure", "content": "..." },
-    "sectionV":  { "title": "Ethics & Integrity", "content": "..." },
-    "sectionVI": { "title": "Assessment", "content": "..." },
-    "teacherReflection": "..."
+    "lessonTitle": "short lesson title",
+    "aiFramework": "UNESCO AI CFT or TeachAI Toolkit",
+    "sectionI":  { "title": "Standards Alignment", "content": "National Teaching Standards: ...\\nAI Competency Block: ...\\nProgression Level: ..." },
+    "sectionII": { "title": "Learning Objectives", "content": "Subject Mastery: Students will be able to...\\nAI Literacy Goal: ..." },
+    "sectionIII":{ "title": "AI Tool Integration", "content": "Tool(s) Selected: ...\\nPurpose of AI: ...\\nHuman-in-the-Loop: ..." },
+    "sectionIV": { "title": "Instructional Procedure", "content": "1. Direct Instruction: ...\\n2. Guided Practice: ...\\n3. Critical Reflection: ..." },
+    "sectionV":  { "title": "Ethics & Integrity", "content": "Data Privacy: ...\\nCitations: ...\\nStudent Agreement: ..." },
+    "sectionVI": { "title": "Assessment", "content": "Formative: ...\\nSummative: ..." },
+    "teacherReflection": "How did the AI tool enhance or hinder student learning? ...\\nWere there any unexpected ethical dilemmas or technical issues? ..."
   }
 }
 Use \\n for line breaks inside content strings. Do NOT use double-quote characters (") inside any content value — if you need quotation marks, use single quotes (') instead.`;

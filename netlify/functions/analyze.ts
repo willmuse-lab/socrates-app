@@ -134,6 +134,12 @@ export default async function handler(req: Request) {
   }
 
   const { text, aiPreference = "avoid", dimensions = [], activeFramework = "triple-a", bloomsLevel = "Analyze", subject = "", gradeLevel = "" } = body;
+  // The client splits one analysis into two parallel halves so each stays far
+  // below the function time limit: "diagnosis" (score/failures/dimensions) and
+  // "redesigns" (the three suggestions). Absent/unknown = full (backward compat).
+  const part = body.part === "diagnosis" || body.part === "redesigns" ? body.part : "full";
+  const wantDiagnosis = part !== "redesigns";
+  const wantRedesigns = part !== "diagnosis";
   if (!text || typeof text !== "string" || !text.trim()) {
     return new Response(JSON.stringify({ error: "No assignment text provided" }), { status: 400, headers });
   }
@@ -196,10 +202,10 @@ ${subject ? `SUBJECT: ${subject}` : ""}
 ${gradeLevel ? `GRADE LEVEL: ${gradeLevel}` : ""}
 
 Analyze this assignment and produce a CONCISE result — brevity matters, long outputs time out:
-1. resilienceScore (0-100) and a 1-2 sentence summary
+${wantDiagnosis ? `1. resilienceScore (0-100) and a 1-2 sentence summary
 2. aiFailureBreakdown: exactly 3 specific ways a student could shortcut this with AI (1-2 sentences each)
-3. A score and a one-sentence explanation for each scoring dimension
-4. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational) — each with a SHORT rewritten assignment (a redesigned prompt of roughly 3-6 sentences, NOT a long document) and a 1-2 sentence description. Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy from the catalog and fit this subject and grade level; name the strategy category (A-G) in the description.
+3. A score and a one-sentence explanation for each scoring dimension` : ""}
+${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational) — each with a SHORT rewritten assignment (a redesigned prompt of roughly 3-6 sentences, NOT a long document) and a 1-2 sentence description. Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy from the catalog and fit this subject and grade level; name the strategy category (A-G) in the description.` : ""}
 
 ASSIGNMENT TEXT:
 """
@@ -208,19 +214,19 @@ ${text.substring(0, 8000)}
 
 OUTPUT FORMAT — return ONLY a single valid JSON object, no markdown, no code fences, no commentary before or after. Use exactly this shape:
 {
-  "resilienceScore": 0,
+${wantDiagnosis ? `  "resilienceScore": 0,
   "summary": "2-3 sentence overview",
   "aiFailureBreakdown": { "headline": "one sentence", "failures": [ { "type": "short name", "severity": "High|Medium|Low", "explanation": "what a student could do", "fix": "how to close the gap" } ] },
-  "dimensions": [ { "name": "dimension name", "score": 0, "explanation": "why" } ],
-  "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "how it applies the teacher's chosen AI strategy", "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]
+  "dimensions": [ { "name": "dimension name", "score": 0, "explanation": "why" } ]${wantRedesigns ? "," : ""}` : ""}
+${wantRedesigns ? `  "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "how it applies the teacher's chosen AI strategy", "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]` : ""}
 }
-Include exactly 3 failures, one entry per scoring dimension, and exactly three suggestions (one Bronze, one Silver, one Gold). Keep every field concise. Do NOT use double-quote characters (") inside any string value — use single quotes (') instead.`;
+${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimension. " : ""}${wantRedesigns ? "Include exactly three suggestions (one Bronze, one Silver, one Gold). " : ""}Keep every field concise. Do NOT use double-quote characters (") inside any string value — use single quotes (') instead.`;
 
   try {
     console.log("analyze v3: calling model");
     const stream = client.messages.stream({
       model: "claude-haiku-4-5",
-      max_tokens: 2500,
+      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 1700 : 2500,
       system,
       messages: [{ role: "user", content: userMessage }],
     });
