@@ -21,13 +21,21 @@ export function StreamingProgress({ percent, isVisible }: StreamingProgressProps
     return () => clearInterval(interval);
   }, [isVisible]);
 
+  // The two analysis steps only bump `percent` at real checkpoints, which left
+  // the bar frozen for long stretches. Trickle upward continuously (ease-out
+  // toward a 95% ceiling) so it always climbs, while a real checkpoint snaps it
+  // forward and acts as a floor. It reaches 100% only on true completion.
   useEffect(() => {
-    if (percent > displayPercent) {
-      const step = Math.max(1, Math.floor((percent - displayPercent) / 8));
-      const timer = setTimeout(() => setDisplayPercent(p => Math.min(p + step, percent)), 40);
-      return () => clearTimeout(timer);
-    }
-  }, [percent, displayPercent]);
+    if (!isVisible) { setDisplayPercent(0); return; }
+    const id = setInterval(() => {
+      setDisplayPercent(p => {
+        const floor = Math.min(percent, 99);          // real checkpoints pull it up
+        const trickled = p + Math.max(0.4, (95 - p) * 0.05); // ease-out creep to 95
+        return Math.min(99, Math.max(p, floor, trickled));
+      });
+    }, 180);
+    return () => clearInterval(id);
+  }, [isVisible, percent]);
 
   const comment = TEACHER_COMMENTS[quoteIndex];
 

@@ -211,6 +211,7 @@ ${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bro
    - Be grounded in THIS classroom: require at least one thing that can only come from the student's own class, week, life, or self-found evidence (a named classmate, an in-class artifact, a screenshot they captured, a specific local example) — something that cannot be produced by a chatbot alone.
    - Fit the SUBJECT and GRADE LEVEL${subject ? ` (${subject})` : ""}${gradeLevel ? ` at ${gradeLevel}` : ""} in vocabulary, complexity, and expectations — a redesign for young students must read differently from one for advanced students.
    - Preserve the teacher's original topic and learning goal — improve HOW it's done, don't replace WHAT it teaches.
+   - Be realistically SHORT to complete: the whole redesigned assignment must fit within ONE class period (Gold may use at most two). NEVER spread the work across days or weeks, and never write a multi-week or "Week 1 / Week 2 / Day 1" timeline. Keep it to what a student can finish in a class or two.
    Length: Bronze ~3-4 sentences, Silver ~4-6, Gold ~5-7 — specific and usable but TIGHT; every sentence must add a concrete detail, no filler. Give a 1-sentence description of the concrete change.
    Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy from the catalog; name the strategy category (A-G) in the description.` : ""}
 
