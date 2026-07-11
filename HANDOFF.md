@@ -87,6 +87,13 @@ every dashboard task with exact click paths, one step per message, and wait.
 4. Analysis quality was deliberately traded down (Haiku, ~short outputs) to
    fit the timeout. "Quality tuning" is a parked task — any attempt must be
    tested against the 30s ceiling on a deploy preview first.
+4b. **"Analysis service is busy" = HTTP 429 rate limit.** The parallel split
+   (below) doubled the per-analysis request rate against the Anthropic tier;
+   rapid re-testing tripped it. gemini.ts `call()` now retries 429/502/503/529
+   with backoff (1.2s, 2.8s) — each retry is a fresh function invocation with a
+   clean budget. If 429s persist under real load, raise the Anthropic tier.
+   Redesigns max_tokens tuned 2400→1800 and length targets trimmed to cut the
+   ~23s time back toward ~15s while keeping the concreteness quality bar.
 5. **Analyze is SPLIT into two parallel calls (July 4 2026):** the client
    (gemini.ts) fires `part: "diagnosis"` (score/summary/failures/dimensions,
    max_tokens 1100) and `part: "redesigns"` (three suggestions, max_tokens

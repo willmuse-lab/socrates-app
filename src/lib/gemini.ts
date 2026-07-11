@@ -70,20 +70,31 @@ export async function analyzeAssignment(
   };
 
   const call = async (part: "diagnosis" | "redesigns") => {
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...common, part }),
-    });
-    if (!response.ok) {
-      let detail = `Server error: ${response.status}`;
+    // Transient statuses (rate limit / overload / gateway) are retried with a
+    // short backoff — each attempt is a fresh function invocation with its own
+    // time budget, so this is safe. Backoff lets the rate-limit window clear.
+    const RETRYABLE = new Set([429, 502, 503, 529]);
+    const backoffsMs = [1200, 2800];
+    let lastDetail = "";
+    for (let attempt = 0; attempt <= backoffsMs.length; attempt++) {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...common, part }),
+      });
+      if (response.ok) return await response.json();
+      lastDetail = `Server error: ${response.status}`;
       try {
         const err = await response.json();
-        if (err?.error) detail = err.error;
+        if (err?.error) lastDetail = err.error;
       } catch {}
-      throw new Error(detail);
+      if (RETRYABLE.has(response.status) && attempt < backoffsMs.length) {
+        await new Promise((r) => setTimeout(r, backoffsMs[attempt]));
+        continue;
+      }
+      throw new Error(lastDetail);
     }
-    return await response.json();
+    throw new Error(lastDetail);
   };
 
   // The two halves run in PARALLEL — each is a small, fast request that stays

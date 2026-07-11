@@ -211,7 +211,7 @@ ${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bro
    - Be grounded in THIS classroom: require at least one thing that can only come from the student's own class, week, life, or self-found evidence (a named classmate, an in-class artifact, a screenshot they captured, a specific local example) — something that cannot be produced by a chatbot alone.
    - Fit the SUBJECT and GRADE LEVEL${subject ? ` (${subject})` : ""}${gradeLevel ? ` at ${gradeLevel}` : ""} in vocabulary, complexity, and expectations — a redesign for young students must read differently from one for advanced students.
    - Preserve the teacher's original topic and learning goal — improve HOW it's done, don't replace WHAT it teaches.
-   Length: Bronze ~3-5 sentences, Silver ~5-8, Gold ~6-10 — long enough to be specific and usable, never a vague one-liner. Give a 1-2 sentence description explaining the concrete change.
+   Length: Bronze ~3-4 sentences, Silver ~4-6, Gold ~5-7 — specific and usable but TIGHT; every sentence must add a concrete detail, no filler. Give a 1-sentence description of the concrete change.
    Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy from the catalog; name the strategy category (A-G) in the description.` : ""}
 
 ASSIGNMENT TEXT:
@@ -233,7 +233,7 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
     console.log("analyze v3: calling model");
     const stream = client.messages.stream({
       model: "claude-haiku-4-5",
-      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 2400 : 2500,
+      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 1800 : 2500,
       system,
       messages: [{ role: "user", content: userMessage }],
     });
