@@ -235,7 +235,10 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
     const stream = client.messages.stream({
       model: "claude-haiku-4-5",
       max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 1800 : 2500,
-      system,
+      // Cache the large, identical system prompt (research base + catalog) so
+      // repeat/re-analyses reuse it at ~0.1x cost instead of re-sending it every
+      // time — cuts token load and eases rate-limit pressure from the two-call split.
+      system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: userMessage }],
     });
     const response = await withTimeout(stream.finalMessage(), 26000, "Model request");
