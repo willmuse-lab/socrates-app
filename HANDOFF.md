@@ -217,7 +217,13 @@ localhost) — OAuth needs the real web address.
 3. **Rotate the Anthropic API key** — Will pasted screenshots showing the full
    key in chat. Create new key in console.anthropic.com, swap in Netlify,
    delete old. Walk him through it.
-4. Quality tuning of analyzer output (see lesson #4).
+4. Quality tuning of analyzer output — FIRST PASS DONE July 4 2026: the
+   redesign prompt now enforces a "quality bar" (concrete mechanics + timing +
+   exact deliverable, class-grounded self-sourced evidence, subject/grade fit,
+   preserve original topic; Bronze ~3-5 / Silver ~5-8 / Gold ~6-10 sentences),
+   redesigns max_tokens raised to 2400 (separate parallel call, timeout-safe).
+   NEXT lever if more quality wanted: move the redesigns half to Sonnet 5
+   (~5¢/analysis vs ~2¢ on Haiku — still trivial vs $9.99/mo). See lesson #5.
 5. Unlink the stale `musesocrates` Netlify site.
 6. Custom domain (he wanted "socrates.ai.com" — explained invalid; choose
    socrates.ai (~$70-100/yr) vs socratesai.com (~$12/yr); not decided).

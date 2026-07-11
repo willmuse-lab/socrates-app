@@ -205,7 +205,14 @@ Analyze this assignment and produce a CONCISE result — brevity matters, long o
 ${wantDiagnosis ? `1. resilienceScore (0-100) and a 1-2 sentence summary
 2. aiFailureBreakdown: exactly 3 specific ways a student could shortcut this with AI (1-2 sentences each)
 3. A score and a one-sentence explanation for each scoring dimension` : ""}
-${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational) — each with a SHORT rewritten assignment (a redesigned prompt of roughly 3-6 sentences, NOT a long document) and a 1-2 sentence description. Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy from the catalog and fit this subject and grade level; name the strategy category (A-G) in the description.` : ""}
+${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bronze (small practical tweak), Silver (substantial restructure), Gold (transformational) — each a rewritten assignment a teacher could hand out tomorrow.
+   QUALITY BAR — this is what makes the redesign worth paying for. Each rewritten assignment MUST:
+   - Be CONCRETE, not abstract. Specify the actual activity, the timing/structure (e.g. "a 15-minute in-class debate", "a 3-round peer exchange"), and the exact deliverable the student turns in. NEVER use vague verbs like "incorporate discussion", "add reflection", or "encourage critical thinking" without saying precisely how.
+   - Be grounded in THIS classroom: require at least one thing that can only come from the student's own class, week, life, or self-found evidence (a named classmate, an in-class artifact, a screenshot they captured, a specific local example) — something that cannot be produced by a chatbot alone.
+   - Fit the SUBJECT and GRADE LEVEL${subject ? ` (${subject})` : ""}${gradeLevel ? ` at ${gradeLevel}` : ""} in vocabulary, complexity, and expectations — a redesign for young students must read differently from one for advanced students.
+   - Preserve the teacher's original topic and learning goal — improve HOW it's done, don't replace WHAT it teaches.
+   Length: Bronze ~3-5 sentences, Silver ~5-8, Gold ~6-10 — long enough to be specific and usable, never a vague one-liner. Give a 1-2 sentence description explaining the concrete change.
+   Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy from the catalog; name the strategy category (A-G) in the description.` : ""}
 
 ASSIGNMENT TEXT:
 """
@@ -226,7 +233,7 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
     console.log("analyze v3: calling model");
     const stream = client.messages.stream({
       model: "claude-haiku-4-5",
-      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 1700 : 2500,
+      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 2400 : 2500,
       system,
       messages: [{ role: "user", content: userMessage }],
     });
