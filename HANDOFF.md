@@ -88,10 +88,21 @@ every dashboard task with exact click paths, one step per message, and wait.
    fit the timeout. "Quality tuning" is a parked task — any attempt must be
    tested against the 30s ceiling on a deploy preview first.
 4b. **"Analysis service is busy" = HTTP 429 rate limit.** The parallel split
-   (below) doubled the per-analysis request rate against the Anthropic tier;
-   rapid re-testing tripped it. gemini.ts `call()` now retries 429/502/503/529
-   with backoff (1.2s, 2.8s) — each retry is a fresh function invocation with a
-   clean budget. If 429s persist under real load, raise the Anthropic tier.
+   (below) doubled the per-analysis request AND token rate against the Anthropic
+   tier (the full system prompt — research base + catalog — is sent in BOTH
+   halves), so back-to-back analyses trip a low tier's per-minute limit.
+   gemini.ts `call()` retries 429/502/503/529 with backoff (1.2s, 2.8s), but a
+   per-MINUTE limit needs ~60s to clear, so retries alone don't fully fix it.
+   REAL FIX: raise the Anthropic account tier (console.anthropic.com → Plans &
+   Billing → add credits / auto-reload bumps the tier). Optional code
+   mitigation: trim each half's system prompt to only the parts it needs
+   (diagnosis doesn't need the full redesign catalog; redesigns don't need all
+   scoring guidance) to cut ~40% of input tokens. Not yet done.
+4c. **Progress bar never showed on first analysis (FIXED July 4 2026).** The
+   render checked `!result` before `isAnalyzing`, so during the first analysis
+   (result still null) it kept showing the input form with an "Analyzing..."
+   button and never reached the StreamingProgress branch. Reordered so
+   `isAnalyzing` wins first. StreamingProgress now also trickles the % upward.
    Redesigns max_tokens tuned 2400→1800 and length targets trimmed to cut the
    ~23s time back toward ~15s while keeping the concreteness quality bar.
 5. **Analyze is SPLIT into two parallel calls (July 4 2026):** the client

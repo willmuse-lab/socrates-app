@@ -130,7 +130,11 @@ export function AssignmentAnalyzer({
 
   return (
     <div className="flex-1 flex flex-col">
-      {!result ? (
+      {isAnalyzing ? (
+        <div className="flex-1 flex items-center justify-center">
+          <StreamingProgress stage={progressStage} percent={progressPercent} isVisible={isAnalyzing} />
+        </div>
+      ) : !result ? (
         <div className="flex-1 flex items-center justify-center p-6 md:p-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl w-full space-y-10">
             <div className="grid md:grid-cols-[1fr_2fr] gap-10 items-center">
@@ -209,10 +213,6 @@ export function AssignmentAnalyzer({
               </Card>
             </div>
           </motion.div>
-        </div>
-      ) : isAnalyzing ? (
-        <div className="flex-1 flex items-center justify-center">
-          <StreamingProgress stage={progressStage} percent={progressPercent} isVisible={isAnalyzing} />
         </div>
       ) : (
         <div className="flex-1 flex flex-col md:grid md:grid-cols-[1fr_340px] overflow-hidden">
