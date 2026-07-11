@@ -68,9 +68,9 @@ export function StreamingProgress({ percent, isVisible }: StreamingProgressProps
           {/* Slim progress bar so it never looks frozen */}
           <div className="w-full max-w-sm space-y-1.5">
             <div className="h-1 w-full bg-secondary rounded-full overflow-hidden">
-              <motion.div className="h-full bg-accent rounded-full" style={{ width: `${displayPercent}%` }} transition={{ duration: 0.3, ease: "easeOut" }} />
+              <motion.div className="h-full bg-accent rounded-full" style={{ width: `${Math.round(displayPercent)}%` }} transition={{ duration: 0.3, ease: "easeOut" }} />
             </div>
-            <p className="text-center text-[10px] text-muted-foreground">{displayPercent}%</p>
+            <p className="text-center text-[10px] text-muted-foreground">{Math.round(displayPercent)}%</p>
           </div>
         </motion.div>
       )}
