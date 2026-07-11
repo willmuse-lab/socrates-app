@@ -98,6 +98,20 @@ every dashboard task with exact click paths, one step per message, and wait.
    mitigation: trim each half's system prompt to only the parts it needs
    (diagnosis doesn't need the full redesign catalog; redesigns don't need all
    scoring guidance) to cut ~40% of input tokens. Not yet done.
+   MITIGATIONS DONE July 4 2026: client retries transient statuses (above);
+   analyzer system prompt is prompt-CACHED (ephemeral) so re-analyses reuse the
+   big research-base prefix at ~0.1x. STATUS (checked July 11): Netlify function
+   logs showed analyses SUCCEEDING cleanly (~10-14s each, NO `Analysis failed`
+   line, no 429 captured), so the "busy" is INTERMITTENT, not constant, and was
+   NOT reproducing. NOTE: the two parallel halves start ~6s apart in the logs,
+   hinting the bottleneck may be NETLIFY function concurrency/cold-start rather
+   than an Anthropic rate limit — a tier bump might NOT be the fix. UNRESOLVED
+   but parked: Will is monitoring over the next few days and will revisit ONLY
+   if it recurs. IF IT RETURNS: reproduce the "busy" error, then check Netlify →
+   Logs → Functions → analyze at that timestamp — an `Analysis failed: <detail>`
+   line = Anthropic (read the detail for the exact limit); NO log line for that
+   click = Netlify throttling the invocation (different fix, e.g. make the two
+   analyze halves sequential or upgrade the Netlify plan).
 4c. **Progress bar never showed on first analysis (FIXED July 4 2026).** The
    render checked `!result` before `isAnalyzing`, so during the first analysis
    (result still null) it kept showing the input form with an "Analyzing..."
