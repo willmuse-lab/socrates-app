@@ -209,10 +209,19 @@ before any dashboard work. Migration plan: build everything fresh in
 SocratesIQEd's Cloud project (consent screen, new OAuth client with the
 Supabase callback, Drive + Picker APIs, API key), swap the new Client
 ID/Secret into Supabase's Google provider, verify login on the live site,
-then the old account can be abandoned. Status: IN PROGRESS July 12 2026 —
-Drive + Picker APIs were enabled in SocratesIQEd's project ("My First
-Project", ID lateral-origin-502217-c2); consent screen + OAuth client + API
-key + Supabase swap + Netlify env vars still to do.
+then the old account can be abandoned. Status: **MIGRATION DONE July 12
+2026.** In SocratesIQEd's project ("My First Project", ID
+lateral-origin-502217-c2, project NUMBER 594395270830): Drive + Picker APIs
+enabled; consent screen configured (app "SocratesIQ", External); OAuth
+client "SocratesIQ Web" created (Client ID
+594395270830-1bm1abjtec2mrnt70gkd5hhjev45a2jq.apps.googleusercontent.com)
+with both site origins + the Supabase callback redirect; Supabase Google
+provider swapped to the new Client ID/Secret and login TESTED WORKING on the
+live site; restricted Picker API key created; all three VITE_GOOGLE_* env
+vars set in Netlify (API key saved "without marking as secret" — Netlify's
+secret handling would block it from the client bundle where it belongs).
+The old socratesaiedu OAuth client is now unused. Remaining: none for setup —
+the Drive feature just needs the code merged to main + deploy.
 
 ## Social login setup (Google + Microsoft) — Will's dashboard steps
 
