@@ -139,6 +139,23 @@ feedback from BOTH a peer and an AI, then a reflection reconciling the two; the
 student's judgement is the assessed artifact.
 [Kharbach, 2026] Let AI handle research logistics and differentiation while students
 do interpretation, evaluation, and argument; tailor to the subject.
+
+Kharbach (2026), "Critical Thinking Activities for the Age of AI" (educatorstechnology.com):
+  13 classroom-tested activities that make the AI INTERACTION ITSELF the site of
+  critical thinking, mapped to Ennis's (2015) six CT skills: analyzing arguments,
+  judging source credibility, handling ambiguity, evaluating assumptions,
+  recognizing fallacies, asking clarification questions. Core design principle:
+  break the "prompt, receive, accept, move on" cycle by inserting friction where
+  the student must question, verify, and respond with their own reasoning.
+  KEY RULE: the activity is only half the work — ALWAYS end with a short
+  reflective memo (what the AI got wrong, what surprised you, what you'd do
+  differently); reflection is where the thinking habit takes root.
+  Underlying evidence base: Gerlich (2025) cognitive offloading erodes critical
+  thinking; Fan et al. (2025) "metacognitive laziness"; Kosmyna et al. (2025, MIT)
+  brain imaging shows lower cognitive effort ("cognitive debt") in AI-assisted
+  writing; Bastani et al. (2025, PNAS) unguarded AI harms math learning;
+  Sourati et al. (2026) LLMs homogenize expression. Implication: HOW students
+  use AI matters more than WHETHER they use it.
 `;
 
 export const STRATEGY_CATALOG = `
@@ -181,11 +198,26 @@ never default to the same two or three moves:
      - Oral defense, recorded explanation, build, demo, or visual.
      - In-class or live component (Socratic seminar, whiteboard work, peer teaching).
      - Portfolio assembled over time rather than a single submission.
-  E. CRITIQUE & EVALUATE AI (Baule Shift 3; embrace lane)
+  E. CRITIQUE & EVALUATE AI (Baule Shift 3; embrace lane; Kharbach 2026 activities)
      - Generate an AI draft, then critique, fact-check, and correct it with citations.
      - Compare two AI outputs; argue which is stronger and why.
      - PAIRR: peer + AI feedback, then a reconciling reflection as the graded artifact.
      - Bias/perspective mapping: prompt AI from several viewpoints; map conflicts.
+     - Push-Back Protocol: multi-round structured challenge of one AI answer —
+       demand evidence, surface assumptions, ask what perspectives are missing;
+       document how the answer shifts each round.
+     - Hallucination Detective: fact-check an AI text with planted errors (fake
+       citations, wrong dates) against real sources; name what was fabricated.
+     - Blind comparison: unlabeled human vs. AI text on the same topic; identify
+       which is which and defend the call (fluency is not accuracy).
+     - Annotation table: three columns — what the AI said / what's wrong / the fix.
+     - AI debate: AI argues both sides; teams fact-check, find gaps, add evidence.
+     - Funhouse Mirror: ask AI about something the class knows DEEPLY (a text you
+       read, a lab you ran); catalog the distortions an expert would catch.
+     - The Reveal: evaluate a text presented as student work, then reveal it was
+       AI; discuss how knowing the source changed the judgment.
+     - For ALL of these: close with a short reflective memo — that's the graded
+       thinking artifact (Kharbach's key rule).
   F. RAISE THE COGNITIVE BAR (Bloom's; Ai-RACE: 4Cs)
      - Shift from summary/recall to synthesis, evaluation, design, argument under
        constraints.
