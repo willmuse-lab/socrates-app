@@ -40,8 +40,8 @@ export function AboutPage({ onBack }: PageProps) {
         <Mail className="w-8 h-8 text-accent mx-auto" />
         <h3 className="text-xl font-bold font-serif italic">Get in touch</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">Questions about the framework, partnership opportunities, research collaboration, or school pricing.</p>
-        <Button onClick={() => window.location.href = 'mailto:hello@socratesmuse.com'} className="gap-2">
-          <Mail className="w-4 h-4" />hello@socratesmuse.com
+        <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com'} className="gap-2">
+          <Mail className="w-4 h-4" />socratesiqed@gmail.com
         </Button>
       </div>
     </motion.div>
@@ -114,10 +114,10 @@ export function PrivacyPage({ onBack }: PageProps) {
       {[
         { title: 'What data we collect', content: 'We collect the minimum necessary: your name and email address, assignment text you submit for analysis, your saved assignments and analysis results, and basic usage metadata.\n\nWe do NOT collect student names, student work, grades, or any personally identifiable student information.' },
         { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers SocratesIQ.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded — it is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
-        { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at hello@socratesmuse.com to request a DPA.' },
+        { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at socratesiqed@gmail.com to request a DPA.' },
         { title: 'Google Drive & Docs', content: 'When you use the Google Drive features, we request the narrowest permission Google offers (per-file access): SocratesIQ can only read files you explicitly pick in the Google file window, and can create new Google Docs when you export.\n\nWe cannot see, list, or search the rest of your Drive. Your Google sign-in token stays in your browser for the session and is never sent to our servers, logged, or stored in our database.' },
-        { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email hello@socratesmuse.com. We will process deletion requests within 14 days.' },
-        { title: 'Contact', content: 'Data privacy questions: hello@socratesmuse.com\nWe aim to respond within 2 business days.' },
+        { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email socratesiqed@gmail.com. We will process deletion requests within 14 days.' },
+        { title: 'Contact', content: 'Data privacy questions: socratesiqed@gmail.com\nWe aim to respond within 2 business days.' },
       ].map(({ title, content }) => (
         <div key={title} className="space-y-3 pb-6 border-b border-border last:border-0">
           <h2 className="text-lg font-bold">{title}</h2>
@@ -152,7 +152,7 @@ export function FeedbackPage({ onBack }: PageProps) {
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-3">
         <h3 className="text-xl font-bold font-serif italic">Using SocratesIQ in your classroom?</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">We'd love to hear what's working. Send us your experience and it may appear here.</p>
-        <Button onClick={() => window.location.href = 'mailto:hello@socratesmuse.com?subject=My%20Socrates%20feedback'} className="gap-2">
+        <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com?subject=My%20Socrates%20feedback'} className="gap-2">
           <Mail className="w-4 h-4" />Share your feedback
         </Button>
       </div>
@@ -181,7 +181,7 @@ export function TermsPage({ onBack }: PageProps) {
         { title: '10. Limitation of liability', content: 'To the maximum extent permitted by law, we are not liable for any indirect, incidental, or consequential damages arising from your use of the Service. Our total liability for any claim relating to the Service will not exceed the amount you paid us in the 12 months before the claim.' },
         { title: '11. Termination', content: 'You may stop using the Service at any time. We may suspend or terminate access if you violate these Terms or use the Service in a way that could harm us or other users. Upon termination, your right to use the Service ends; sections that by their nature should survive (such as intellectual property, disclaimers, and limitation of liability) will continue to apply.' },
         { title: '12. Changes to these terms', content: 'We may update these Terms from time to time. When we make material changes, we will update the date above and, where appropriate, notify you. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.' },
-        { title: '13. Contact', content: 'Questions about these Terms: hello@socratesmuse.com' },
+        { title: '13. Contact', content: 'Questions about these Terms: socratesiqed@gmail.com' },
       ].map(({ title, content }) => (
         <div key={title} className="space-y-3 pb-6 border-b border-border last:border-0">
           <h2 className="text-lg font-bold">{title}</h2>
@@ -211,7 +211,7 @@ const HELP_TOPICS = [
   },
   {
     title: 'Standards alignment and lesson plans',
-    content: 'You can align results to your state standards and generate a full lesson plan:\n\n1. UPLOAD YOUR STANDARDS once — during onboarding, or anytime in Settings. PDF, Word, or text.\n2. After an analysis, choose a redesign level, select your standards document on the results screen, and run alignment. You\'ll see which standards the assignment addresses, any gaps, and near-misses.\n3. Generate the LESSON PLAN — built on the CCSS-aligned template: learning standards, learning targets, relevance, assessment criteria (each with a student-friendly translation), activities/tasks with your AI rules built in, resources, access for all, and modifications/accommodations. The Word download matches the standard template layout exactly.\n4. Generate STUDENT DIRECTIONS — a student-facing handout with steps, AI rules, and grading expectations.\n\nStandards upload requires being signed in.',
+    content: 'You can align results to your state standards and generate a full lesson plan:\n\n1. UPLOAD YOUR STANDARDS once — during onboarding, or anytime in Settings. PDF, Word, or text.\n2. After an analysis, choose a redesign level, select your standards document on the results screen, and run alignment. You\'ll see which standards the assignment addresses, any gaps, and near-misses.\n3. Generate the LESSON PLAN — built on the CCSS-aligned template: learning standards, learning targets, relevance, assessment criteria, activities/tasks with your AI rules built in, resources, access for all, and modifications/accommodations. The Word download matches the official template layout exactly, with a Notes column left blank for you.\n4. Generate STUDENT DIRECTIONS — a student-facing handout with steps, AI rules, and grading expectations.\n\nStandards upload requires being signed in.',
   },
   {
     title: 'Saving, the Library, and syncing',
@@ -239,7 +239,7 @@ const HELP_TOPICS = [
   },
   {
     title: 'Contact support',
-    content: 'We\'re a small team of educators and we read everything.\n\nEmail: hello@socratesmuse.com\nWe aim to respond within 2 business days.\n\nWhen reporting a problem, it helps to include: what you clicked, what you expected, what happened instead, and roughly what time it happened.',
+    content: 'We\'re a small team of educators and we read everything.\n\nEmail: socratesiqed@gmail.com\nWe aim to respond within 2 business days.\n\nWhen reporting a problem, it helps to include: what you clicked, what you expected, what happened instead, and roughly what time it happened.',
   },
 ];
 
@@ -254,7 +254,7 @@ export function HelpPage({ onBack }: PageProps) {
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-2">
         <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Help & How-To</h1></div>
-        <p className="text-muted-foreground">Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:hello@socratesmuse.com" className="text-accent font-semibold hover:underline">hello@socratesmuse.com</a>.</p>
+        <p className="text-muted-foreground">Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.</p>
       </div>
       <input
         value={query}
@@ -263,7 +263,7 @@ export function HelpPage({ onBack }: PageProps) {
         className="w-full h-10 px-4 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
       />
       {topics.length === 0 && (
-        <p className="text-sm text-muted-foreground">No topics match "{query}". Try another word, or email <a href="mailto:hello@socratesmuse.com" className="text-accent font-semibold hover:underline">hello@socratesmuse.com</a>.</p>
+        <p className="text-sm text-muted-foreground">No topics match "{query}". Try another word, or email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.</p>
       )}
       {topics.map(({ title, content }) => (
         <div key={title} className="space-y-3 pb-6 border-b border-border last:border-0">

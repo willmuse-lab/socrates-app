@@ -7,9 +7,12 @@ session. Read this whole file before making changes. Last updated: July 4 2026.
 
 **RENAMED July 4 2026: the product is now "SocratesIQ"** (was Socrates /
 Socrates Studio). All visible UI, tab title, and PDF/DOCX export headers say
-SocratesIQ; internal code identifiers, localStorage keys, model personas
-("You are Socrates"), and the hello@socratesmuse.com email were deliberately
-NOT renamed. **Domain: socratesiq.com** — bought via Netlify July 4 2026, set
+SocratesIQ; internal code identifiers, localStorage keys, and model personas
+("You are Socrates") were deliberately NOT renamed. The old
+hello@socratesmuse.com contact email WAS replaced July 12 2026 — every
+user-facing contact/mailto (Get in touch, share your feedback, Contact,
+Privacy/Terms/Help pages, School-District pricing) now uses
+socratesiqed@gmail.com, the official account. **Domain: socratesiq.com** — bought via Netlify July 4 2026, set
 as primary (www redirects to apex), DNS/HTTPS were still propagating at
 purchase. Supabase auth updated: Site URL = https://socratesiq.com, redirect
 list has BOTH https://socratesiq.com/** and the old netlify.app/** entry.
@@ -154,30 +157,30 @@ every dashboard task with exact click paths, one step per message, and wait.
    handleAnalyze() which read stale React state — first click re-analyzed the
    OLD text. handleAnalyze now takes an optional overrideText; keep that
    pattern for any analyze-right-after-setText flow.
-7. **Lesson plan is template-locked — REPLACED July 12 2026 with the SCOE
-   CCSS-Aligned template** (Will uploaded scoe.org's
-   ccssalignedlessonplantemplate.docx and chose "replace" over "offer both").
-   Structure: Subject(s)/Grade/Teacher/School header, a two-column table
-   (LESSON ELEMENT ~70% | STUDENT-FRIENDLY TRANSLATION ~30%, translations for
-   elements 2-4 only), eight elements (Standards, Targets, Relevance,
-   Assessment Criteria, Activities/Tasks, Resources, Access for All,
-   Modifications), then "Common Core Aligned Lesson: Reflection" (AI answers
-   ONLY the shifts question; post-teaching questions stay unanswered,
-   rendered verbatim). See SCOE_LESSON_PLAN_TEMPLATE in
-   _shared/research-base.ts, the JSON spec in generate.ts, the LessonPlan type
-   in standards.ts, and exportLessonPlanDocx/exportLessonPlanToGoogle in
-   export.ts (the Word download clones the .docx layout exactly, incl. the
-   original 10036/4354 dxa column widths; PDF is a linear approximation).
-   The AI permission category now feeds Activities/Tasks (this template has
-   no AI sections) and still drives student directions. The old Section I-VI
-   AI-integrated template is RETIRED but kept in research-base.ts
+7. **Lesson plan is template-locked to the SocratesIQ CCSS-aligned template**
+   (Will's CORRECTED SocratesIQ_Lesson_Plan.docx, July 12 2026 — it replaced
+   both the July-4 Section I-VI template AND the first SCOE variant he
+   uploaded the same day; the first variant had a "Student-Friendly
+   Translation" column, the corrected one has a narrow blank "Notes" column
+   instead, and NO student translations are generated). Structure:
+   Subject(s)/Grade/Teacher/School header (Teacher/School stay blank), a
+   two-column table (LESSON ELEMENT 9582 dxa | Notes 1208 dxa — Notes stays
+   EMPTY), eight elements (Standards, Targets, Relevance, Assessment
+   Criteria, Activities/Tasks incl. the AI-permission rules, Resources,
+   Access for All, Modifications), then "Common Core Aligned Lesson:
+   Reflection" (AI answers ONLY the shifts question; the post-teaching
+   questions render verbatim, unanswered). See SCOE_LESSON_PLAN_TEMPLATE in
+   _shared/research-base.ts, the JSON spec in generate.ts, the LessonPlan
+   type in standards.ts, and exportLessonPlanDocx/exportLessonPlanToGoogle
+   in export.ts (Word clones the .docx exactly; PDF is linear). The old
+   Section I-VI template is RETIRED but kept in research-base.ts
    (LESSON_PLAN_TEMPLATE) for restorability. Do not loosen the template lock.
 
 ## Product decisions already made (don't relitigate)
 
 - Pricing: Teacher $9.99/mo or $99.99/yr only; School/District = "Call for
-  pricing" → mailto hello@socratesmuse.com. No payment processing exists yet —
-  "Get started" is a stub.
+  pricing" → mailto socratesiqed@gmail.com (changed from hello@socratesmuse.com
+  July 12 2026). No payment processing exists yet — "Get started" is a stub.
 - Testimonials are anonymized (generic role tags only, no names/grades/
   subjects). Source of truth: `src/lib/comments.ts` (feeds the analyzing-screen
   rotation AND the Feedback page). Will adds quotes by giving them in chat.

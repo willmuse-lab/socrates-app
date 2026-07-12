@@ -43,19 +43,16 @@ export interface AlignmentResult {
   nearMisses: { code: string; text: string; suggestion: string }[];
 }
 
-// SCOE CCSS-Aligned template (active since July 12 2026). Elements 2-4 carry a
-// student-friendly translation, matching the school template's second column.
+// SocratesIQ lesson plan (CCSS-aligned template, corrected version July 12
+// 2026): eight elements + a blank "Notes" column in the exports.
 export interface LessonPlan {
   lessonTitle?: string;
   subjects?: string;
   grade?: string;
   standards: string;
   targets: string;
-  targetsStudent?: string;
   relevance: string;
-  relevanceStudent?: string;
   assessment: string;
-  assessmentStudent?: string;
   activities: string;
   resources: string;
   accessForAll: string;
@@ -179,14 +176,13 @@ export async function generateStudentDirections(
 // Convenience: turn a LessonPlan into clean plain text (for copy / export).
 // Mirrors the SCOE template's element order and labels.
 export function lessonPlanToText(plan: LessonPlan): string {
-  const sf = (t?: string) => (t ? `\nStudent-friendly translation: ${t}` : '');
   return [
     `${plan.lessonTitle || 'Lesson Plan'}`,
     `Subject(s): ${plan.subjects || '________'}    Grade: ${plan.grade || '________'}\nTeacher(s): ________    School: ________`,
     `Learning Standard(s) Addressed:\n${plan.standards}`,
-    `Learning Target(s):\n${plan.targets}${sf(plan.targetsStudent)}`,
-    `Relevance/Rationale:\n${plan.relevance}${sf(plan.relevanceStudent)}`,
-    `Formative Assessment Criteria for Success:\n${plan.assessment}${sf(plan.assessmentStudent)}`,
+    `Learning Target(s):\n${plan.targets}`,
+    `Relevance/Rationale:\n${plan.relevance}`,
+    `Formative Assessment Criteria for Success:\n${plan.assessment}`,
     `Activities/Tasks:\n${plan.activities}`,
     `Resources/Materials:\n${plan.resources}`,
     `Access for All:\n${plan.accessForAll}`,

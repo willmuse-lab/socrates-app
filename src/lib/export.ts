@@ -190,13 +190,13 @@ export function redesignToBlocks(assignmentText: string): DocBlock[] {
 // parenthetical prompts VERBATIM; the Word export below clones the file's
 // layout exactly (header blanks, two-column table ~70/30, reflection section).
 // ---------------------------------------------------------------------------
-interface ScoeRow { label: string; prompt: string; key: keyof LessonPlan; student?: keyof LessonPlan; }
+interface ScoeRow { label: string; prompt: string; key: keyof LessonPlan; }
 
 const SCOE_ROWS: ScoeRow[] = [
   { label: 'Learning Standard(s) Addressed:', prompt: '', key: 'standards' },
-  { label: 'Learning Target(s):', prompt: '(What will students know & be able to do as a result of this lesson?)', key: 'targets', student: 'targetsStudent' },
-  { label: 'Relevance/Rationale:', prompt: '(Why are the outcomes of this lesson important in the real world? Why are these outcomes essential for future learning?)', key: 'relevance', student: 'relevanceStudent' },
-  { label: 'Formative Assessment Criteria for Success:', prompt: "(How will you & your students know if they have successfully met the outcomes? What specific criteria will be met in a successful product/process? What does success on this lesson's outcomes look like?)", key: 'assessment', student: 'assessmentStudent' },
+  { label: 'Learning Target(s):', prompt: '(What will students know & be able to do as a result of this lesson?)', key: 'targets' },
+  { label: 'Relevance/Rationale:', prompt: '(Why are the outcomes of this lesson important in the real world? Why are these outcomes essential for future learning?)', key: 'relevance' },
+  { label: 'Formative Assessment Criteria for Success:', prompt: "(How will you & your students know if they have successfully met the outcomes? What specific criteria will be met in a successful product/process? What does success on this lesson's outcomes look like?)", key: 'assessment' },
   { label: 'Activities/Tasks:', prompt: '(What learning experiences will students engage in? How will you use these learning experiences or their student products as formative assessment opportunities?)', key: 'activities' },
   { label: 'Resources/Materials:', prompt: '(What texts, digital resources, & materials will be used in this lesson?)', key: 'resources' },
   { label: 'Access for All:', prompt: '(How will you ensure that all students have access to and are able to engage appropriately in this lesson? Consider all aspects of student diversity.)', key: 'accessForAll' },
@@ -220,8 +220,7 @@ export function lessonPlanToBlocks(plan: LessonPlan): DocBlock[] {
     { text: `Subject(s): ${plan.subjects || '________'}    Grade: ${plan.grade || '________'}\nTeacher(s): ________    School: ________` },
   ];
   SCOE_ROWS.forEach(row => {
-    const student = row.student ? scoeVal(plan, row.student) : '';
-    blocks.push({ heading: row.label, text: scoeVal(plan, row.key) + (student ? `\n\nStudent-friendly translation: ${student}` : '') });
+    blocks.push({ heading: row.label, text: scoeVal(plan, row.key) });
   });
   blocks.push({ heading: 'Common Core Aligned Lesson: Reflection', text: `${SCOE_REFLECTION_INTRO}\n${plan.shiftReflection || ''}\n\n${SCOE_REFLECTION_CHOICE}\n${SCOE_REFLECTION_QUESTIONS.map(q => '• ' + q).join('\n')}` });
   return blocks;
@@ -235,28 +234,21 @@ export async function exportLessonPlanDocx(plan: LessonPlan) {
     scoeVal(plan, row.key).split('\n').forEach(p => paras.push(new Paragraph({ text: p, spacing: { after: 80 } })));
     return paras;
   };
-  const studentParas = (row: ScoeRow): Paragraph[] => {
-    const text = row.student ? scoeVal(plan, row.student) : '';
-    return text ? text.split('\n').map(p => new Paragraph({ text: p, spacing: { after: 80 } })) : [new Paragraph('')];
-  };
-
-  // Column widths copied from the original .docx grid (10036 / 4354 dxa).
+  // Column widths copied from the corrected .docx grid (9582 / 1208 dxa);
+  // the narrow "Notes" column stays blank for the teacher's own notes.
   const table = new Table({
-    width: { size: 14390, type: WidthType.DXA },
+    width: { size: 10790, type: WidthType.DXA },
     rows: [
       new TableRow({
         children: [
-          new TableCell({ width: { size: 10036, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'LESSON ELEMENT', bold: true })] })] }),
-          new TableCell({ width: { size: 4354, type: WidthType.DXA }, children: [
-            new Paragraph({ children: [new TextRun({ text: 'STUDENT-FRIENDLY TRANSLATION', bold: true })] }),
-            new Paragraph({ children: [new TextRun({ text: '( # 2,3,4 only)', bold: true })] }),
-          ] }),
+          new TableCell({ width: { size: 9582, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'LESSON ELEMENT', bold: true })] })] }),
+          new TableCell({ width: { size: 1208, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'Notes', bold: true })] })] }),
         ],
       }),
       ...SCOE_ROWS.map(row => new TableRow({
         children: [
-          new TableCell({ width: { size: 10036, type: WidthType.DXA }, children: cellParas(row) }),
-          new TableCell({ width: { size: 4354, type: WidthType.DXA }, children: studentParas(row) }),
+          new TableCell({ width: { size: 9582, type: WidthType.DXA }, children: cellParas(row) }),
+          new TableCell({ width: { size: 1208, type: WidthType.DXA }, children: [new Paragraph('')] }),
         ],
       })),
     ],
@@ -284,19 +276,16 @@ export async function exportLessonPlanDocx(plan: LessonPlan) {
 
 /** Google Doc export with a real two-column table matching the template. */
 export async function exportLessonPlanToGoogle(plan: LessonPlan): Promise<string> {
-  const rowsHtml = SCOE_ROWS.map(row => {
-    const student = row.student ? scoeVal(plan, row.student) : '';
-    return `<tr>
+  const rowsHtml = SCOE_ROWS.map(row => `<tr>
       <td><p><b>${esc(row.label)}</b></p>${row.prompt ? `<p><i>${esc(row.prompt)}</i></p>` : ''}${para(scoeVal(plan, row.key))}</td>
-      <td>${student ? para(student) : '<p></p>'}</td>
-    </tr>`;
-  }).join('');
+      <td><p></p></td>
+    </tr>`).join('');
   const html = `<html><body>
     <h1 style="text-align:center">${esc(plan.lessonTitle || 'Lesson Plan')}</h1>
     <p>Subject(s): ${esc(plan.subjects || '______________________________')} &nbsp;&nbsp; Grade: ${esc(plan.grade || '____________')}</p>
     <p>Teacher(s): ______________________________ &nbsp;&nbsp; School: ____________________</p>
     <table border="1" style="border-collapse:collapse;width:100%">
-      <tr><td style="width:70%"><p><b>LESSON ELEMENT</b></p></td><td style="width:30%"><p><b>STUDENT-FRIENDLY TRANSLATION</b></p><p><b>( # 2,3,4 only)</b></p></td></tr>
+      <tr><td style="width:89%"><p><b>LESSON ELEMENT</b></p></td><td style="width:11%"><p><b>Notes</b></p></td></tr>
       ${rowsHtml}
     </table>
     <p><b>Common Core Aligned Lesson:&nbsp; Reflection</b></p>

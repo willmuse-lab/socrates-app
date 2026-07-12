@@ -167,9 +167,7 @@ ${subject ? `SUBJECT: ${subject}` : ""}
 ${gradeLevel ? `GRADE LEVEL: ${gradeLevel}` : ""}
 
 Requirements:
-- Fill EVERY element of the template. The three student-friendly translations
-  (targets, relevance, assessment) are written TO the student in plain first-person
-  language ("I can...", "I'll know I've got it when...").
+- Fill EVERY element of the template.
 - Activities/Tasks must be built directly from the assignment text above and must
   state plainly how AI may or may not be used per the permission category.
 - Modifications/Accommodations must be specific (not "provide support as needed").
@@ -186,11 +184,8 @@ Return ONLY a single valid JSON object, no markdown fences, no commentary:
     "grade": "grade level, from context",
     "standards": "Learning Standard(s) Addressed",
     "targets": "Learning Target(s)",
-    "targetsStudent": "student-friendly translation of the targets",
     "relevance": "Relevance/Rationale",
-    "relevanceStudent": "student-friendly translation of the relevance",
     "assessment": "Formative Assessment Criteria for Success",
-    "assessmentStudent": "student-friendly translation of the criteria",
     "activities": "Activities/Tasks (numbered steps, incl. the AI rules)",
     "resources": "Resources/Materials",
     "accessForAll": "Access for All",

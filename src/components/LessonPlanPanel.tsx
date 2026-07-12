@@ -115,13 +115,12 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
     step === 'planning' ? 'Building the lesson plan…' :
     step === 'directions' ? 'Writing student directions…' : '';
 
-  // SCOE CCSS template rows (labels match the school's .docx verbatim);
-  // student = the "student-friendly translation" column (elements 2-4 only).
+  // Template rows (labels match the corrected SocratesIQ .docx verbatim).
   const planRows = plan ? [
     { label: 'Learning Standard(s) Addressed', content: plan.standards },
-    { label: 'Learning Target(s)', content: plan.targets, student: plan.targetsStudent },
-    { label: 'Relevance/Rationale', content: plan.relevance, student: plan.relevanceStudent },
-    { label: 'Formative Assessment Criteria for Success', content: plan.assessment, student: plan.assessmentStudent },
+    { label: 'Learning Target(s)', content: plan.targets },
+    { label: 'Relevance/Rationale', content: plan.relevance },
+    { label: 'Formative Assessment Criteria for Success', content: plan.assessment },
     { label: 'Activities/Tasks', content: plan.activities },
     { label: 'Resources/Materials', content: plan.resources },
     { label: 'Access for All', content: plan.accessForAll },
@@ -225,12 +224,6 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
                 <div key={row.label} className="p-3 bg-card">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-teal-700">{row.label}</div>
                   <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/80 mt-1">{row.content}</div>
-                  {row.student && (
-                    <div className="mt-2 p-2 rounded-lg bg-teal-50/60 border border-teal-100">
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-teal-600">Student-friendly translation</div>
-                      <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/70 mt-0.5 italic">{row.student}</div>
-                    </div>
-                  )}
                 </div>
               ))}
               <div className="p-3 bg-muted/30">

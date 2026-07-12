@@ -216,21 +216,20 @@ SCORING — every score MUST be justified against named framework criteria
 // below (kept for restorability). The exact .docx layout is mirrored in
 // src/lib/export.ts.
 export const SCOE_LESSON_PLAN_TEMPLATE = `
-CCSS-ALIGNED LESSON PLAN TEMPLATE — this is the school's official template. Every
-lesson plan MUST fill in EXACTLY these elements, in this order. Elements 2, 3, and 4
-ALSO get a "student-friendly translation": the same idea rewritten in plain first-person
-student language ("I can...", "This matters because...").
+CCSS-ALIGNED LESSON PLAN TEMPLATE — this is the official SocratesIQ template. Every
+lesson plan MUST fill in EXACTLY these elements, in this order. (The template also
+has a narrow "Notes" column that stays BLANK for the teacher's own notes.)
 
 Header: Subject(s) and Grade (from the teacher's context; leave Teacher(s)/School blank).
 
 1. Learning Standard(s) Addressed — the aligned standards VERBATIM when provided
    (state SCOS codes etc.); otherwise clear placeholder language the teacher can fill in.
 2. Learning Target(s) — what students will know & be able to do as a result of this
-   lesson. (+ student-friendly translation)
+   lesson.
 3. Relevance/Rationale — why the outcomes matter in the real world and for future
-   learning. (+ student-friendly translation)
+   learning.
 4. Formative Assessment Criteria for Success — how teacher & students know they met
-   the outcomes; what success looks like. (+ student-friendly translation)
+   the outcomes; what success looks like.
 5. Activities/Tasks — the learning experiences, built directly from the assignment
    text, INCLUDING how AI may or may not be used per the teacher's chosen AI
    permission category, and how the activities double as formative assessment.
