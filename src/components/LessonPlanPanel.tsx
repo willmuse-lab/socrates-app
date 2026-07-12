@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Copy, Check, Loader2, GraduationCap, ClipboardList, Target, AlertCircle, Sparkles, FileDown, FileText, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
-import { downloadSimplePDF, downloadSimpleDocx, exportSimpleDocToGoogle, lessonPlanToBlocks, directionsToBlocks, DocBlock } from '@/src/lib/export';
+import { downloadSimplePDF, downloadSimpleDocx, exportSimpleDocToGoogle, lessonPlanToBlocks, directionsToBlocks, exportLessonPlanDocx, exportLessonPlanToGoogle, DocBlock } from '@/src/lib/export';
 import { googleConfigured } from '@/src/lib/google';
 import {
   AlignmentResult,
@@ -82,29 +82,27 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
     setTimeout(() => setCopied(null), 2000);
   };
 
-  // Download the lesson plan or student directions as PDF / Word / Google Doc.
-  const download = async (title: string, blocks: DocBlock[], format: 'pdf' | 'docx' | 'gdoc') => {
+  // Run one export action (PDF / Word / Google Doc) with consistent toasts.
+  const runExport = async (format: 'pdf' | 'docx' | 'gdoc', fn: () => any) => {
     try {
-      if (format === 'pdf') { downloadSimplePDF(title, blocks); toast.success('PDF downloaded!'); }
-      else if (format === 'docx') { await downloadSimpleDocx(title, blocks); toast.success('Word document downloaded!'); }
-      else {
-        toast.info('Creating Google Doc…');
-        const url = await exportSimpleDocToGoogle(title, blocks);
-        window.open(url, '_blank'); toast.success('Saved to your Google Drive!');
-      }
+      if (format === 'gdoc') toast.info('Creating Google Doc…');
+      const result = await fn();
+      if (format === 'pdf') toast.success('PDF downloaded!');
+      else if (format === 'docx') toast.success('Word document downloaded!');
+      else { window.open(result as string, '_blank'); toast.success('Saved to your Google Drive!'); }
     } catch (e: any) { toast.error(e?.message || 'Download failed. Please try again.'); }
   };
 
-  const ExportButtons = ({ title, blocks }: { title: string; blocks: DocBlock[] }) => (
+  const ExportButtons = ({ pdf, docx, gdoc }: { pdf: () => any; docx: () => any; gdoc: () => any }) => (
     <div className="flex items-center gap-2.5">
-      <button onClick={() => download(title, blocks, 'pdf')} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors" title="Download PDF">
+      <button onClick={() => runExport('pdf', pdf)} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors" title="Download PDF">
         <FileDown className="w-3 h-3" />PDF
       </button>
-      <button onClick={() => download(title, blocks, 'docx')} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors" title="Download Word document">
+      <button onClick={() => runExport('docx', docx)} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors" title="Download Word document">
         <FileText className="w-3 h-3" />Word
       </button>
       {googleConfigured && (
-        <button onClick={() => download(title, blocks, 'gdoc')} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-green-600 transition-colors" title="Save as Google Doc">
+        <button onClick={() => runExport('gdoc', gdoc)} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-green-600 transition-colors" title="Save as Google Doc">
           <ExternalLink className="w-3 h-3" />Google Doc
         </button>
       )}
@@ -117,13 +115,17 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
     step === 'planning' ? 'Building the lesson plan…' :
     step === 'directions' ? 'Writing student directions…' : '';
 
-  const sections = plan ? [
-    { num: 'I', ...plan.sectionI },
-    { num: 'II', ...plan.sectionII },
-    { num: 'III', ...plan.sectionIII },
-    { num: 'IV', ...plan.sectionIV },
-    { num: 'V', ...plan.sectionV },
-    { num: 'VI', ...plan.sectionVI },
+  // SCOE CCSS template rows (labels match the school's .docx verbatim);
+  // student = the "student-friendly translation" column (elements 2-4 only).
+  const planRows = plan ? [
+    { label: 'Learning Standard(s) Addressed', content: plan.standards },
+    { label: 'Learning Target(s)', content: plan.targets, student: plan.targetsStudent },
+    { label: 'Relevance/Rationale', content: plan.relevance, student: plan.relevanceStudent },
+    { label: 'Formative Assessment Criteria for Success', content: plan.assessment, student: plan.assessmentStudent },
+    { label: 'Activities/Tasks', content: plan.activities },
+    { label: 'Resources/Materials', content: plan.resources },
+    { label: 'Access for All', content: plan.accessForAll },
+    { label: 'Modifications/Accommodations', content: plan.modifications },
   ] : [];
 
   return (
@@ -205,25 +207,35 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
                   {copied === 'plan' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                   {copied === 'plan' ? 'Copied' : 'Copy all'}
                 </button>
-                <ExportButtons title={plan.lessonTitle || 'Lesson Plan'} blocks={lessonPlanToBlocks(plan)} />
+                <ExportButtons
+                  pdf={() => downloadSimplePDF(plan.lessonTitle || 'Lesson Plan', lessonPlanToBlocks(plan))}
+                  docx={() => exportLessonPlanDocx(plan)}
+                  gdoc={() => exportLessonPlanToGoogle(plan)}
+                />
               </div>
             </div>
             <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
-              {(plan.lessonTitle || plan.aiFramework) && (
-                <div className="p-3 bg-teal-50/50">
-                  <div className="text-xs font-bold">{plan.lessonTitle || 'Lesson Plan'}</div>
-                  {plan.aiFramework && <div className="text-[10px] text-muted-foreground mt-0.5">AI Framework: {plan.aiFramework}</div>}
+              <div className="p-3 bg-teal-50/50">
+                <div className="text-xs font-bold">{plan.lessonTitle || 'Lesson Plan'}</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">
+                  Subject(s): {plan.subjects || '—'} · Grade: {plan.grade || '—'}
                 </div>
-              )}
-              {sections.map(sec => (
-                <div key={sec.num} className="p-3 bg-card">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-teal-700">Section {sec.num}: {sec.title}</div>
-                  <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/80 mt-1">{sec.content}</div>
+              </div>
+              {planRows.map(row => (
+                <div key={row.label} className="p-3 bg-card">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-teal-700">{row.label}</div>
+                  <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/80 mt-1">{row.content}</div>
+                  {row.student && (
+                    <div className="mt-2 p-2 rounded-lg bg-teal-50/60 border border-teal-100">
+                      <div className="text-[9px] font-bold uppercase tracking-wider text-teal-600">Student-friendly translation</div>
+                      <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/70 mt-0.5 italic">{row.student}</div>
+                    </div>
+                  )}
                 </div>
               ))}
               <div className="p-3 bg-muted/30">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Teacher Reflection</div>
-                <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/70 mt-1">{plan.teacherReflection}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Common Core Aligned Lesson: Reflection</div>
+                <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/70 mt-1">{plan.shiftReflection}</div>
               </div>
             </div>
           </motion.div>
@@ -242,7 +254,11 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
                   {copied === 'directions' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                   {copied === 'directions' ? 'Copied' : 'Copy all'}
                 </button>
-                <ExportButtons title={directions.title || 'Student Directions'} blocks={directionsToBlocks(directions)} />
+                <ExportButtons
+                  pdf={() => downloadSimplePDF(directions.title || 'Student Directions', directionsToBlocks(directions))}
+                  docx={() => downloadSimpleDocx(directions.title || 'Student Directions', directionsToBlocks(directions))}
+                  gdoc={() => exportSimpleDocToGoogle(directions.title || 'Student Directions', directionsToBlocks(directions))}
+                />
               </div>
             </div>
             <div className="rounded-xl border border-border p-3 bg-card space-y-3">

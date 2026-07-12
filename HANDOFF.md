@@ -154,13 +154,24 @@ every dashboard task with exact click paths, one step per message, and wait.
    handleAnalyze() which read stale React state — first click re-analyzed the
    OLD text. handleAnalyze now takes an optional overrideText; keep that
    pattern for any analyze-right-after-setText flow.
-7. **Lesson plan is template-locked to Will's SCHOOL template** (he supplied
-   the PDF/DOCX July 4 2026): each section's content must be exactly the
-   labeled lines (Section I: "National Teaching Standards:" / "AI Competency
-   Block:" / "Progression Level:", etc.) — see LESSON_PLAN_TEMPLATE in
-   _shared/research-base.ts and the JSON spec in generate.ts (which now also
-   returns lessonTitle + aiFramework, rendered in LessonPlanPanel and included
-   in lessonPlanToText's header). Do not loosen the labeled-line requirement.
+7. **Lesson plan is template-locked — REPLACED July 12 2026 with the SCOE
+   CCSS-Aligned template** (Will uploaded scoe.org's
+   ccssalignedlessonplantemplate.docx and chose "replace" over "offer both").
+   Structure: Subject(s)/Grade/Teacher/School header, a two-column table
+   (LESSON ELEMENT ~70% | STUDENT-FRIENDLY TRANSLATION ~30%, translations for
+   elements 2-4 only), eight elements (Standards, Targets, Relevance,
+   Assessment Criteria, Activities/Tasks, Resources, Access for All,
+   Modifications), then "Common Core Aligned Lesson: Reflection" (AI answers
+   ONLY the shifts question; post-teaching questions stay unanswered,
+   rendered verbatim). See SCOE_LESSON_PLAN_TEMPLATE in
+   _shared/research-base.ts, the JSON spec in generate.ts, the LessonPlan type
+   in standards.ts, and exportLessonPlanDocx/exportLessonPlanToGoogle in
+   export.ts (the Word download clones the .docx layout exactly, incl. the
+   original 10036/4354 dxa column widths; PDF is a linear approximation).
+   The AI permission category now feeds Activities/Tasks (this template has
+   no AI sections) and still drives student directions. The old Section I-VI
+   AI-integrated template is RETIRED but kept in research-base.ts
+   (LESSON_PLAN_TEMPLATE) for restorability. Do not loosen the template lock.
 
 ## Product decisions already made (don't relitigate)
 

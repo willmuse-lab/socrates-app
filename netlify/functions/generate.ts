@@ -3,15 +3,14 @@
 //  Three fast modes, called in sequence by the frontend so each stays well
 //  inside the 26s function budget:
 //    mode: "align"       → match assignment to uploaded SCOS standards
-//    mode: "lesson_plan"  → Section I-VI lesson plan (template-locked)
+//    mode: "lesson_plan"  → SCOE CCSS-aligned lesson plan (template-locked)
 //    mode: "directions"   → student-facing directions
 // ============================================================================
 import Anthropic from "@anthropic-ai/sdk";
 import {
   FRAMEWORKS,
-  AIAS_SCALE,
   PERMISSION_CATEGORIES,
-  LESSON_PLAN_TEMPLATE,
+  SCOE_LESSON_PLAN_TEMPLATE,
 } from "./_shared/research-base";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 27000, maxRetries: 0 });
@@ -131,66 +130,72 @@ Do NOT use double-quote characters (") inside any string value — use single qu
 }
 
 // ---------------------------------------------------------------------------
-// MODE: lesson_plan — Section I-VI template-locked lesson plan
+// MODE: lesson_plan — SCOE CCSS-Aligned template (active since July 12 2026;
+// the Section I-VI AI-integrated template it replaced is kept in
+// research-base.ts for restorability)
 // ---------------------------------------------------------------------------
 async function runLessonPlan(body: any) {
   const { assignmentText, alignedStandards, permissionCategory, subject, gradeLevel } = body;
 
   const standardsBlock = Array.isArray(alignedStandards) && alignedStandards.length > 0
     ? alignedStandards.map((s: any) => `${s.code}: ${s.text}`).join("\n")
-    : "No SCOS alignment provided — write Section I using clear placeholder language the teacher can fill in (e.g., '[Insert your state standard code]'), and note that uploading a standards document enables automatic alignment.";
+    : "No standards alignment provided — write the standards element using clear placeholder language the teacher can fill in (e.g., '[Insert your state standard code]'), and note that uploading a standards document enables automatic alignment.";
 
-  const system = `You are Socrates, an expert in AI-integrated lesson planning for grades 6-12.
-You generate lesson plans that follow the research-locked template EXACTLY. You never
-skip, rename, merge, or reorder sections.
+  const system = `You are Socrates, an expert lesson planner for grades 6-12.
+You generate lesson plans that follow the school's template EXACTLY. You never skip,
+rename, merge, or reorder elements.
 
 PEDAGOGICAL FRAMEWORKS (these must visibly shape the plan):
 ${FRAMEWORKS}
 
-${AIAS_SCALE}
-
 ${PERMISSION_CATEGORIES}
 
-${LESSON_PLAN_TEMPLATE}`;
+${SCOE_LESSON_PLAN_TEMPLATE}`;
 
-  const userMessage = `Generate a complete lesson plan for this redesigned assignment.
+  const userMessage = `Generate a complete lesson plan for this assignment.
 
-REDESIGNED ASSIGNMENT (this drives Section IV):
+ASSIGNMENT (this drives Activities/Tasks):
 """
 ${String(assignmentText).substring(0, 6000)}
 """
 
-ALIGNED STANDARDS (these go in Section I, verbatim):
+ALIGNED STANDARDS (these go in "standards", verbatim):
 ${standardsBlock}
 
-TEACHER'S CHOSEN AI PERMISSION CATEGORY (this drives Section III): ${permissionCategory || "Not specified — default to 'AI as Feedback Partner' and note the teacher can change it."}
+TEACHER'S CHOSEN AI PERMISSION CATEGORY (weave its rules into Activities/Tasks): ${permissionCategory || "Not specified — default to 'AI as Feedback Partner' and note the teacher can change it."}
 ${subject ? `SUBJECT: ${subject}` : ""}
 ${gradeLevel ? `GRADE LEVEL: ${gradeLevel}` : ""}
 
 Requirements:
-- Follow the template EXACTLY: every section's content must consist ONLY of the
-  template's labeled lines for that section, one per line, label verbatim with its
-  colon, then the filled-in content (e.g. Section I content is exactly three lines
-  starting "National Teaching Standards:", "AI Competency Block:", "Progression Level:").
-- Section III's "Purpose of AI:" line must name the chosen permission category and
-  the student's responsibility under it, per the framework definitions.
-- Section V's "Citations:" line must apply the tiered AI disclosure framework (Baule Shift 5).
-- Section VI's "Formative:" line must cover BOTH subject AND AI-tool understanding.
-- BE CONCISE — this matters: each labeled line is 1-2 tight sentences. Total under
-  700 words. Long plans get cut off and fail.
+- Fill EVERY element of the template. The three student-friendly translations
+  (targets, relevance, assessment) are written TO the student in plain first-person
+  language ("I can...", "I'll know I've got it when...").
+- Activities/Tasks must be built directly from the assignment text above and must
+  state plainly how AI may or may not be used per the permission category.
+- Modifications/Accommodations must be specific (not "provide support as needed").
+- shiftReflection: name ONE CCSS instructional shift this lesson reflects and 1-2
+  sentences on how. Do NOT answer the template's post-teaching questions.
+- BE CONCISE — this matters: 1-3 tight sentences per element (Activities/Tasks may
+  use up to 5 short numbered steps). Total under 700 words. Long plans get cut off and fail.
 
 Return ONLY a single valid JSON object, no markdown fences, no commentary:
 {
   "lessonPlan": {
     "lessonTitle": "short lesson title",
-    "aiFramework": "UNESCO AI CFT or TeachAI Toolkit",
-    "sectionI":  { "title": "Standards Alignment", "content": "National Teaching Standards: ...\\nAI Competency Block: ...\\nProgression Level: ..." },
-    "sectionII": { "title": "Learning Objectives", "content": "Subject Mastery: Students will be able to...\\nAI Literacy Goal: ..." },
-    "sectionIII":{ "title": "AI Tool Integration", "content": "Tool(s) Selected: ...\\nPurpose of AI: ...\\nHuman-in-the-Loop: ..." },
-    "sectionIV": { "title": "Instructional Procedure", "content": "1. Direct Instruction: ...\\n2. Guided Practice: ...\\n3. Critical Reflection: ..." },
-    "sectionV":  { "title": "Ethics & Integrity", "content": "Data Privacy: ...\\nCitations: ...\\nStudent Agreement: ..." },
-    "sectionVI": { "title": "Assessment", "content": "Formative: ...\\nSummative: ..." },
-    "teacherReflection": "How did the AI tool enhance or hinder student learning? ...\\nWere there any unexpected ethical dilemmas or technical issues? ..."
+    "subjects": "subject(s), from context",
+    "grade": "grade level, from context",
+    "standards": "Learning Standard(s) Addressed",
+    "targets": "Learning Target(s)",
+    "targetsStudent": "student-friendly translation of the targets",
+    "relevance": "Relevance/Rationale",
+    "relevanceStudent": "student-friendly translation of the relevance",
+    "assessment": "Formative Assessment Criteria for Success",
+    "assessmentStudent": "student-friendly translation of the criteria",
+    "activities": "Activities/Tasks (numbered steps, incl. the AI rules)",
+    "resources": "Resources/Materials",
+    "accessForAll": "Access for All",
+    "modifications": "Modifications/Accommodations",
+    "shiftReflection": "which CCSS shift this lesson reflects and how"
   }
 }
 Use \\n for line breaks inside content strings. Do NOT use double-quote characters (") inside any content value — if you need quotation marks, use single quotes (') instead.`;

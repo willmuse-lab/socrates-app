@@ -1,8 +1,8 @@
 import { jsPDF } from 'jspdf';
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, Table, TableRow, TableCell, WidthType } from 'docx';
 import { saveAs } from 'file-saver';
 import { AnalysisResult } from './gemini';
-import { LessonPlan, StudentDirections, LessonPlanSection } from './standards';
+import { LessonPlan, StudentDirections } from './standards';
 import { createGoogleDoc } from './google';
 
 export async function exportToPDF(result: AnalysisResult, originalText: string) {
@@ -184,14 +184,129 @@ export function redesignToBlocks(assignmentText: string): DocBlock[] {
   return [{ text: assignmentText }];
 }
 
+// ---------------------------------------------------------------------------
+// SCOE CCSS-Aligned Lesson Plan template (the school's official .docx,
+// supplied July 12 2026). SCOE_ROWS carries the template's labels and
+// parenthetical prompts VERBATIM; the Word export below clones the file's
+// layout exactly (header blanks, two-column table ~70/30, reflection section).
+// ---------------------------------------------------------------------------
+interface ScoeRow { label: string; prompt: string; key: keyof LessonPlan; student?: keyof LessonPlan; }
+
+const SCOE_ROWS: ScoeRow[] = [
+  { label: 'Learning Standard(s) Addressed:', prompt: '', key: 'standards' },
+  { label: 'Learning Target(s):', prompt: '(What will students know & be able to do as a result of this lesson?)', key: 'targets', student: 'targetsStudent' },
+  { label: 'Relevance/Rationale:', prompt: '(Why are the outcomes of this lesson important in the real world? Why are these outcomes essential for future learning?)', key: 'relevance', student: 'relevanceStudent' },
+  { label: 'Formative Assessment Criteria for Success:', prompt: "(How will you & your students know if they have successfully met the outcomes? What specific criteria will be met in a successful product/process? What does success on this lesson's outcomes look like?)", key: 'assessment', student: 'assessmentStudent' },
+  { label: 'Activities/Tasks:', prompt: '(What learning experiences will students engage in? How will you use these learning experiences or their student products as formative assessment opportunities?)', key: 'activities' },
+  { label: 'Resources/Materials:', prompt: '(What texts, digital resources, & materials will be used in this lesson?)', key: 'resources' },
+  { label: 'Access for All:', prompt: '(How will you ensure that all students have access to and are able to engage appropriately in this lesson? Consider all aspects of student diversity.)', key: 'accessForAll' },
+  { label: 'Modifications/Accommodations:', prompt: '(What curriculum modifications and/or classroom accommodations will you make for Students with Disabilities in your class? Be as specific as possible.)', key: 'modifications' },
+];
+
+const SCOE_REFLECTION_INTRO = 'Does this lesson reflect one of the “shifts” in instruction? If so, please describe which shift is addressed and how?';
+const SCOE_REFLECTION_CHOICE = 'In addition, please choose ONE question below to respond to after you have taught the lesson OR create your own question and respond to it after you have taught the lesson.';
+const SCOE_REFLECTION_QUESTIONS = [
+  'How did this lesson support 21st Century Skills?',
+  'How did this lesson reflect academic rigor?',
+  'How did this lesson cognitively engage students?',
+  'How did this lesson engage students in collaborative learning and enhance their collaborative learning skills?',
+];
+
+const scoeVal = (plan: LessonPlan, key: keyof LessonPlan) => String(plan[key] ?? '');
+
+/** Linear block form of the SCOE plan — used for the PDF download. */
 export function lessonPlanToBlocks(plan: LessonPlan): DocBlock[] {
-  const s = (sec: LessonPlanSection, num: string): DocBlock => ({ heading: `Section ${num}: ${sec.title}`, text: sec.content });
-  return [
-    { text: `Teacher: ________    Date: ________    Grade/Subject: ________\nAI Framework: ${plan.aiFramework || 'TeachAI Toolkit'}` },
-    s(plan.sectionI, 'I'), s(plan.sectionII, 'II'), s(plan.sectionIII, 'III'),
-    s(plan.sectionIV, 'IV'), s(plan.sectionV, 'V'), s(plan.sectionVI, 'VI'),
-    { heading: 'Teacher Reflection', text: plan.teacherReflection },
+  const blocks: DocBlock[] = [
+    { text: `Subject(s): ${plan.subjects || '________'}    Grade: ${plan.grade || '________'}\nTeacher(s): ________    School: ________` },
   ];
+  SCOE_ROWS.forEach(row => {
+    const student = row.student ? scoeVal(plan, row.student) : '';
+    blocks.push({ heading: row.label, text: scoeVal(plan, row.key) + (student ? `\n\nStudent-friendly translation: ${student}` : '') });
+  });
+  blocks.push({ heading: 'Common Core Aligned Lesson: Reflection', text: `${SCOE_REFLECTION_INTRO}\n${plan.shiftReflection || ''}\n\n${SCOE_REFLECTION_CHOICE}\n${SCOE_REFLECTION_QUESTIONS.map(q => '• ' + q).join('\n')}` });
+  return blocks;
+}
+
+/** Word download that clones the school's SCOE template layout exactly. */
+export async function exportLessonPlanDocx(plan: LessonPlan) {
+  const cellParas = (row: ScoeRow): Paragraph[] => {
+    const paras = [new Paragraph({ children: [new TextRun({ text: row.label, bold: true })], spacing: { after: 60 } })];
+    if (row.prompt) paras.push(new Paragraph({ children: [new TextRun({ text: row.prompt, italics: true, size: 20 })], spacing: { after: 120 } }));
+    scoeVal(plan, row.key).split('\n').forEach(p => paras.push(new Paragraph({ text: p, spacing: { after: 80 } })));
+    return paras;
+  };
+  const studentParas = (row: ScoeRow): Paragraph[] => {
+    const text = row.student ? scoeVal(plan, row.student) : '';
+    return text ? text.split('\n').map(p => new Paragraph({ text: p, spacing: { after: 80 } })) : [new Paragraph('')];
+  };
+
+  // Column widths copied from the original .docx grid (10036 / 4354 dxa).
+  const table = new Table({
+    width: { size: 14390, type: WidthType.DXA },
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({ width: { size: 10036, type: WidthType.DXA }, children: [new Paragraph({ children: [new TextRun({ text: 'LESSON ELEMENT', bold: true })] })] }),
+          new TableCell({ width: { size: 4354, type: WidthType.DXA }, children: [
+            new Paragraph({ children: [new TextRun({ text: 'STUDENT-FRIENDLY TRANSLATION', bold: true })] }),
+            new Paragraph({ children: [new TextRun({ text: '( # 2,3,4 only)', bold: true })] }),
+          ] }),
+        ],
+      }),
+      ...SCOE_ROWS.map(row => new TableRow({
+        children: [
+          new TableCell({ width: { size: 10036, type: WidthType.DXA }, children: cellParas(row) }),
+          new TableCell({ width: { size: 4354, type: WidthType.DXA }, children: studentParas(row) }),
+        ],
+      })),
+    ],
+  });
+
+  const doc = new Document({
+    sections: [{
+      properties: {},
+      children: [
+        new Paragraph({ children: [new TextRun({ text: plan.lessonTitle || 'Lesson Plan', bold: true, size: 28 })], alignment: AlignmentType.CENTER, spacing: { after: 200 } }),
+        new Paragraph({ children: [new TextRun(`Subject(s): ${plan.subjects || '______________________________'}    Grade: ${plan.grade || '____________'}`)], spacing: { after: 120 } }),
+        new Paragraph({ children: [new TextRun('Teacher(s): ______________________________    School: ____________________')], spacing: { after: 240 } }),
+        table,
+        new Paragraph({ children: [new TextRun({ text: 'Common Core Aligned Lesson:  Reflection', bold: true })], spacing: { before: 360, after: 160 } }),
+        new Paragraph({ text: SCOE_REFLECTION_INTRO, spacing: { after: 80 } }),
+        ...(plan.shiftReflection ? plan.shiftReflection.split('\n').map(p => new Paragraph({ text: p, spacing: { after: 160 } })) : []),
+        new Paragraph({ text: SCOE_REFLECTION_CHOICE, spacing: { before: 160, after: 120 } }),
+        ...SCOE_REFLECTION_QUESTIONS.map(q => new Paragraph({ text: q, bullet: { level: 0 } })),
+      ],
+    }],
+  });
+  const blob = await Packer.toBlob(doc);
+  saveAs(blob, `${slugify(plan.lessonTitle || 'lesson-plan')}.docx`);
+}
+
+/** Google Doc export with a real two-column table matching the template. */
+export async function exportLessonPlanToGoogle(plan: LessonPlan): Promise<string> {
+  const rowsHtml = SCOE_ROWS.map(row => {
+    const student = row.student ? scoeVal(plan, row.student) : '';
+    return `<tr>
+      <td><p><b>${esc(row.label)}</b></p>${row.prompt ? `<p><i>${esc(row.prompt)}</i></p>` : ''}${para(scoeVal(plan, row.key))}</td>
+      <td>${student ? para(student) : '<p></p>'}</td>
+    </tr>`;
+  }).join('');
+  const html = `<html><body>
+    <h1 style="text-align:center">${esc(plan.lessonTitle || 'Lesson Plan')}</h1>
+    <p>Subject(s): ${esc(plan.subjects || '______________________________')} &nbsp;&nbsp; Grade: ${esc(plan.grade || '____________')}</p>
+    <p>Teacher(s): ______________________________ &nbsp;&nbsp; School: ____________________</p>
+    <table border="1" style="border-collapse:collapse;width:100%">
+      <tr><td style="width:70%"><p><b>LESSON ELEMENT</b></p></td><td style="width:30%"><p><b>STUDENT-FRIENDLY TRANSLATION</b></p><p><b>( # 2,3,4 only)</b></p></td></tr>
+      ${rowsHtml}
+    </table>
+    <p><b>Common Core Aligned Lesson:&nbsp; Reflection</b></p>
+    <p>${esc(SCOE_REFLECTION_INTRO)}</p>
+    ${para(plan.shiftReflection || '')}
+    <p>${esc(SCOE_REFLECTION_CHOICE)}</p>
+    <ul>${SCOE_REFLECTION_QUESTIONS.map(q => `<li>${esc(q)}</li>`).join('')}</ul>
+  </body></html>`;
+  const { url } = await createGoogleDoc(plan.lessonTitle || 'Lesson Plan', html);
+  return url;
 }
 
 export function directionsToBlocks(d: StudentDirections): DocBlock[] {

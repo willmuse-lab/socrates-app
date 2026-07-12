@@ -211,6 +211,40 @@ SCORING — every score MUST be justified against named framework criteria
         of doing the work. AI can assist but cannot replace the student.
 `;
 
+// ACTIVE lesson plan template since July 12 2026 (Will's decision): the SCOE
+// CCSS-Aligned Lesson Plan — replaces the Section I-VI AI-integrated template
+// below (kept for restorability). The exact .docx layout is mirrored in
+// src/lib/export.ts.
+export const SCOE_LESSON_PLAN_TEMPLATE = `
+CCSS-ALIGNED LESSON PLAN TEMPLATE — this is the school's official template. Every
+lesson plan MUST fill in EXACTLY these elements, in this order. Elements 2, 3, and 4
+ALSO get a "student-friendly translation": the same idea rewritten in plain first-person
+student language ("I can...", "This matters because...").
+
+Header: Subject(s) and Grade (from the teacher's context; leave Teacher(s)/School blank).
+
+1. Learning Standard(s) Addressed — the aligned standards VERBATIM when provided
+   (state SCOS codes etc.); otherwise clear placeholder language the teacher can fill in.
+2. Learning Target(s) — what students will know & be able to do as a result of this
+   lesson. (+ student-friendly translation)
+3. Relevance/Rationale — why the outcomes matter in the real world and for future
+   learning. (+ student-friendly translation)
+4. Formative Assessment Criteria for Success — how teacher & students know they met
+   the outcomes; what success looks like. (+ student-friendly translation)
+5. Activities/Tasks — the learning experiences, built directly from the assignment
+   text, INCLUDING how AI may or may not be used per the teacher's chosen AI
+   permission category, and how the activities double as formative assessment.
+6. Resources/Materials — texts, digital resources, and materials used.
+7. Access for All — how ALL students can access and engage (student diversity).
+8. Modifications/Accommodations — specific curriculum modifications and classroom
+   accommodations for Students with Disabilities.
+
+Reflection (pre-teaching part only): which CCSS instructional "shift" this lesson
+reflects and how. The template's post-teaching reflection questions are left for the
+teacher and must NOT be answered.
+`;
+
+// RETIRED July 12 2026 (kept for restorability — was the active template July 4-12):
 export const LESSON_PLAN_TEMPLATE = `
 AI-INTEGRATED LESSON PLAN TEMPLATE — this is the school's official template. Every
 lesson plan MUST reproduce this structure EXACTLY: same sections, same order, and the

@@ -43,18 +43,24 @@ export interface AlignmentResult {
   nearMisses: { code: string; text: string; suggestion: string }[];
 }
 
-export interface LessonPlanSection { title: string; content: string; }
-
+// SCOE CCSS-Aligned template (active since July 12 2026). Elements 2-4 carry a
+// student-friendly translation, matching the school template's second column.
 export interface LessonPlan {
   lessonTitle?: string;
-  aiFramework?: string;
-  sectionI: LessonPlanSection;
-  sectionII: LessonPlanSection;
-  sectionIII: LessonPlanSection;
-  sectionIV: LessonPlanSection;
-  sectionV: LessonPlanSection;
-  sectionVI: LessonPlanSection;
-  teacherReflection: string;
+  subjects?: string;
+  grade?: string;
+  standards: string;
+  targets: string;
+  targetsStudent?: string;
+  relevance: string;
+  relevanceStudent?: string;
+  assessment: string;
+  assessmentStudent?: string;
+  activities: string;
+  resources: string;
+  accessForAll: string;
+  modifications: string;
+  shiftReflection?: string;
 }
 
 export interface StudentDirections {
@@ -156,7 +162,7 @@ export async function generateLessonPlan(
   gradeLevel?: string
 ): Promise<LessonPlan> {
   const r = await callGenerate({ mode: 'lesson_plan', assignmentText, alignedStandards, permissionCategory, subject, gradeLevel });
-  if (!r.lessonPlan?.sectionI) throw new Error('Unexpected lesson plan response shape.');
+  if (!r.lessonPlan?.targets || !r.lessonPlan?.activities) throw new Error('Unexpected lesson plan response shape.');
   return r.lessonPlan as LessonPlan;
 }
 
@@ -171,18 +177,21 @@ export async function generateStudentDirections(
 }
 
 // Convenience: turn a LessonPlan into clean plain text (for copy / export).
+// Mirrors the SCOE template's element order and labels.
 export function lessonPlanToText(plan: LessonPlan): string {
-  const s = (sec: LessonPlanSection, num: string) => `${num}: ${sec.title}\n${sec.content}`;
+  const sf = (t?: string) => (t ? `\nStudent-friendly translation: ${t}` : '');
   return [
-    // Header matches the school template: title, teacher/date blanks, framework.
-    `${plan.lessonTitle || '[Lesson Title]'}\nTeacher: ________ | Date: ________ | Grade/Subject: ________\nAI Framework: ${plan.aiFramework || 'TeachAI Toolkit'}`,
-    s(plan.sectionI, 'Section I'),
-    s(plan.sectionII, 'Section II'),
-    s(plan.sectionIII, 'Section III'),
-    s(plan.sectionIV, 'Section IV'),
-    s(plan.sectionV, 'Section V'),
-    s(plan.sectionVI, 'Section VI'),
-    `Teacher Reflection\n${plan.teacherReflection}`,
+    `${plan.lessonTitle || 'Lesson Plan'}`,
+    `Subject(s): ${plan.subjects || '________'}    Grade: ${plan.grade || '________'}\nTeacher(s): ________    School: ________`,
+    `Learning Standard(s) Addressed:\n${plan.standards}`,
+    `Learning Target(s):\n${plan.targets}${sf(plan.targetsStudent)}`,
+    `Relevance/Rationale:\n${plan.relevance}${sf(plan.relevanceStudent)}`,
+    `Formative Assessment Criteria for Success:\n${plan.assessment}${sf(plan.assessmentStudent)}`,
+    `Activities/Tasks:\n${plan.activities}`,
+    `Resources/Materials:\n${plan.resources}`,
+    `Access for All:\n${plan.accessForAll}`,
+    `Modifications/Accommodations:\n${plan.modifications}`,
+    `Common Core Aligned Lesson: Reflection\n${plan.shiftReflection || ''}`,
   ].join('\n\n');
 }
 
