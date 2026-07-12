@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
-import { Copy, Check, Loader2, GraduationCap, ClipboardList, Target, AlertCircle, Sparkles } from 'lucide-react';
+import { Copy, Check, Loader2, GraduationCap, ClipboardList, Target, AlertCircle, Sparkles, FileDown, FileText, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { downloadSimplePDF, downloadSimpleDocx, exportSimpleDocToGoogle, lessonPlanToBlocks, directionsToBlocks, DocBlock } from '@/src/lib/export';
+import { googleConfigured } from '@/src/lib/google';
 import {
   AlignmentResult,
   LessonPlan,
@@ -79,6 +81,35 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
     toast.success('Copied to clipboard');
     setTimeout(() => setCopied(null), 2000);
   };
+
+  // Download the lesson plan or student directions as PDF / Word / Google Doc.
+  const download = async (title: string, blocks: DocBlock[], format: 'pdf' | 'docx' | 'gdoc') => {
+    try {
+      if (format === 'pdf') { downloadSimplePDF(title, blocks); toast.success('PDF downloaded!'); }
+      else if (format === 'docx') { await downloadSimpleDocx(title, blocks); toast.success('Word document downloaded!'); }
+      else {
+        toast.info('Creating Google Doc…');
+        const url = await exportSimpleDocToGoogle(title, blocks);
+        window.open(url, '_blank'); toast.success('Saved to your Google Drive!');
+      }
+    } catch (e: any) { toast.error(e?.message || 'Download failed. Please try again.'); }
+  };
+
+  const ExportButtons = ({ title, blocks }: { title: string; blocks: DocBlock[] }) => (
+    <div className="flex items-center gap-2.5">
+      <button onClick={() => download(title, blocks, 'pdf')} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors" title="Download PDF">
+        <FileDown className="w-3 h-3" />PDF
+      </button>
+      <button onClick={() => download(title, blocks, 'docx')} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors" title="Download Word document">
+        <FileText className="w-3 h-3" />Word
+      </button>
+      {googleConfigured && (
+        <button onClick={() => download(title, blocks, 'gdoc')} className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-green-600 transition-colors" title="Save as Google Doc">
+          <ExternalLink className="w-3 h-3" />Google Doc
+        </button>
+      )}
+    </div>
+  );
 
   const busy = step === 'aligning' || step === 'planning' || step === 'directions';
   const stepLabel =
@@ -169,10 +200,13 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
                 <ClipboardList className="w-3.5 h-3.5 text-teal-600" />
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Lesson plan</p>
               </div>
-              <button onClick={() => copy(lessonPlanToText(plan), 'plan')} className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors">
-                {copied === 'plan' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                {copied === 'plan' ? 'Copied' : 'Copy all'}
-              </button>
+              <div className="flex items-center gap-2.5">
+                <button onClick={() => copy(lessonPlanToText(plan), 'plan')} className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors">
+                  {copied === 'plan' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  {copied === 'plan' ? 'Copied' : 'Copy all'}
+                </button>
+                <ExportButtons title={plan.lessonTitle || 'Lesson Plan'} blocks={lessonPlanToBlocks(plan)} />
+              </div>
             </div>
             <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
               {(plan.lessonTitle || plan.aiFramework) && (
@@ -203,10 +237,13 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
                 <GraduationCap className="w-3.5 h-3.5 text-teal-600" />
                 <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Student directions</p>
               </div>
-              <button onClick={() => copy(directionsToText(directions), 'directions')} className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors">
-                {copied === 'directions' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                {copied === 'directions' ? 'Copied' : 'Copy all'}
-              </button>
+              <div className="flex items-center gap-2.5">
+                <button onClick={() => copy(directionsToText(directions), 'directions')} className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground hover:text-foreground transition-colors">
+                  {copied === 'directions' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  {copied === 'directions' ? 'Copied' : 'Copy all'}
+                </button>
+                <ExportButtons title={directions.title || 'Student Directions'} blocks={directionsToBlocks(directions)} />
+              </div>
             </div>
             <div className="rounded-xl border border-border p-3 bg-card space-y-3">
               <div className="text-xs font-bold">{directions.title}</div>

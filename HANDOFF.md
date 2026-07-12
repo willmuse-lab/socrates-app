@@ -38,7 +38,9 @@ every dashboard task with exact click paths, one step per message, and wait.
 - Client libs: `src/lib/gemini.ts` (analyze API client — name is legacy, it
   calls Claude), `standards.ts` (feature branch), `supabase.ts`, `profile.ts`
   (multi-select subjects/grades), `comments.ts` (teacher testimonials),
-  `pdf.ts` (bundled pdf.js worker — do NOT use CDN workerSrc)
+  `pdf.ts` (bundled pdf.js worker — do NOT use CDN workerSrc), `google.ts`
+  (client-side Google Drive: Picker import + create-Google-Doc export,
+  drive.file scope, NO backend functions — see "Google Drive integration")
 
 ## Deployment facts (IMPORTANT — non-obvious)
 
@@ -154,7 +156,9 @@ every dashboard task with exact click paths, one step per message, and wait.
 - Public research content is trimmed: source names only + "proprietary
   methodology" notes (About/Scoring pages). Full research/prompts live
   server-side only. Departments/sharing feature was removed entirely.
-  Google Drive/Docs buttons are commented out (no backend functions exist).
+- **Google Drive integration (built July 12 2026, client-side, no backend):**
+  see the dedicated section below. Import from Drive + export to Google Docs,
+  plus Word/PDF downloads for redesigns, lesson plans, and student directions.
 - **Social login (Google + Microsoft):** "Continue with Google/Microsoft"
   buttons are LIVE on the login dialog (`LoginDialog.tsx`), backed by Supabase
   `signInWithOAuth` (`signInWithProvider` in `supabase.ts`, provider `google` /
@@ -210,10 +214,11 @@ localhost) — OAuth needs the real web address.
    → Certificates & secrets → New client secret → copy the Value → Supabase →
    Providers → **Azure** (Microsoft = Azure in Supabase) → toggle on, paste
    both, Save.
-- Reuse the SAME Google Cloud project when the Drive feature returns — Drive
-  just needs extra scopes added to it (which then triggers Google verification,
-  the slow part — see task 10). Google project is named "Socrates", owned by
-  socratesaiedu@gmail.com; OAuth client "Socrates Web" already created.
+- The Drive feature (shipped July 12 2026) reuses this SAME Google Cloud
+  project and the SAME "Socrates Web" OAuth client — it only adds the
+  non-sensitive `drive.file` scope, which does NOT trigger Google
+  verification. Google project is named "Socrates", owned by
+  socratesaiedu@gmail.com. Setup steps: "Google Drive integration" section.
 
 **Gotchas hit during Google setup (apply to Microsoft too):**
 - After entering Client ID + Secret in the Supabase provider panel, the toggle
@@ -230,6 +235,51 @@ localhost) — OAuth needs the real web address.
   To brand it you need Supabase's paid Custom Domain add-on (run auth on
   auth.<yourdomain>) — bundle with the custom-domain task (#6) and Google
   verification (#10). Do NOT chase this standalone.
+
+## Google Drive integration (built July 12 2026) — how it works
+
+**Decision (Will's):** use Google's own Picker with the `drive.file` scope —
+per-file access only, which is a NON-SENSITIVE scope, so NO Google app
+verification/review is needed. The fancier in-app Drive file list (needs
+`drive.readonly`, a sensitive scope + formal review) was deliberately NOT
+chosen; its UI is kept unused in `GoogleDriveBrowser.tsx` for a possible
+future upgrade. This choice is reversible later.
+
+**Architecture: 100% client-side.** No Netlify functions, no token storage.
+`src/lib/google.ts` lazy-loads Google Identity Services + the Picker script,
+gets a popup OAuth token (cached in memory ~55 min), and calls the Drive REST
+API directly from the browser:
+- IMPORT: `GoogleDrivePicker.tsx` ("Select from Google Drive" on the input
+  screen) → Picker → reads Google Docs (export text/plain) or PDF/DOCX/TXT
+  stored in Drive (alt=media + the same pdf.js/mammoth parsing FileUploader uses).
+- EXPORT ("Save as Google Doc"): multipart upload of HTML with
+  mimeType application/vnd.google-apps.document — Drive converts HTML → Doc.
+  Available for the full analysis report, each Bronze/Silver/Gold redesign
+  ("Download this version" row, includes inline edits), and the lesson plan +
+  student directions (buttons next to "Copy all" in LessonPlanPanel).
+- Word/PDF downloads for redesigns/lesson plan/directions are pure client-side
+  (generic `DocBlock` exporters in `export.ts`) and work with NO Google setup.
+- The stale `/api/google/*` redirects in netlify.toml and the old 5-function
+  backend plan are OBSOLETE for this feature (only relevant if the
+  GoogleDriveBrowser upgrade ever happens).
+
+**ALL Google buttons are hidden until env vars exist** (`googleConfigured`
+in google.ts). NOT YET DONE — Will's one-time dashboard steps (walk him
+through, one at a time; VITE_ vars bake at build → trigger deploy after):
+1. console.cloud.google.com (account socratesaiedu@gmail.com, project
+   "Socrates" — SAME project as Google login) → APIs & Services → Library →
+   enable **Google Drive API** and **Google Picker API**.
+2. Credentials → OAuth client "Socrates Web" → add Authorized JavaScript
+   origins: `https://socratesiq.com` and
+   `https://brilliant-mandazi-3937f4.netlify.app` (add a deploy-preview
+   origin temporarily when testing on a preview). Copy the Client ID.
+3. Credentials → Create credentials → **API key** → restrict it: Application
+   restrictions = Websites (same origins), API restrictions = Picker API.
+4. Cloud console home → note the **project NUMBER** (not name/ID).
+5. Netlify (brilliant-mandazi) → Environment variables, all contexts:
+   `VITE_GOOGLE_CLIENT_ID` (from 2), `VITE_GOOGLE_API_KEY` (from 3),
+   `VITE_GOOGLE_APP_ID` (project number from 4) → Trigger deploy.
+Privacy page + Help page already describe the feature accurately.
 
 - **Help page (added July 4 2026):** searchable in-app Help & How-To
   (`HelpPage` in StaticPages.tsx, viewMode 'help', first footer link). Covers
@@ -265,12 +315,13 @@ localhost) — OAuth needs the real web address.
    visible in bundle — known limitation).
 9. Four-role buyer review exercise (teacher/principal/head/acquirer) was
    paused at the Principal's questions.
-10. Google Drive/Docs backend (five functions) if that feature returns.
-    NOTE: reading Drive is a Google "sensitive scope" → requires Google app
-    verification (privacy policy + review, days-to-weeks). Start that clock
-    early. Drive UI already built (`GoogleDrivePicker.tsx`, commented out) and
-    netlify.toml already has the /api/google/* redirects; the 5 functions and
-    OAuth token refresh are what's missing.
+10. ~~Google Drive/Docs backend~~ SUPERSEDED July 12 2026: Drive import +
+    Google Doc export shipped client-side with the Picker (`drive.file`, no
+    verification needed) — see "Google Drive integration" section. Remaining:
+    Will's Google Cloud/Netlify dashboard steps (listed there), then test on
+    a deploy preview. The old five-function backend plan only returns if the
+    in-app Drive browsing upgrade (GoogleDriveBrowser.tsx + drive.readonly +
+    Google verification) is ever wanted.
 11b. **NEXT UP:** Enable MICROSOFT (Azure) social login in Supabase — Google is
     done/tested. Follow "Social login setup" step 2. Button already live.
 11. `marketing/brand-brief.md` exists for Claude.ai marketing Projects.

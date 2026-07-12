@@ -13,7 +13,8 @@ import { Loader2, Shield, Zap, Sparkles, Share2, FileText, FileDown, Copy, Check
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import { exportToPDF, exportToDocx, exportToGoogleDocs } from '@/src/lib/export';
+import { exportToPDF, exportToDocx, exportToGoogleDocs, downloadSimplePDF, downloadSimpleDocx, exportSimpleDocToGoogle, redesignToBlocks } from '@/src/lib/export';
+import { googleConfigured } from '@/src/lib/google';
 import { AIFailureBreakdown } from './AIFailureBreakdown';
 import { StreamingProgress } from './StreamingProgress';
 import { StandardsManager } from './StandardsManager';
@@ -109,12 +110,30 @@ export function AssignmentAnalyzer({
     if (!result) return;
     const title = `SocratesIQ Analysis — ${text.trim().split('\n')[0].substring(0, 40)}`;
     try {
+      toast.info('Creating Google Doc…');
       const res = await exportToGoogleDocs(result, text, title);
-      if (res?.docUrl) { window.open(res.docUrl, '_blank'); toast.success('Opened in Google Docs!'); }
+      if (res?.docUrl) { window.open(res.docUrl, '_blank'); toast.success('Saved to your Google Drive!'); }
     } catch (err: any) {
-      if (err.message === 'NOT_AUTHENTICATED') toast.error('Connect Google Drive first.');
-      else toast.error('Google Docs export failed.');
+      toast.error(err?.message || 'Google Docs export failed.');
     }
+  };
+
+  // Download one redesigned assignment (PDF / Word / Google Doc). Exports the
+  // teacher's inline edits when present.
+  const handleDownloadRedesign = async (i: number, format: 'pdf' | 'docx' | 'gdoc') => {
+    if (!result) return;
+    const suggestion = result.suggestions[i];
+    const body = editedTexts[i] ?? suggestion.modifiedAssignment;
+    const title = suggestion.title || `${suggestion.level} Redesign`;
+    try {
+      if (format === 'pdf') { downloadSimplePDF(title, redesignToBlocks(body)); toast.success('PDF downloaded!'); }
+      else if (format === 'docx') { await downloadSimpleDocx(title, redesignToBlocks(body)); toast.success('Word document downloaded!'); }
+      else {
+        toast.info('Creating Google Doc…');
+        const url = await exportSimpleDocToGoogle(title, redesignToBlocks(body));
+        window.open(url, '_blank'); toast.success('Saved to your Google Drive!');
+      }
+    } catch (err: any) { toast.error(err?.message || 'Download failed. Please try again.'); }
   };
 
   const handleStrengthen = () => { setActiveLevel('Gold'); suggestionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast.info('Showing Socratic Transformation (Gold Level)'); };
@@ -196,10 +215,12 @@ export function AssignmentAnalyzer({
                 <CardHeader><CardTitle className="text-lg font-serif italic">Upload Document</CardTitle><CardDescription>PDF, DOCX, or TXT files.</CardDescription></CardHeader>
                 <CardContent className="space-y-4">
                   <FileUploader onTextExtracted={setText} />
-                  {/* Hidden until the Google OAuth backend functions are built — re-enable to restore Drive import.
-                  <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or</span></div></div>
-                  <GoogleDrivePicker onFileSelected={setText} />
-                  */}
+                  {googleConfigured && (
+                    <>
+                      <div className="relative"><div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div><div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or</span></div></div>
+                      <GoogleDrivePicker onFileSelected={setText} />
+                    </>
+                  )}
                 </CardContent>
               </Card>
               <Card className="border border-border shadow-sm flex flex-col">
@@ -223,9 +244,9 @@ export function AssignmentAnalyzer({
               <div className="ml-auto flex items-center gap-1 flex-wrap">
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleExportPDF}><FileDown className="w-3.5 h-3.5" />PDF</Button>
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleExportDocx}><FileText className="w-3.5 h-3.5" />DOCX</Button>
-                {/* Hidden until the Google OAuth backend is built — re-enable to restore Google Docs export.
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-green-600 gap-1.5 text-xs" onClick={handleExportGoogleDocs}><ExternalLink className="w-3.5 h-3.5" />Google Doc</Button>
-                */}
+                {googleConfigured && (
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-green-600 gap-1.5 text-xs" onClick={handleExportGoogleDocs}><ExternalLink className="w-3.5 h-3.5" />Google Doc</Button>
+                )}
                 <div className="w-px h-4 bg-border mx-1" />
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleShare}><Share2 className="w-3.5 h-3.5" />Share</Button>
               </div>
@@ -307,6 +328,14 @@ export function AssignmentAnalyzer({
                         <button onClick={() => handleFeedback(i, 'up')} className={`p-1.5 rounded-md transition-all ${feedback[i] === 'up' ? 'bg-green-100 text-green-600' : 'text-muted-foreground hover:text-green-500 hover:bg-green-50'}`}><ThumbsUp className="w-3.5 h-3.5" /></button>
                         <button onClick={() => handleFeedback(i, 'down')} className={`p-1.5 rounded-md transition-all ${feedback[i] === 'down' ? 'bg-red-100 text-red-500' : 'text-muted-foreground hover:text-red-400 hover:bg-red-50'}`}><ThumbsDown className="w-3.5 h-3.5" /></button>
                       </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Download this version:</span>
+                      <Button variant="ghost" size="sm" className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-accent" onClick={() => handleDownloadRedesign(i, 'pdf')}><FileDown className="w-3.5 h-3.5" />PDF</Button>
+                      <Button variant="ghost" size="sm" className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-accent" onClick={() => handleDownloadRedesign(i, 'docx')}><FileText className="w-3.5 h-3.5" />Word</Button>
+                      {googleConfigured && (
+                        <Button variant="ghost" size="sm" className="h-8 text-xs gap-1.5 text-muted-foreground hover:text-green-600" onClick={() => handleDownloadRedesign(i, 'gdoc')}><ExternalLink className="w-3.5 h-3.5" />Google Doc</Button>
+                      )}
                     </div>
                   </TabsContent>
                 ))}

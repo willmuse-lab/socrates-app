@@ -115,7 +115,7 @@ export function PrivacyPage({ onBack }: PageProps) {
         { title: 'What data we collect', content: 'We collect the minimum necessary: your name and email address, assignment text you submit for analysis, your saved assignments and analysis results, and basic usage metadata.\n\nWe do NOT collect student names, student work, grades, or any personally identifiable student information.' },
         { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers SocratesIQ.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded — it is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
         { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at hello@socratesmuse.com to request a DPA.' },
-        { title: 'Google Drive & Docs', content: 'When you connect Google Drive, we request the minimum permissions needed: read access to your Google Docs and write access to create new Google Docs for export.\n\nWe do not access any other files in your Drive. Your Google OAuth token is stored in a secure, HttpOnly cookie and is never logged or stored in our database.' },
+        { title: 'Google Drive & Docs', content: 'When you use the Google Drive features, we request the narrowest permission Google offers (per-file access): SocratesIQ can only read files you explicitly pick in the Google file window, and can create new Google Docs when you export.\n\nWe cannot see, list, or search the rest of your Drive. Your Google sign-in token stays in your browser for the session and is never sent to our servers, logged, or stored in our database.' },
         { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email hello@socratesmuse.com. We will process deletion requests within 14 days.' },
         { title: 'Contact', content: 'Data privacy questions: hello@socratesmuse.com\nWe aim to respond within 2 business days.' },
       ].map(({ title, content }) => (
@@ -198,8 +198,8 @@ const HELP_TOPICS = [
     content: 'SocratesIQ analyzes your assignments for how easily a student could complete them with AI, then helps you redesign them.\n\nThe basic flow: paste or upload an assignment → pick your AI strategy → click Analyze. You get a resilience score (0–100), a breakdown of exactly how AI could shortcut the assignment, and three ready-to-use redesigns (Bronze, Silver, Gold).\n\nSet up your teaching profile when you first sign in (subjects and grade levels) — every analysis is tailored to what you teach.',
   },
   {
-    title: 'Adding an assignment (paste, upload, or template)',
-    content: 'Three ways to get an assignment in:\n\n1. PASTE — copy your assignment text into the "Paste Text" box.\n2. UPLOAD — drop a PDF, Word (.docx), or plain-text file into the "Upload Document" card. The text is extracted automatically.\n3. TEMPLATE — click "Start from a template" to begin from a sample assignment for your subject.\n\nIf a PDF won\'t read (some scanned PDFs are images, not text), try the Word version, or copy-paste the text instead.',
+    title: 'Adding an assignment (paste, upload, Google Drive, or template)',
+    content: 'Four ways to get an assignment in:\n\n1. PASTE — copy your assignment text into the "Paste Text" box.\n2. UPLOAD — drop a PDF, Word (.docx), or plain-text file into the "Upload Document" card. The text is extracted automatically.\n3. GOOGLE DRIVE — click "Select from Google Drive," sign in to Google if asked, and pick a Google Doc (or a PDF/Word file stored in Drive). SocratesIQ can only read the specific files you pick — never the rest of your Drive.\n4. TEMPLATE — click "Start from a template" to begin from a sample assignment for your subject.\n\nIf a PDF won\'t read (some scanned PDFs are images, not text), try the Word version, or copy-paste the text instead.',
   },
   {
     title: 'The three AI strategies (Avoid, Augment, Embrace)',
@@ -218,8 +218,8 @@ const HELP_TOPICS = [
     content: 'Click Save on any analysis to keep it. Your saved assignments live in the Library (top navigation).\n\nWhen you\'re signed in, saved assignments sync to the cloud — you\'ll see a cloud icon and can access them from any device. You can reopen, review, or delete saved assignments from the Library at any time.',
   },
   {
-    title: 'Exporting and sharing results',
-    content: 'From any analysis you can export:\n\nPDF — a formatted analysis report.\nDOCX — the same report as a Word document you can edit.\nSHARE — copies a summary to share with a colleague.\n\nExports include your score, the failure breakdown, and the redesigns.',
+    title: 'Downloading and sharing results',
+    content: 'THE FULL ANALYSIS REPORT (top of the results screen): download as PDF or Word (DOCX), save straight to your Google Drive as a Google Doc, or click SHARE to copy a summary link for a colleague. The report includes your score, the failure breakdown, and all three redesigns.\n\nONE REDESIGNED ASSIGNMENT: under each Bronze/Silver/Gold version, use the "Download this version" row to get just that assignment as a PDF, Word document, or Google Doc — ready to hand out. If you used "Edit inline," your edits are included.\n\nLESSON PLAN & STUDENT DIRECTIONS: once generated, each has its own PDF / Word / Google Doc buttons next to "Copy all."\n\nGoogle Doc saves open in a new tab and land in your Drive automatically. The first time, Google will ask you to sign in and approve — allow popups for this site.',
   },
   {
     title: 'Signing in: email, Google, and Microsoft',
