@@ -179,6 +179,9 @@ Requirements:
   it is normally answered after teaching, so write it as expectation, not report.
 - BE CONCISE — this matters: 1-3 tight sentences per element (Activities/Tasks may
   use up to 5 short numbered steps). Total under 700 words. Long plans get cut off and fail.
+- PLAIN TEXT ONLY — never use markdown syntax (no ** for bold, no #, no * bullets).
+  Use plain numbered lists (1. 2. 3.) and dashes (-) only. Asterisks show up as
+  garbage characters in the printed document.
 
 Return ONLY a single valid JSON object, no markdown fences, no commentary:
 {
@@ -243,6 +246,8 @@ Requirements:
   NOT allowed, and how to cite/disclose AI help if the category requires it.
 - A short "How you'll be graded" section (plain language, no rubric jargon).
 - Reading level appropriate to the grade. Warm but direct tone.
+- PLAIN TEXT ONLY — never use markdown syntax (no ** for bold, no #). Plain numbered
+  lists and dashes only.
 
 Return ONLY a single valid JSON object:
 {

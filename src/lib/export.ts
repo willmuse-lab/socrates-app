@@ -226,6 +226,86 @@ export function lessonPlanToBlocks(plan: LessonPlan): DocBlock[] {
   return blocks;
 }
 
+/** PDF download drawing the template's actual two-column table (LESSON
+ *  ELEMENT | Notes), with rows split cleanly across page breaks. */
+export function exportLessonPlanPDF(plan: LessonPlan) {
+  const doc = new jsPDF();
+  const M = 15;                    // page margin (mm)
+  const tableW = 180, col1 = 158, col2 = 22;
+  const lineH = 4.4, pad = 2.5, bottom = 282;
+  let y = 16;
+
+  // --- header ---
+  doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+  const title = plan.lessonTitle || 'Lesson Plan';
+  doc.text(doc.splitTextToSize(title, tableW), 105, y, { align: 'center' });
+  y += doc.splitTextToSize(title, tableW).length * 6 + 4;
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+  doc.text(`Subject(s): ${plan.subjects || '______________________________'}    Grade: ${plan.grade || '____________'}`, M, y); y += 5.5;
+  doc.text(`Teacher(s): ${plan.teacher || '______________________________'}    School: ${plan.school || '____________________'}`, M, y); y += 7;
+
+  // --- table rows: each row is a list of {text, bold} display lines ---
+  doc.setFontSize(9);
+  type Line = { text: string; bold: boolean };
+  const wrap = (text: string, bold: boolean, width: number): Line[] =>
+    text.split('\n').flatMap(p => (doc.splitTextToSize(p || ' ', width) as string[]).map(t => ({ text: t, bold })));
+
+  const drawRow = (lines: Line[], notesLines: Line[] = []) => {
+    let i = 0, j = 0;
+    while (i < lines.length || j < notesLines.length || (i === 0 && lines.length === 0)) {
+      if (bottom - y < lineH + 2 * pad) { doc.addPage(); y = 16; }
+      const maxLines = Math.max(1, Math.floor((bottom - y - 2 * pad) / lineH));
+      const chunk = lines.slice(i, i + maxLines);
+      const notesChunk = notesLines.slice(j, j + maxLines);
+      const segLines = Math.max(chunk.length, notesChunk.length, 1);
+      const segH = segLines * lineH + 2 * pad;
+      doc.rect(M, y, col1, segH);
+      doc.rect(M + col1, y, col2, segH);
+      chunk.forEach((line, k) => {
+        doc.setFont('helvetica', line.bold ? 'bold' : 'normal');
+        doc.text(line.text, M + pad, y + pad + 3 + k * lineH);
+      });
+      notesChunk.forEach((line, k) => {
+        doc.setFont('helvetica', line.bold ? 'bold' : 'normal');
+        doc.text(line.text, M + col1 + pad, y + pad + 3 + k * lineH);
+      });
+      y += segH; i += chunk.length; j += notesChunk.length;
+      if (i >= lines.length && j >= notesLines.length) break;
+    }
+  };
+
+  drawRow(wrap('LESSON ELEMENT', true, col1 - 2 * pad), wrap('Notes', true, col2 - 2 * pad));
+  SCOE_ROWS.forEach(row => {
+    drawRow([
+      ...wrap(row.label, true, col1 - 2 * pad),
+      ...wrap(scoeVal(plan, row.key), false, col1 - 2 * pad),
+    ]);
+  });
+
+  // --- reflection section (linear, below the table) ---
+  const put = (text: string, bold: boolean, size = 9, gap = 2) => {
+    doc.setFontSize(size); doc.setFont('helvetica', bold ? 'bold' : 'normal');
+    text.split('\n').forEach(par => {
+      const ls = doc.splitTextToSize(par || ' ', tableW) as string[];
+      ls.forEach(l => { if (y > bottom) { doc.addPage(); y = 16; } doc.text(l, M, y); y += lineH; });
+    });
+    y += gap;
+  };
+  y += 5;
+  put('Common Core Aligned Lesson:  Reflection', true, 10, 3);
+  put(SCOE_REFLECTION_INTRO, false);
+  if (plan.shiftReflection) put(plan.shiftReflection, false, 9, 4);
+  put(SCOE_REFLECTION_CHOICE, false, 9, 3);
+  SCOE_REFLECTION_QUESTIONS.forEach(q => put('•  ' + q, false, 9, 0.5));
+  if (plan.reflectionQuestion) {
+    y += 3;
+    put(plan.reflectionQuestion, true);
+    put(plan.reflectionAnswer || '', false);
+  }
+
+  doc.save(`${slugify(plan.lessonTitle || 'lesson-plan')}.pdf`);
+}
+
 /** Word download that clones the school's SCOE template layout exactly. */
 export async function exportLessonPlanDocx(plan: LessonPlan) {
   const cellParas = (row: ScoeRow): Paragraph[] => {

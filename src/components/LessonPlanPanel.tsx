@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Copy, Check, Loader2, GraduationCap, ClipboardList, Target, AlertCircle, Sparkles, FileDown, FileText, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
-import { downloadSimplePDF, downloadSimpleDocx, exportSimpleDocToGoogle, lessonPlanToBlocks, directionsToBlocks, exportLessonPlanDocx, exportLessonPlanToGoogle, DocBlock } from '@/src/lib/export';
+import { downloadSimplePDF, downloadSimpleDocx, exportSimpleDocToGoogle, directionsToBlocks, exportLessonPlanDocx, exportLessonPlanToGoogle, exportLessonPlanPDF } from '@/src/lib/export';
 import { googleConfigured } from '@/src/lib/google';
 import {
   AlignmentResult,
@@ -32,6 +32,19 @@ interface LessonPlanPanelProps {
 }
 
 type Step = 'idle' | 'aligning' | 'planning' | 'directions' | 'done' | 'error';
+
+// The model occasionally slips markdown syntax (**bold**, # headings) into its
+// text despite instructions; printed documents must never show those characters.
+function scrubMarkdown(obj: Record<string, any>) {
+  for (const k of Object.keys(obj)) {
+    if (typeof obj[k] === 'string') {
+      obj[k] = obj[k]
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*\*/g, '')
+        .replace(/^#+\s*/gm, '');
+    }
+  }
+}
 
 export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLevel, teacherName, schoolName }: LessonPlanPanelProps) {
   const [permission, setPermission] = useState<PermissionCategory>('AI as Feedback Partner');
@@ -70,11 +83,13 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
       lp.grade = gradeLevel || lp.grade || '';
       lp.teacher = teacherName || '';
       lp.school = schoolName || '';
+      scrubMarkdown(lp);
       setPlan(lp);
 
       // Step 3 — Student directions
       setStep('directions');
       const dir = await generateStudentDirections(assignmentText, permission, gradeLevel);
+      scrubMarkdown(dir);
       setDirections(dir);
 
       setStep('done');
@@ -217,38 +232,45 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
                   {copied === 'plan' ? 'Copied' : 'Copy all'}
                 </button>
                 <ExportButtons
-                  pdf={() => downloadSimplePDF(plan.lessonTitle || 'Lesson Plan', lessonPlanToBlocks(plan))}
+                  pdf={() => exportLessonPlanPDF(plan)}
                   docx={() => exportLessonPlanDocx(plan)}
                   gdoc={() => exportLessonPlanToGoogle(plan)}
                 />
               </div>
             </div>
-            <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
-              <div className="p-3 bg-teal-50/50">
-                <div className="text-xs font-bold">{plan.lessonTitle || 'Lesson Plan'}</div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">
-                  Subject(s): {plan.subjects || '—'} · Grade: {plan.grade || '—'}
+            {/* Document-style preview mirroring the printable template (the
+                Word download is the exact file; this matches its layout). */}
+            <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+              <div className="text-center text-sm font-bold">{plan.lessonTitle || 'Lesson Plan'}</div>
+              <div className="text-[11px]">Subject(s): <span className="font-semibold">{plan.subjects || '______________'}</span>&emsp;Grade: <span className="font-semibold">{plan.grade || '______'}</span></div>
+              <div className="text-[11px]">Teacher(s): <span className="font-semibold">{plan.teacher || '______________'}</span>&emsp;School: <span className="font-semibold">{plan.school || '______________'}</span></div>
+              <table className="w-full border-collapse text-[11px]">
+                <thead>
+                  <tr>
+                    <th className="border border-foreground/30 p-2 text-left font-bold w-[88%]">LESSON ELEMENT</th>
+                    <th className="border border-foreground/30 p-2 text-left font-bold">Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {planRows.map(row => (
+                    <tr key={row.label}>
+                      <td className="border border-foreground/30 p-2 align-top">
+                        <div className="font-bold">{row.label}:</div>
+                        <div className="leading-relaxed whitespace-pre-wrap text-foreground/80 mt-1">{row.content}</div>
+                      </td>
+                      <td className="border border-foreground/30 p-2 align-top" />
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div className="text-[11px] font-bold pt-1">Common Core Aligned Lesson:&nbsp; Reflection</div>
+              <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/80">{plan.shiftReflection}</div>
+              {plan.reflectionQuestion && (
+                <div>
+                  <div className="text-[11px] font-bold italic">{plan.reflectionQuestion}</div>
+                  <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/80 mt-0.5">{plan.reflectionAnswer}</div>
                 </div>
-                <div className="text-[10px] text-muted-foreground mt-0.5">
-                  Teacher(s): {plan.teacher || '—'} · School: {plan.school || '—'}
-                </div>
-              </div>
-              {planRows.map(row => (
-                <div key={row.label} className="p-3 bg-card">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-teal-700">{row.label}</div>
-                  <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/80 mt-1">{row.content}</div>
-                </div>
-              ))}
-              <div className="p-3 bg-muted/30">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Common Core Aligned Lesson: Reflection</div>
-                <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/70 mt-1">{plan.shiftReflection}</div>
-                {plan.reflectionQuestion && (
-                  <div className="mt-2">
-                    <div className="text-[10px] font-bold text-muted-foreground italic">{plan.reflectionQuestion}</div>
-                    <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/70 mt-0.5">{plan.reflectionAnswer}</div>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </motion.div>
         )}
