@@ -21,7 +21,18 @@ async function fetchUploadedResearch(): Promise<string> {
   try {
     const { data, error } = await supabase.from("research_papers").select("title, authors, year, content").order("created_at", { ascending: false });
     if (error || !data || data.length === 0) return "";
-    return data.map((paper: any) => `RESEARCH PAPER: ${paper.title}\nAuthors: ${paper.authors} (${paper.year})\n${paper.content.substring(0, 8000)}`).join("\n\n");
+    // Cap per paper AND in total — this text is sent with EVERY analysis half,
+    // so an uncapped library silently eats the per-minute input-token budget
+    // (the cause of live 429s on a low Anthropic tier, July 12 2026).
+    const parts: string[] = [];
+    let total = 0;
+    for (const paper of data as any[]) {
+      const entry = `RESEARCH PAPER: ${paper.title}\nAuthors: ${paper.authors} (${paper.year})\n${paper.content.substring(0, 4000)}`;
+      if (total + entry.length > 8000) break;
+      parts.push(entry);
+      total += entry.length;
+    }
+    return parts.join("\n\n");
   } catch (e) {
     console.error("Failed to fetch research papers:", e);
     return "";
@@ -164,6 +175,20 @@ export default async function handler(req: Request) {
     ? `Use Bloom's Revised Taxonomy as the analysis framework. Target cognitive level: ${bloomsLevel}. Score how well the assignment demands genuine cognition at or above that level despite AI availability.`
     : `Use the Triple-A Framework (Anchor, Audit, Agency) as the analysis framework.`;
 
+  // Each half gets ONLY the reference material it needs (the full prompt goes
+  // to "full" for backward compat). This cut ~40% of input tokens per half —
+  // done July 12 2026 after live 429s against a 10k input-tokens/min limit.
+  // The diagnosis half still needs the A-G category NAMES for its "fix"
+  // mapping, so it gets this compact index instead of the full catalog:
+  const STRATEGY_INDEX = `STRATEGY CATEGORY INDEX (for mapping fixes; A-G):
+  A. LOCALIZE & ANCHOR — tie to this class/week/town; require local or current evidence.
+  B. SURFACE THE PROCESS — drafts, revision history, prompt logs, research trail.
+  C. MAKE IT PERSONAL & APPLIED — student's own life/community; interviews, original data.
+  D. CHANGE THE MEDIUM — oral defense, live/in-class component, build or demo.
+  E. CRITIQUE & EVALUATE AI — student corrects, fact-checks, or compares AI output.
+  F. RAISE THE COGNITIVE BAR — synthesis, evaluation, argument, novel transfer.
+  G. COLLABORATIVE & ITERATIVE — peer review, checkpoints, group + individual reflection.`;
+
   const system = `You are Socrates, an expert in AI-resilient assignment design for K-12 and college educators. You analyze assignments for vulnerability to AI completion and redesign them so AI cannot replace genuine student thinking.
 
 PEDAGOGICAL FRAMEWORKS:
@@ -175,19 +200,19 @@ ${AIAS_SCALE}
 RESEARCH BASE:
 ${RESEARCH_NOTES}
 ${uploadedResearch ? `\nADDITIONAL UPLOADED RESEARCH:\n${uploadedResearch}\n` : ""}
-SCORING GUIDANCE:
+${wantDiagnosis ? `SCORING GUIDANCE:
 ${SCORING_GUIDANCE}
-
-REDESIGN STRATEGY CATALOG:
+` : ""}
+${wantRedesigns ? `REDESIGN STRATEGY CATALOG:
 ${STRATEGY_CATALOG}
 
-${PERMISSION_CATEGORIES}
+${PERMISSION_CATEGORIES}` : STRATEGY_INDEX}
 
 FRAMEWORK LOCKING RULES — these are requirements, not suggestions:
-- Every dimension score's explanation must reference the specific framework criterion it measures (Triple-A pillar, Ai-RACE component, or Bloom's level) by name.
+${wantDiagnosis ? `- Every dimension score's explanation must reference the specific framework criterion it measures (Triple-A pillar, Ai-RACE component, or Bloom's level) by name.
 - The overall resilienceScore must be consistent with the scoring guidance bands, and the summary must state which framework elements are present or missing.
-- Bronze, Silver, and Gold are levels of INTENSITY (light tweak, substantial restructure, transformational), and every redesign must pursue the TEACHER'S AI STRATEGY stated in the user message — do NOT default to maximizing AI-resistance unless the strategy is "Avoid". Bronze engages roughly ONE framework dimension, Silver about TWO, and Gold engages all THREE at the strategy's fullest expression.
-- Every aiFailureBreakdown fix must map to a named strategy category (A-G).
+- Every aiFailureBreakdown fix must map to a named strategy category (A-G).` : ""}
+${wantRedesigns ? `- Bronze, Silver, and Gold are levels of INTENSITY (light tweak, substantial restructure, transformational), and every redesign must pursue the TEACHER'S AI STRATEGY stated in the user message — do NOT default to maximizing AI-resistance unless the strategy is "Avoid". Bronze engages roughly ONE framework dimension, Silver about TWO, and Gold engages all THREE at the strategy's fullest expression.` : ""}
 
 Ground every suggestion in the research above. Be concrete and classroom-ready: the modifiedAssignment text must be complete enough for a teacher to hand out as-is.`;
 
@@ -295,7 +320,10 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
         }
         result = JSON.parse(repaired);
       } catch {
-        console.error("analyze v3: JSON parse failed");
+        // Log a head/tail snippet so recurring parse failures can actually be
+        // diagnosed from the function logs (5 hit live on July 12 2026).
+        const clean = (s: string) => s.replace(/\s+/g, " ");
+        console.error(`analyze v3: JSON parse failed (part=${part}, len=${raw.length}, stop=${response.stop_reason}) head: ${clean(raw.substring(0, 300))} ... tail: ${clean(raw.substring(Math.max(0, raw.length - 200)))}`);
         return new Response(JSON.stringify({ error: "The analysis came back in an unexpected format. Please try again." }), { status: 502, headers });
       }
     }

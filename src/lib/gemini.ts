@@ -74,7 +74,10 @@ export async function analyzeAssignment(
     // short backoff — each attempt is a fresh function invocation with its own
     // time budget, so this is safe. Backoff lets the rate-limit window clear.
     const RETRYABLE = new Set([429, 502, 503, 529]);
-    const backoffsMs = [1200, 2800];
+    // The Anthropic limit that bites is per-MINUTE (confirmed live July 12
+    // 2026), so waits must be long enough for the window to move — short
+    // retries just burn requests.
+    const backoffsMs = [2000, 8000, 20000];
     let lastDetail = "";
     for (let attempt = 0; attempt <= backoffsMs.length; attempt++) {
       const response = await fetch("/api/analyze", {

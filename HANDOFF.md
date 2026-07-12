@@ -100,10 +100,28 @@ every dashboard task with exact click paths, one step per message, and wait.
    mitigation: trim each half's system prompt to only the parts it needs
    (diagnosis doesn't need the full redesign catalog; redesigns don't need all
    scoring guidance) to cut ~40% of input tokens. Not yet done.
-   July 12 2026: the "busy" error hit LIVE on lesson-plan generation (right
-   after an analyze + align — burst within one rate-limit minute). Fix:
-   standards.ts callGenerate now retries 429/502/503/529 with longer backoff
-   (2s, 6s, 15s), matching gemini.ts.
+   July 12 2026 — ROOT CAUSE CONFIRMED from Netlify logs: `Analysis failed:
+   This request would exceed your organization's rate limit of 10,000 input
+   tokens per minute (model: claude-haiku-4-5)`. That's Anthropic TIER 1 —
+   one analysis (two halves × full system prompt) nearly fills the minute.
+   It is NOT Netlify throttling. REAL FIX: Will is bumping the org to Tier 2
+   (console.anthropic.com → Plans & Billing → bring total deposits to $40).
+   CODE MITIGATIONS SHIPPED July 12 2026: (a) standards.ts callGenerate now
+   retries 429/502/503/529 (backoff 2s/6s/15s); (b) gemini.ts analyze backoff
+   lengthened to 2s/8s/20s (per-minute window needs real waits); (c) each
+   analyze half's system prompt trimmed to only what it needs — diagnosis
+   drops the strategy catalog + permission categories (gets a compact A-G
+   index for fix mapping), redesigns drop scoring guidance (~40% fewer input
+   tokens/half); (d) uploaded research capped 4000 chars/paper, 8000 total
+   (was UNCAPPED at 8000/paper — a growing research library would silently
+   re-break the token budget).
+   ALSO SPOTTED July 12 2026: five `analyze v3: JSON parse failed` errors in
+   ~3 minutes of live logs (shows as "unexpected format" to the teacher, and
+   the retry-clicks worsen the rate limit). Parse failures now log part,
+   length, stop_reason, and a head/tail snippet of the raw model output —
+   NEXT TIME IT HAPPENS read that log line; if stop=max_tokens it's
+   truncation (raise that half's max_tokens or tighten length targets),
+   otherwise inspect the snippet for a new malformation to teach repairJSON.
    MITIGATIONS DONE July 4 2026: client retries transient statuses (above);
    analyzer system prompt is prompt-CACHED (ephemeral) so re-analyses reuse the
    big research-base prefix at ~0.1x. STATUS (checked July 11): Netlify function
