@@ -100,6 +100,10 @@ every dashboard task with exact click paths, one step per message, and wait.
    mitigation: trim each half's system prompt to only the parts it needs
    (diagnosis doesn't need the full redesign catalog; redesigns don't need all
    scoring guidance) to cut ~40% of input tokens. Not yet done.
+   July 12 2026: the "busy" error hit LIVE on lesson-plan generation (right
+   after an analyze + align — burst within one rate-limit minute). Fix:
+   standards.ts callGenerate now retries 429/502/503/529 with longer backoff
+   (2s, 6s, 15s), matching gemini.ts.
    MITIGATIONS DONE July 4 2026: client retries transient statuses (above);
    analyzer system prompt is prompt-CACHED (ephemeral) so re-analyses reuse the
    big research-base prefix at ~0.1x. STATUS (checked July 11): Netlify function

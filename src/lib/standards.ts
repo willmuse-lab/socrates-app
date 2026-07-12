@@ -112,17 +112,29 @@ export async function deleteStandardsDocument(id: string) {
 // earlier step's output.
 // ---------------------------------------------------------------------------
 async function callGenerate(payload: Record<string, unknown>) {
-  const response = await fetch('/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  if (!response.ok) {
-    let detail = `Server error: ${response.status}`;
+  // Same transient-status retry as gemini.ts, with longer backoffs: these
+  // calls often run right after an analysis, so a per-minute rate limit may
+  // need several seconds to clear. Each attempt is a fresh function
+  // invocation with its own time budget; the step spinner stays up meanwhile.
+  const RETRYABLE = new Set([429, 502, 503, 529]);
+  const backoffsMs = [2000, 6000, 15000];
+  let detail = '';
+  for (let attempt = 0; attempt <= backoffsMs.length; attempt++) {
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (response.ok) return response.json();
+    detail = `Server error: ${response.status}`;
     try { const err = await response.json(); if (err?.error) detail = err.error; } catch {}
+    if (RETRYABLE.has(response.status) && attempt < backoffsMs.length) {
+      await new Promise(r => setTimeout(r, backoffsMs[attempt]));
+      continue;
+    }
     throw new Error(detail);
   }
-  return response.json();
+  throw new Error(detail);
 }
 
 export async function alignToStandards(
