@@ -1,7 +1,7 @@
 # SOCRATES — Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: July 4 2026.
+session. Read this whole file before making changes. Last updated: July 12 2026.
 
 ## What this is
 
@@ -187,6 +187,15 @@ every dashboard task with exact click paths, one step per message, and wait.
 - Pricing: Teacher $9.99/mo or $99.99/yr only; School/District = "Call for
   pricing" → mailto socratesiqed@gmail.com (changed from hello@socratesmuse.com
   July 12 2026). No payment processing exists yet — "Get started" is a stub.
+- **HIDDEN from all users (Will, July 12 2026):** the Microsoft login button
+  (LoginDialog.tsx — commented out; Azure was never enabled so it only errored),
+  and the Admin dashboard + Research Library menu items (App.tsx — the
+  onViewAdmin/onViewDashboard props to UserMenu are commented out; restore the
+  props to bring the Admin section back). All three are hidden, not deleted.
+  NOTE: with the Research Library hidden, new research goes into
+  _shared/research-base.ts via chat (see Working conventions) — e.g. the
+  Kharbach (2026) critical-thinking activities guide was distilled into
+  RESEARCH_NOTES + STRATEGY_CATALOG category E on July 12 2026.
 - Testimonials are anonymized (generic role tags only, no names/grades/
   subjects). Source of truth: `src/lib/comments.ts` (feeds the analyzing-screen
   rotation AND the Feedback page). Will adds quotes by giving them in chat.
@@ -402,8 +411,11 @@ Privacy page + Help page already describe the feature accurately.
     a deploy preview. The old five-function backend plan only returns if the
     in-app Drive browsing upgrade (GoogleDriveBrowser.tsx + drive.readonly +
     Google verification) is ever wanted.
-11b. **NEXT UP:** Enable MICROSOFT (Azure) social login in Supabase — Google is
-    done/tested. Follow "Social login setup" step 2. Button already live.
+11b. Enable MICROSOFT (Azure) social login — DEPRIORITIZED July 12 2026: the
+    button is now HIDDEN (Will's call) and Google login covers most teachers.
+    If revived: un-comment the button in LoginDialog.tsx, then follow "Social
+    login setup" step 2 — but note the official account is now SocratesIQEd
+    (the old socratesaiedu Microsoft/Azure attempts are moot).
 11. `marketing/brand-brief.md` exists for Claude.ai marketing Projects.
 
 ## Working conventions
