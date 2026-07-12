@@ -196,6 +196,24 @@ every dashboard task with exact click paths, one step per message, and wait.
   @socratesiq.com is a later task). Google-only users have no password; the
   sent-confirmation copy points them back to the Google button.
 
+## ⭐ OFFICIAL GOOGLE ACCOUNT (decided July 12 2026)
+
+**SocratesIQEd@gmail.com is THE official Google account for everything**
+(Google Cloud, Drive integration, and eventually all Google login OAuth).
+Will's explicit decision. The OLD account `socratesaiedu@gmail.com` — which
+owns the original "Socrates" Cloud project and the "Socrates Web" OAuth
+client that Google login currently runs through — is DEPRECATED; do not add
+anything new there. CAUTION: the two addresses look nearly identical
+("socratesIQED" vs "socratesAIEDU") — double-check which one is signed in
+before any dashboard work. Migration plan: build everything fresh in
+SocratesIQEd's Cloud project (consent screen, new OAuth client with the
+Supabase callback, Drive + Picker APIs, API key), swap the new Client
+ID/Secret into Supabase's Google provider, verify login on the live site,
+then the old account can be abandoned. Status: IN PROGRESS July 12 2026 —
+Drive + Picker APIs were enabled in SocratesIQEd's project ("My First
+Project", ID lateral-origin-502217-c2); consent screen + OAuth client + API
+key + Supabase swap + Netlify env vars still to do.
+
 ## Social login setup (Google + Microsoft) — Will's dashboard steps
 
 Code is done; these are the one-time dashboard tasks to make the buttons work.
@@ -214,11 +232,12 @@ localhost) — OAuth needs the real web address.
    → Certificates & secrets → New client secret → copy the Value → Supabase →
    Providers → **Azure** (Microsoft = Azure in Supabase) → toggle on, paste
    both, Save.
-- The Drive feature (shipped July 12 2026) reuses this SAME Google Cloud
-  project and the SAME "Socrates Web" OAuth client — it only adds the
-  non-sensitive `drive.file` scope, which does NOT trigger Google
-  verification. Google project is named "Socrates", owned by
-  socratesaiedu@gmail.com. Setup steps: "Google Drive integration" section.
+- The Drive feature (shipped July 12 2026) uses the SAME Cloud project and
+  OAuth client as Google login — it only adds the non-sensitive `drive.file`
+  scope, which does NOT trigger Google verification. As of July 12 2026 that
+  project is being migrated to SocratesIQEd@gmail.com (see the OFFICIAL
+  GOOGLE ACCOUNT section above); the socratesaiedu "Socrates" project is
+  deprecated. Setup steps: "Google Drive integration" section.
 
 **Gotchas hit during Google setup (apply to Microsoft too):**
 - After entering Client ID + Secret in the Supabase provider panel, the toggle
@@ -264,21 +283,29 @@ API directly from the browser:
   GoogleDriveBrowser upgrade ever happens).
 
 **ALL Google buttons are hidden until env vars exist** (`googleConfigured`
-in google.ts). NOT YET DONE — Will's one-time dashboard steps (walk him
-through, one at a time; VITE_ vars bake at build → trigger deploy after):
-1. console.cloud.google.com (account socratesaiedu@gmail.com, project
-   "Socrates" — SAME project as Google login) → APIs & Services → Library →
-   enable **Google Drive API** and **Google Picker API**.
-2. Credentials → OAuth client "Socrates Web" → add Authorized JavaScript
-   origins: `https://socratesiq.com` and
+in google.ts). Will's one-time dashboard steps — ALL in the NEW official
+account **SocratesIQEd@gmail.com**, project "My First Project"
+(lateral-origin-502217-c2); walk him through one at a time; VITE_ vars bake
+at build → trigger deploy after:
+1. APIs & Services → Library → enable **Google Drive API** and **Google
+   Picker API**. DONE July 12 2026 (they were enabled in this account).
+2. Google Auth Platform: configure the consent screen (app name SocratesIQ,
+   support email, Audience External → Publish), then Clients → create a Web
+   application client. Authorized JavaScript origins:
+   `https://socratesiq.com` and
    `https://brilliant-mandazi-3937f4.netlify.app` (add a deploy-preview
-   origin temporarily when testing on a preview). Copy the Client ID.
-3. Credentials → Create credentials → **API key** → restrict it: Application
+   origin temporarily when testing on a preview). Authorized redirect URI:
+   `https://llvtiuhtjpprtwlvnauu.supabase.co/auth/v1/callback` (so this SAME
+   client also serves Google login). Copy Client ID + Secret.
+3. Supabase → Authentication → Providers → Google → replace Client ID +
+   Secret with the new ones, Save (re-open to confirm it stuck — see
+   gotchas). Then TEST Google login on the live site.
+4. Credentials → Create credentials → **API key** → restrict it: Application
    restrictions = Websites (same origins), API restrictions = Picker API.
-4. Cloud console home → note the **project NUMBER** (not name/ID).
-5. Netlify (brilliant-mandazi) → Environment variables, all contexts:
-   `VITE_GOOGLE_CLIENT_ID` (from 2), `VITE_GOOGLE_API_KEY` (from 3),
-   `VITE_GOOGLE_APP_ID` (project number from 4) → Trigger deploy.
+5. Cloud console home → note the **project NUMBER** (not name/ID).
+6. Netlify (brilliant-mandazi) → Environment variables, all contexts:
+   `VITE_GOOGLE_CLIENT_ID` (from 2), `VITE_GOOGLE_API_KEY` (from 4),
+   `VITE_GOOGLE_APP_ID` (project number from 5) → Trigger deploy.
 Privacy page + Help page already describe the feature accurately.
 
 - **Help page (added July 4 2026):** searchable in-app Help & How-To
