@@ -49,6 +49,9 @@ export interface LessonPlan {
   lessonTitle?: string;
   subjects?: string;
   grade?: string;
+  /** Filled CLIENT-SIDE from the teacher's profile — never sent to the model. */
+  teacher?: string;
+  school?: string;
   standards: string;
   targets: string;
   relevance: string;
@@ -58,6 +61,9 @@ export interface LessonPlan {
   accessForAll: string;
   modifications: string;
   shiftReflection?: string;
+  /** The ONE template reflection question the model chose, and its anticipated answer. */
+  reflectionQuestion?: string;
+  reflectionAnswer?: string;
 }
 
 export interface StudentDirections {
@@ -178,7 +184,7 @@ export async function generateStudentDirections(
 export function lessonPlanToText(plan: LessonPlan): string {
   return [
     `${plan.lessonTitle || 'Lesson Plan'}`,
-    `Subject(s): ${plan.subjects || '________'}    Grade: ${plan.grade || '________'}\nTeacher(s): ________    School: ________`,
+    `Subject(s): ${plan.subjects || '________'}    Grade: ${plan.grade || '________'}\nTeacher(s): ${plan.teacher || '________'}    School: ${plan.school || '________'}`,
     `Learning Standard(s) Addressed:\n${plan.standards}`,
     `Learning Target(s):\n${plan.targets}`,
     `Relevance/Rationale:\n${plan.relevance}`,
@@ -187,7 +193,7 @@ export function lessonPlanToText(plan: LessonPlan): string {
     `Resources/Materials:\n${plan.resources}`,
     `Access for All:\n${plan.accessForAll}`,
     `Modifications/Accommodations:\n${plan.modifications}`,
-    `Common Core Aligned Lesson: Reflection\n${plan.shiftReflection || ''}`,
+    `Common Core Aligned Lesson: Reflection\n${plan.shiftReflection || ''}${plan.reflectionQuestion ? `\n\n${plan.reflectionQuestion}\n${plan.reflectionAnswer || ''}` : ''}`,
   ].join('\n\n');
 }
 

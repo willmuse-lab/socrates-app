@@ -172,7 +172,11 @@ Requirements:
   state plainly how AI may or may not be used per the permission category.
 - Modifications/Accommodations must be specific (not "provide support as needed").
 - shiftReflection: name ONE CCSS instructional shift this lesson reflects and 1-2
-  sentences on how. Do NOT answer the template's post-teaching questions.
+  sentences on how.
+- reflectionQuestion: choose the ONE question from the template's reflection list
+  that best fits this lesson, copied VERBATIM. reflectionAnswer: 2-3 sentences
+  answering it in ANTICIPATED terms (how the lesson is designed to achieve it) —
+  it is normally answered after teaching, so write it as expectation, not report.
 - BE CONCISE — this matters: 1-3 tight sentences per element (Activities/Tasks may
   use up to 5 short numbered steps). Total under 700 words. Long plans get cut off and fail.
 
@@ -190,7 +194,9 @@ Return ONLY a single valid JSON object, no markdown fences, no commentary:
     "resources": "Resources/Materials",
     "accessForAll": "Access for All",
     "modifications": "Modifications/Accommodations",
-    "shiftReflection": "which CCSS shift this lesson reflects and how"
+    "shiftReflection": "which CCSS shift this lesson reflects and how",
+    "reflectionQuestion": "the one chosen reflection question, verbatim",
+    "reflectionAnswer": "2-3 sentence anticipated answer"
   }
 }
 Use \\n for line breaks inside content strings. Do NOT use double-quote characters (") inside any content value — if you need quotation marks, use single quotes (') instead.`;

@@ -26,10 +26,10 @@ type FeedbackMap = Record<number, 'up' | 'down' | null>;
 
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
-  bloomsLevel = 'Analyze', subject = '', gradeLevel = '', onSave, onReset, initialText = '', userId = ''
+  bloomsLevel = 'Analyze', subject = '', gradeLevel = '', teacherName = '', schoolName = '', onSave, onReset, initialText = '', userId = ''
 }: {
   defaultPreference?: AIPreference, dimensions?: FrameworkDimension[], activeFramework?: 'triple-a' | 'blooms',
-  bloomsLevel?: BloomsLevel, subject?: string, gradeLevel?: string,
+  bloomsLevel?: BloomsLevel, subject?: string, gradeLevel?: string, teacherName?: string, schoolName?: string,
   onSave?: (assignment: Omit<SavedAssignment, 'id' | 'date'>) => void, onReset?: () => void, initialText?: string, userId?: string
 }) {
   const [text, setText] = useState(initialText);
@@ -357,7 +357,7 @@ export function AssignmentAnalyzer({
                   ) : (
                     <p className="text-[11px] text-muted-foreground italic">Sign in with a real account to save and reuse your standards documents.</p>
                   )}
-                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} />
+                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} teacherName={teacherName} schoolName={schoolName} />
                 </Card>
               );
             })()}

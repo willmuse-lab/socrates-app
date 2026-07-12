@@ -168,8 +168,14 @@ every dashboard task with exact click paths, one step per message, and wait.
    EMPTY), eight elements (Standards, Targets, Relevance, Assessment
    Criteria, Activities/Tasks incl. the AI-permission rules, Resources,
    Access for All, Modifications), then "Common Core Aligned Lesson:
-   Reflection" (AI answers ONLY the shifts question; the post-teaching
-   questions render verbatim, unanswered). See SCOE_LESSON_PLAN_TEMPLATE in
+   Reflection" (UPDATED later July 12: AI answers the shifts question AND
+   picks ONE post-teaching question from the list, answering it in
+   ANTICIPATED terms; the full question list still renders verbatim).
+   HEADER AUTOFILL (July 12 2026, Will's decisions): Subject(s)/Grade/
+   Teacher(s)/School are stamped CLIENT-SIDE from the teacher's profile
+   (name, schoolName, joined subjects/gradeLevels — list-all when multiple);
+   name/school are NEVER sent to the model; empty profile fields stay as
+   blank ________ lines. See SCOE_LESSON_PLAN_TEMPLATE in
    _shared/research-base.ts, the JSON spec in generate.ts, the LessonPlan
    type in standards.ts, and exportLessonPlanDocx/exportLessonPlanToGoogle
    in export.ts (Word clones the .docx exactly; PDF is linear). The old

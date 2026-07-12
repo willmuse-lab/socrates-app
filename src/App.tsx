@@ -211,6 +211,7 @@ export default function App() {
                 defaultPreference={defaultPreference} dimensions={dimensions}
                 activeFramework={activeFramework} bloomsLevel={bloomsLevel}
                 subject={profile?.subject || ''} gradeLevel={profile?.gradeLevel || ''}
+                teacherName={profile?.name || ''} schoolName={profile?.schoolName || ''}
                 onSave={handleSaveAssignment} onReset={() => setOpenedAssignment(null)}
                 initialText={openedAssignment?.fullText || ''}
                 userId={user?.id || ''}

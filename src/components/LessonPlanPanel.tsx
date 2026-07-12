@@ -26,11 +26,14 @@ interface LessonPlanPanelProps {
   standardsDoc: StandardsDocument | null;
   subject?: string;
   gradeLevel?: string;
+  /** From the teacher's profile — stamped into the plan header CLIENT-SIDE only. */
+  teacherName?: string;
+  schoolName?: string;
 }
 
 type Step = 'idle' | 'aligning' | 'planning' | 'directions' | 'done' | 'error';
 
-export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLevel }: LessonPlanPanelProps) {
+export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLevel, teacherName, schoolName }: LessonPlanPanelProps) {
   const [permission, setPermission] = useState<PermissionCategory>('AI as Feedback Partner');
   const [step, setStep] = useState<Step>('idle');
   const [error, setError] = useState('');
@@ -60,6 +63,13 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
         subject,
         gradeLevel
       );
+      // Stamp the header from the teacher's profile ON-DEVICE (name/school are
+      // never sent to the model). Profile wins over model guesses; empty
+      // profile fields stay blank lines in the exports (Will's decision).
+      lp.subjects = subject || lp.subjects || '';
+      lp.grade = gradeLevel || lp.grade || '';
+      lp.teacher = teacherName || '';
+      lp.school = schoolName || '';
       setPlan(lp);
 
       // Step 3 — Student directions
@@ -219,6 +229,9 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
                 <div className="text-[10px] text-muted-foreground mt-0.5">
                   Subject(s): {plan.subjects || '—'} · Grade: {plan.grade || '—'}
                 </div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">
+                  Teacher(s): {plan.teacher || '—'} · School: {plan.school || '—'}
+                </div>
               </div>
               {planRows.map(row => (
                 <div key={row.label} className="p-3 bg-card">
@@ -229,6 +242,12 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
               <div className="p-3 bg-muted/30">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Common Core Aligned Lesson: Reflection</div>
                 <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/70 mt-1">{plan.shiftReflection}</div>
+                {plan.reflectionQuestion && (
+                  <div className="mt-2">
+                    <div className="text-[10px] font-bold text-muted-foreground italic">{plan.reflectionQuestion}</div>
+                    <div className="text-[11px] leading-relaxed whitespace-pre-wrap text-foreground/70 mt-0.5">{plan.reflectionAnswer}</div>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>

@@ -238,9 +238,10 @@ Header: Subject(s) and Grade (from the teacher's context; leave Teacher(s)/Schoo
 8. Modifications/Accommodations — specific curriculum modifications and classroom
    accommodations for Students with Disabilities.
 
-Reflection (pre-teaching part only): which CCSS instructional "shift" this lesson
-reflects and how. The template's post-teaching reflection questions are left for the
-teacher and must NOT be answered.
+Reflection: (a) which CCSS instructional "shift" this lesson reflects and how;
+(b) ONE question chosen from the template's reflection list (21st Century Skills /
+academic rigor / cognitive engagement / collaborative learning), answered in
+anticipated terms — how the lesson is DESIGNED to achieve it.
 `;
 
 // RETIRED July 12 2026 (kept for restorability — was the active template July 4-12):

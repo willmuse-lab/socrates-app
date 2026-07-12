@@ -217,12 +217,12 @@ const scoeVal = (plan: LessonPlan, key: keyof LessonPlan) => String(plan[key] ??
 /** Linear block form of the SCOE plan — used for the PDF download. */
 export function lessonPlanToBlocks(plan: LessonPlan): DocBlock[] {
   const blocks: DocBlock[] = [
-    { text: `Subject(s): ${plan.subjects || '________'}    Grade: ${plan.grade || '________'}\nTeacher(s): ________    School: ________` },
+    { text: `Subject(s): ${plan.subjects || '________'}    Grade: ${plan.grade || '________'}\nTeacher(s): ${plan.teacher || '________'}    School: ${plan.school || '________'}` },
   ];
   SCOE_ROWS.forEach(row => {
     blocks.push({ heading: row.label, text: scoeVal(plan, row.key) });
   });
-  blocks.push({ heading: 'Common Core Aligned Lesson: Reflection', text: `${SCOE_REFLECTION_INTRO}\n${plan.shiftReflection || ''}\n\n${SCOE_REFLECTION_CHOICE}\n${SCOE_REFLECTION_QUESTIONS.map(q => '• ' + q).join('\n')}` });
+  blocks.push({ heading: 'Common Core Aligned Lesson: Reflection', text: `${SCOE_REFLECTION_INTRO}\n${plan.shiftReflection || ''}\n\n${SCOE_REFLECTION_CHOICE}\n${SCOE_REFLECTION_QUESTIONS.map(q => '• ' + q).join('\n')}${plan.reflectionQuestion ? `\n\n${plan.reflectionQuestion}\n${plan.reflectionAnswer || ''}` : ''}` });
   return blocks;
 }
 
@@ -260,13 +260,17 @@ export async function exportLessonPlanDocx(plan: LessonPlan) {
       children: [
         new Paragraph({ children: [new TextRun({ text: plan.lessonTitle || 'Lesson Plan', bold: true, size: 28 })], alignment: AlignmentType.CENTER, spacing: { after: 200 } }),
         new Paragraph({ children: [new TextRun(`Subject(s): ${plan.subjects || '______________________________'}    Grade: ${plan.grade || '____________'}`)], spacing: { after: 120 } }),
-        new Paragraph({ children: [new TextRun('Teacher(s): ______________________________    School: ____________________')], spacing: { after: 240 } }),
+        new Paragraph({ children: [new TextRun(`Teacher(s): ${plan.teacher || '______________________________'}    School: ${plan.school || '____________________'}`)], spacing: { after: 240 } }),
         table,
         new Paragraph({ children: [new TextRun({ text: 'Common Core Aligned Lesson:  Reflection', bold: true })], spacing: { before: 360, after: 160 } }),
         new Paragraph({ text: SCOE_REFLECTION_INTRO, spacing: { after: 80 } }),
         ...(plan.shiftReflection ? plan.shiftReflection.split('\n').map(p => new Paragraph({ text: p, spacing: { after: 160 } })) : []),
         new Paragraph({ text: SCOE_REFLECTION_CHOICE, spacing: { before: 160, after: 120 } }),
         ...SCOE_REFLECTION_QUESTIONS.map(q => new Paragraph({ text: q, bullet: { level: 0 } })),
+        ...(plan.reflectionQuestion ? [
+          new Paragraph({ children: [new TextRun({ text: plan.reflectionQuestion, bold: true })], spacing: { before: 200, after: 80 } }),
+          ...(plan.reflectionAnswer || '').split('\n').map(p2 => new Paragraph({ text: p2, spacing: { after: 80 } })),
+        ] : []),
       ],
     }],
   });
@@ -283,7 +287,7 @@ export async function exportLessonPlanToGoogle(plan: LessonPlan): Promise<string
   const html = `<html><body>
     <h1 style="text-align:center">${esc(plan.lessonTitle || 'Lesson Plan')}</h1>
     <p>Subject(s): ${esc(plan.subjects || '______________________________')} &nbsp;&nbsp; Grade: ${esc(plan.grade || '____________')}</p>
-    <p>Teacher(s): ______________________________ &nbsp;&nbsp; School: ____________________</p>
+    <p>Teacher(s): ${esc(plan.teacher || '______________________________')} &nbsp;&nbsp; School: ${esc(plan.school || '____________________')}</p>
     <table border="1" style="border-collapse:collapse;width:100%">
       <tr><td style="width:89%"><p><b>LESSON ELEMENT</b></p></td><td style="width:11%"><p><b>Notes</b></p></td></tr>
       ${rowsHtml}
@@ -293,6 +297,7 @@ export async function exportLessonPlanToGoogle(plan: LessonPlan): Promise<string
     ${para(plan.shiftReflection || '')}
     <p>${esc(SCOE_REFLECTION_CHOICE)}</p>
     <ul>${SCOE_REFLECTION_QUESTIONS.map(q => `<li>${esc(q)}</li>`).join('')}</ul>
+    ${plan.reflectionQuestion ? `<p><b>${esc(plan.reflectionQuestion)}</b></p>${para(plan.reflectionAnswer || '')}` : ''}
   </body></html>`;
   const { url } = await createGoogleDoc(plan.lessonTitle || 'Lesson Plan', html);
   return url;
