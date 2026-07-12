@@ -140,10 +140,13 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
                 className="w-full h-11 gap-2.5 text-sm font-semibold border-border hover:bg-secondary">
                 <GoogleIcon />Continue with Google
               </Button>
+              {/* Microsoft login hidden (Will, July 12 2026) — the Azure
+                  provider was never enabled in Supabase, so the button only
+                  produced errors. Restore once Azure is set up (see HANDOFF).
               <Button type="button" variant="outline" onClick={() => handleProvider('azure')} disabled={isSubmitting}
                 className="w-full h-11 gap-2.5 text-sm font-semibold border-border hover:bg-secondary">
                 <MicrosoftIcon />Continue with Microsoft
-              </Button>
+              </Button> */}
               <div className="relative py-1">
                 <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
                 <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">Or</span></div>

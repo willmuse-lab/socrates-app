@@ -222,8 +222,8 @@ const HELP_TOPICS = [
     content: 'THE FULL ANALYSIS REPORT (top of the results screen): download as PDF or Word (DOCX), save straight to your Google Drive as a Google Doc, or click SHARE to copy a summary link for a colleague. The report includes your score, the failure breakdown, and all three redesigns.\n\nONE REDESIGNED ASSIGNMENT: under each Bronze/Silver/Gold version, use the "Download this version" row to get just that assignment as a PDF, Word document, or Google Doc — ready to hand out. If you used "Edit inline," your edits are included.\n\nLESSON PLAN & STUDENT DIRECTIONS: once generated, each has its own PDF / Word / Google Doc buttons next to "Copy all."\n\nGoogle Doc saves open in a new tab and land in your Drive automatically. The first time, Google will ask you to sign in and approve — allow popups for this site.',
   },
   {
-    title: 'Signing in: email, Google, and Microsoft',
-    content: 'Two ways to sign in today:\n\nEMAIL + PASSWORD — create an account with any email address.\nGOOGLE — click "Continue with Google" and use your Google account. No separate password needed.\n\n"Continue with Microsoft" is visible but not yet active — it\'s coming soon.\n\nIf you signed up with Google, always use the Google button — your account has no password.',
+    title: 'Signing in: email and Google',
+    content: 'Two ways to sign in today:\n\nEMAIL + PASSWORD — create an account with any email address.\nGOOGLE — click "Continue with Google" and use your Google account. No separate password needed.\n\nIf you signed up with Google, always use the Google button — your account has no password.',
   },
   {
     title: 'Forgot your password?',

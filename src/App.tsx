@@ -188,8 +188,11 @@ export default function App() {
               onLogout={handleLogout}
               onViewLibrary={() => setViewMode('library')}
               onViewSettings={() => setIsSettingsOpen(true)}
+              /* Admin dashboard + Research Library hidden from ALL users
+                 (Will, July 12 2026). UserMenu only shows its Admin section
+                 when these props are passed — restore them to bring it back.
               onViewAdmin={() => setViewMode('admin-research')}
-              onViewDashboard={() => setViewMode('admin-dashboard')}
+              onViewDashboard={() => setViewMode('admin-dashboard')} */
             />
           ) : (
             <div className="animate-pulse flex items-center gap-3">
