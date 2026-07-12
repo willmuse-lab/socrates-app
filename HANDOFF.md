@@ -354,9 +354,11 @@ Privacy page + Help page already describe the feature accurately.
 2. Trigger deploy of main — DONE July 4 2026 (shipped the pending pricing/
    testimonials/feedback/profile batch + Google login). Re-do after future
    main pushes; auto-deploy still doesn't fire.
-3. **Rotate the Anthropic API key** — Will pasted screenshots showing the full
-   key in chat. Create new key in console.anthropic.com, swap in Netlify,
-   delete old. Walk him through it.
+3. ~~Rotate the Anthropic API key~~ DONE July 12 2026: new key
+   `socratesiq-netlify-july2026` created, swapped into Netlify, deploy
+   confirmed working live; old (leaked) key deleted. Same day Will bumped
+   Anthropic deposits to $40 → Tier 2 (10x the 10k input-tokens/min limit
+   that caused the live "busy" errors).
 4. Quality tuning of analyzer output — FIRST PASS DONE July 4 2026: the
    redesign prompt now enforces a "quality bar" (concrete mechanics + timing +
    exact deliverable, class-grounded self-sourced evidence, subject/grade fit,
