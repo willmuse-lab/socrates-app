@@ -19,10 +19,18 @@ import { AIFailureBreakdown } from './AIFailureBreakdown';
 import { StreamingProgress } from './StreamingProgress';
 import { StandardsManager } from './StandardsManager';
 import { LessonPlanPanel } from './LessonPlanPanel';
-import { StandardsDocument } from '@/src/lib/standards';
+import { StandardsDocument, refineAssignment } from '@/src/lib/standards';
 import { getTemplatesBySubject } from '@/src/lib/templates';
 
 type FeedbackMap = Record<number, 'up' | 'down' | null>;
+
+// Display names for the three AI strategies (renamed July 12 2026 — the
+// internal keys 'avoid'/'augment'/'embrace' are unchanged everywhere).
+const STRATEGY_LABELS: Record<AIPreference, string> = {
+  avoid: 'AI-Free Learning',
+  augment: 'AI-Assisted Learning',
+  embrace: 'AI-Integrated Learning',
+};
 
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
@@ -48,6 +56,8 @@ export function AssignmentAnalyzer({
   const [showTemplates, setShowTemplates] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [editedTexts, setEditedTexts] = useState<Record<number, string>>({});
+  const [refineInputs, setRefineInputs] = useState<Record<number, string>>({});
+  const [refining, setRefining] = useState<number | null>(null);
   const suggestionsRef = React.useRef<HTMLDivElement>(null);
 
   const getChangeSummary = (original: string, modified: string): string[] => {
@@ -136,6 +146,25 @@ export function AssignmentAnalyzer({
     } catch (err: any) { toast.error(err?.message || 'Download failed. Please try again.'); }
   };
 
+  // "Anything you'd like to change?" — revise the selected redesign via AI
+  // BEFORE the lesson plan is generated. The revision lands in editedTexts, so
+  // it flows into the display, downloads, lesson plan, and re-analysis.
+  const handleRefine = async (i: number) => {
+    if (!result) return;
+    const instruction = (refineInputs[i] ?? '').trim();
+    if (!instruction) return;
+    setRefining(i);
+    try {
+      const current = editedTexts[i] ?? result.suggestions[i].modifiedAssignment;
+      const revised = await refineAssignment(current, instruction, subject, gradeLevel);
+      setEditedTexts(prev => ({ ...prev, [i]: revised }));
+      setRefineInputs(prev => ({ ...prev, [i]: '' }));
+      toast.success('Revised! The updated version is shown — revise again or continue to the lesson plan.');
+    } catch (err: any) {
+      toast.error(err?.message || 'Revision failed. Please try again.');
+    } finally { setRefining(null); }
+  };
+
   const handleStrengthen = () => { setActiveLevel('Gold'); suggestionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast.info('Showing Socratic Transformation (Gold Level)'); };
   const handleSaveToLibrary = () => {
     if (!result || !onSave) return;
@@ -174,9 +203,9 @@ export function AssignmentAnalyzer({
               <h3 className="text-sm font-bold uppercase tracking-widest text-center text-muted-foreground">Select Your AI Strategy</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
                 {([
-                  { key: 'avoid' as const, Icon: Shield, label: 'Avoid AI', desc: 'Maximize resilience and human-only output.' },
-                  { key: 'augment' as const, Icon: Zap, label: 'Augment with AI', desc: 'Use AI for brainstorming and research.' },
-                  { key: 'embrace' as const, Icon: Sparkles, label: 'Embrace AI', desc: 'Integrate AI literacy and critical critique.' },
+                  { key: 'avoid' as const, Icon: Shield, label: 'AI-Free Learning', desc: 'Design for human-only creation, reasoning, and demonstration of learning.' },
+                  { key: 'augment' as const, Icon: Zap, label: 'AI-Assisted Learning', desc: 'Students use AI for brainstorming, feedback, and research while maintaining ownership.' },
+                  { key: 'embrace' as const, Icon: Sparkles, label: 'AI-Integrated Learning', desc: 'Students use AI as a tool they analyze, critique, and improve.' },
                 ]).map(({ key, Icon, label, desc }) => (
                   <button key={key} onClick={() => setAiPreference(key)}
                     className={`p-4 rounded-xl border-2 transition-all text-left flex flex-col gap-2 ${aiPreference === key ? 'border-accent bg-accent/5 ring-2 ring-accent/20' : 'border-border hover:border-accent/30'}`}>
@@ -240,7 +269,7 @@ export function AssignmentAnalyzer({
           <div className="p-6 md:p-10 flex flex-col gap-6 overflow-y-auto order-2 md:order-1">
             <div className="flex flex-wrap gap-2 items-center">
               <span className="text-[11px] uppercase tracking-wider px-2.5 py-1 bg-secondary rounded-sm text-muted-foreground font-semibold">Analysis</span>
-              <Badge variant="outline" className="text-[10px] uppercase tracking-widest font-bold border-accent/30 text-accent">{aiPreference}</Badge>
+              <Badge variant="outline" className="text-[10px] uppercase tracking-widest font-bold border-accent/30 text-accent">{STRATEGY_LABELS[aiPreference]}</Badge>
               <div className="ml-auto flex items-center gap-1 flex-wrap">
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleExportPDF}><FileDown className="w-3.5 h-3.5" />PDF</Button>
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleExportDocx}><FileText className="w-3.5 h-3.5" />DOCX</Button>
@@ -304,7 +333,10 @@ export function AssignmentAnalyzer({
                       <h3 className="text-2xl font-serif italic text-accent">{suggestion.title}</h3>
                       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
                     </div>
-                    <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{suggestion.modifiedAssignment}</div>
+                    <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{editedTexts[i] ?? suggestion.modifiedAssignment}</div>
+                    {editedTexts[i] != null && editedTexts[i] !== suggestion.modifiedAssignment && (
+                      <p className="text-[10px] text-muted-foreground italic -mt-4">✏️ Showing your revised version — downloads and the lesson plan will use it.</p>
+                    )}
                     {editingIndex === i && (
                       <div className="space-y-2">
                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Edit directly:</p>
@@ -314,7 +346,7 @@ export function AssignmentAnalyzer({
                       </div>
                     )}
                     <div className="flex flex-wrap items-center gap-3">
-                      <Button variant="outline" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5" onClick={() => copyToClipboard(suggestion.modifiedAssignment, i)}>
+                      <Button variant="outline" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5" onClick={() => copyToClipboard(editedTexts[i] ?? suggestion.modifiedAssignment, i)}>
                         {copiedIndex === i ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}{copiedIndex === i ? 'Copied' : 'Copy'}
                       </Button>
                       <Button variant="default" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5 bg-accent text-white hover:bg-accent/90" onClick={() => applyVersion(editedTexts[i] ?? suggestion.modifiedAssignment, i)}>
@@ -327,6 +359,24 @@ export function AssignmentAnalyzer({
                         <span className="text-[10px] text-muted-foreground uppercase tracking-wider mr-1">Helpful?</span>
                         <button onClick={() => handleFeedback(i, 'up')} className={`p-1.5 rounded-md transition-all ${feedback[i] === 'up' ? 'bg-green-100 text-green-600' : 'text-muted-foreground hover:text-green-500 hover:bg-green-50'}`}><ThumbsUp className="w-3.5 h-3.5" /></button>
                         <button onClick={() => handleFeedback(i, 'down')} className={`p-1.5 rounded-md transition-all ${feedback[i] === 'down' ? 'bg-red-100 text-red-500' : 'text-muted-foreground hover:text-red-400 hover:bg-red-50'}`}><ThumbsDown className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Anything you'd like to change before the lesson plan?</p>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          value={refineInputs[i] ?? ''}
+                          onChange={e => setRefineInputs(prev => ({ ...prev, [i]: e.target.value }))}
+                          onKeyDown={e => { if (e.key === 'Enter') handleRefine(i); }}
+                          disabled={refining === i}
+                          placeholder={'e.g. "make it a group project" or "fit it into one class period"'}
+                          className="flex-1 h-9 text-xs px-3 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-60"
+                        />
+                        <Button variant="outline" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5"
+                          onClick={() => handleRefine(i)} disabled={refining === i || !(refineInputs[i] ?? '').trim()}>
+                          {refining === i ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                          {refining === i ? 'Revising…' : 'Revise'}
+                        </Button>
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/50">

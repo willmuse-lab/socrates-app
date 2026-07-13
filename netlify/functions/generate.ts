@@ -274,6 +274,50 @@ Use \\n for line breaks. Do NOT use double-quote characters (") inside any strin
 }
 
 // ---------------------------------------------------------------------------
+// MODE: refine — revise the selected redesign per the teacher's request,
+// BEFORE the lesson plan is generated. Small, cheap call: it rewrites one
+// assignment, not the whole analysis.
+// ---------------------------------------------------------------------------
+async function runRefine(body: any) {
+  const { assignmentText, instruction, subject, gradeLevel } = body;
+  if (!instruction?.trim()) throw Object.assign(new Error("Tell SocratesIQ what you'd like changed."), { status: 400 });
+
+  const system = `You are Socrates, an expert instructional designer. A teacher has a
+redesigned assignment and wants a specific change made. Apply EXACTLY the requested
+change while preserving everything else: the topic, the learning goal, the
+AI-resilience features (personal/local evidence, process steps, in-class components),
+the grade-appropriate voice, and roughly the same length. Do not add unrequested
+sections. PLAIN TEXT ONLY — no markdown (**, #, * bullets); plain numbered lists and
+dashes only.`;
+
+  const userMessage = `CURRENT ASSIGNMENT:
+"""
+${String(assignmentText).substring(0, 6000)}
+"""
+
+TEACHER'S REQUESTED CHANGE: ${String(instruction).substring(0, 500)}
+${subject ? `SUBJECT: ${subject}` : ""}
+${gradeLevel ? `GRADE LEVEL: ${gradeLevel}` : ""}
+
+Rewrite the assignment with that change applied. Keep it classroom-ready and hand-out
+complete. Return ONLY a single valid JSON object, no markdown fences, no commentary:
+{ "revisedAssignment": "the full revised assignment text" }
+Use \\n for line breaks. Do NOT use double-quote characters (") inside the value — use single quotes (') instead.`;
+
+  const stream = client.messages.stream({
+    model: "claude-haiku-4-5",
+    max_tokens: 1500,
+    system,
+    messages: [{ role: "user", content: userMessage }],
+  });
+  const response = await withTimeout(stream.finalMessage(), 26000, "Revision request");
+  requireComplete(response, "revision");
+  const textBlock = response.content.find(b => b.type === "text");
+  if (!textBlock || textBlock.type !== "text") throw new Error("Empty response from revision model");
+  return extractJSON(textBlock.text);
+}
+
+// ---------------------------------------------------------------------------
 // Handler
 // ---------------------------------------------------------------------------
 export default async function handler(req: Request) {
@@ -309,6 +353,7 @@ export default async function handler(req: Request) {
     if (mode === "align") result = await runAlign(body);
     else if (mode === "lesson_plan") result = await runLessonPlan(body);
     else if (mode === "directions") result = await runDirections(body);
+    else if (mode === "refine") result = await runRefine(body);
     else {
       return new Response(JSON.stringify({ error: `Unknown mode: ${mode}. Use align, lesson_plan, or directions.` }), { status: 400, headers });
     }

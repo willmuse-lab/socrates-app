@@ -398,7 +398,7 @@ export default function App() {
                   {(['avoid','augment','embrace'] as const).map(p => (
                     <button key={p} onClick={() => setDefaultPreference(p)}
                       className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all ${defaultPreference === p ? 'bg-secondary border-accent text-accent' : 'bg-secondary/50 border-border text-muted-foreground hover:border-accent/40'}`}>
-                      {p === 'avoid' ? 'Avoid AI' : p === 'augment' ? 'Augment' : 'Embrace AI'}
+                      {p === 'avoid' ? 'AI-Free' : p === 'augment' ? 'AI-Assisted' : 'AI-Integrated'}
                     </button>
                   ))}
                 </div>

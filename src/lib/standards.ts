@@ -169,6 +169,19 @@ export async function generateLessonPlan(
   return r.lessonPlan as LessonPlan;
 }
 
+/** Revise the selected redesign per the teacher's request (pre-lesson-plan). */
+export async function refineAssignment(
+  assignmentText: string,
+  instruction: string,
+  subject?: string,
+  gradeLevel?: string
+): Promise<string> {
+  const r = await callGenerate({ mode: 'refine', assignmentText, instruction, subject, gradeLevel });
+  if (typeof r.revisedAssignment !== 'string' || !r.revisedAssignment.trim()) throw new Error('Unexpected revision response shape.');
+  // Defensive markdown scrub — printed/exported documents must never show **.
+  return r.revisedAssignment.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*\*/g, '');
+}
+
 export async function generateStudentDirections(
   assignmentText: string,
   permissionCategory: PermissionCategory,

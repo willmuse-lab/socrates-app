@@ -184,6 +184,21 @@ every dashboard task with exact click paths, one step per message, and wait.
 
 ## Product decisions already made (don't relitigate)
 
+- **AI strategy names (July 12 2026, from the ChatGPT SaaS-strategy doc Will
+  shared):** display labels are now "AI-Free Learning" / "AI-Assisted
+  Learning" / "AI-Integrated Learning" (picker, results badge, Settings chips,
+  Help page). The internal keys 'avoid'/'augment'/'embrace' are UNCHANGED
+  everywhere (state, API, prompts, share links) — only labels changed.
+- **"Revise" box on each redesign (July 12 2026):** under every Bronze/
+  Silver/Gold version, "Anything you'd like to change before the lesson
+  plan?" + input → generate.ts mode "refine" (small Haiku call, revises just
+  that assignment per the teacher's request, plain-text output). The revision
+  lands in editedTexts so it flows into the display box, Copy, downloads,
+  lesson plan, and re-analysis. Deliberately NOT metered as a separate
+  "transformation" (per the credit-model decision: 1 credit = 1 complete
+  transformation; refining is free polish). The display box now always shows
+  editedTexts[i] ?? original, with an "edited" note when revised.
+
 - Pricing: Teacher $9.99/mo or $99.99/yr only; School/District = "Call for
   pricing" → mailto socratesiqed@gmail.com (changed from hello@socratesmuse.com
   July 12 2026). No payment processing exists yet — "Get started" is a stub.
