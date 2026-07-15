@@ -193,10 +193,12 @@ export function AssignmentAnalyzer({
               </div>
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <Badge className="bg-accent text-white border-none px-3 py-1">AI-Resilient Assignment Architect</Badge>
-                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">Wisdom in the Age of <span className="text-accent">Artificial Intelligence.</span></h1>
+                  <Badge className="bg-accent text-white border-none px-3 py-1">Curriculum Transformation Platform</Badge>
+                  <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">Transform Yesterday's Assignments into <span className="text-accent">Tomorrow's Learning.</span></h1>
+                  <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground pt-1">Wisdom in the Age of Artificial Intelligence</p>
                 </div>
-                <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">Transform traditional assignments into learning experiences that prioritize critical thinking.</p>
+                <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">Upload the assignments you've refined over years of teaching. SocratesIQ analyzes them, measures AI resilience, and transforms them into standards-aligned, classroom-ready learning experiences — without losing what makes them yours.</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-accent">Built by Teachers · Designed for the AI Era</p>
               </div>
             </div>
             <div className="space-y-4">
@@ -418,9 +420,10 @@ export function AssignmentAnalyzer({
           </div>
           <aside className="bg-card border-b md:border-b-0 md:border-l border-border p-6 md:p-10 flex flex-col gap-8 overflow-y-auto order-1 md:order-2">
             <div className="text-center space-y-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-accent">AI Resilience Score™</p>
               <div className="score-circle mx-auto">
                 <span className={`text-3xl font-bold ${scoreColor}`}>{result.resilienceScore}</span>
-                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Resilience</span>
+                <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">out of 100</span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">{result.summary}</p>
               <button onClick={() => setShowScoreInfo(true)}
@@ -481,7 +484,7 @@ export function AssignmentAnalyzer({
       <Dialog open={showScoreInfo} onOpenChange={setShowScoreInfo}>
         <DialogContent className="sm:max-w-[480px] border-border bg-card p-8 max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold italic font-serif">How is this scored?</DialogTitle>
+            <DialogTitle className="text-2xl font-bold italic font-serif">The AI Resilience Score™</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>

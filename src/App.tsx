@@ -219,14 +219,14 @@ export default function App() {
               <section id="how-to-use" className="py-20 px-6 md:px-10 bg-card border-t border-border">
                 <div className="max-w-4xl mx-auto space-y-12">
                   <div className="text-center space-y-4">
-                    <h2 className="text-3xl font-bold font-serif italic">How to Use SocratesIQ</h2>
-                    <p className="text-muted-foreground">Three steps to AI-resilient assignments.</p>
+                    <h2 className="text-3xl font-bold font-serif italic">Your curriculum already has value.</h2>
+                    <p className="text-muted-foreground">We don't replace it. We strengthen it — in three steps.</p>
                   </div>
                   <div className="grid sm:grid-cols-3 gap-8">
                     {[
-                      { num: '1', color: 'bg-accent', title: 'Input', desc: 'Paste your assignment or import from Google Drive.' },
-                      { num: '2', color: 'bg-green-600', title: 'Analyze', desc: 'Choose your AI strategy and get a resilience score.' },
-                      { num: '3', color: 'bg-amber-600', title: 'Refine', desc: 'Apply Bronze, Silver, or Gold redesigns in one click.' },
+                      { num: '1', color: 'bg-accent', title: 'Analyze', desc: 'Upload your existing assignment and see exactly where AI can replace student thinking.' },
+                      { num: '2', color: 'bg-green-600', title: 'Transform', desc: 'Choose the redesign that best fits your classroom — AI-Free, AI-Assisted, or AI-Integrated.' },
+                      { num: '3', color: 'bg-amber-600', title: 'Teach', desc: 'Download ready-to-use lesson plans, student directions, and standards alignment.' },
                     ].map(s => (
                       <div key={s.num} className="space-y-3">
                         <div className={`w-10 h-10 rounded-full ${s.color} text-white flex items-center justify-center font-bold`}>{s.num}</div>
@@ -234,6 +234,11 @@ export default function App() {
                         <p className="text-sm text-muted-foreground">{s.desc}</p>
                       </div>
                     ))}
+                  </div>
+                  <div className="max-w-2xl mx-auto text-center space-y-3 pt-4">
+                    <h3 className="text-xl font-bold font-serif italic">Your expertise comes first.</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">SocratesIQ doesn't replace your teaching. It helps you redesign assignments while preserving your instructional goals, your classroom voice, and your professional judgment. Bring the assignment you've used for the last 10 years — we'll help you prepare it for the next 10.</p>
+                    <p className="text-xs font-bold uppercase tracking-widest text-accent">Built by a teacher, not a tech company.</p>
                   </div>
                 </div>
               </section>

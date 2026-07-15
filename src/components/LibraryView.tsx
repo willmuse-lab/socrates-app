@@ -59,9 +59,9 @@ export function LibraryView({ onBack, assignments, onOpen, onDelete }: LibraryVi
         <div className="space-y-1">
           <div className="flex items-center gap-3">
             <Library className="w-6 h-6 text-accent" />
-            <h1 className="text-3xl font-bold font-serif italic">Architecture Library</h1>
+            <h1 className="text-3xl font-bold font-serif italic">Curriculum Library</h1>
           </div>
-          <p className="text-muted-foreground">{assignments.length} saved assignment{assignments.length !== 1 ? 's' : ''} — persisted locally in your browser.</p>
+          <p className="text-muted-foreground">{assignments.length} transformed assignment{assignments.length !== 1 ? 's' : ''} — your evolving, AI-era curriculum workspace.</p>
         </div>
         <Button variant="outline" onClick={onBack}>Back to Studio</Button>
       </div>

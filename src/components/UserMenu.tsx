@@ -47,7 +47,7 @@ export function UserMenu({ user, onLogout, onViewLibrary, onViewSettings, onView
         </DropdownMenuGroup>
         <DropdownMenuSeparator className="my-1 bg-border/50" />
         <DropdownMenuGroup>
-          {menuItem(onViewLibrary, Library, 'My Library')}
+          {menuItem(onViewLibrary, Library, 'Curriculum Library')}
           {menuItem(onViewSettings, Settings, 'Settings')}
         </DropdownMenuGroup>
         {onViewAdmin && (
