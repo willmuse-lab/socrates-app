@@ -492,7 +492,7 @@ export function AssignmentAnalyzer({
           </div>
           <aside className="bg-card border-b md:border-b-0 md:border-l border-border p-6 md:p-10 flex flex-col gap-8 overflow-y-auto order-1 md:order-2">
             <div className="text-center space-y-3">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-accent">AI Resilience Score™</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-accent">AI Resilience Score</p>
               <div className="score-circle mx-auto">
                 <span className={`text-3xl font-bold ${scoreColor}`}>{result.resilienceScore}</span>
                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">out of 100</span>
@@ -556,7 +556,7 @@ export function AssignmentAnalyzer({
       <Dialog open={showScoreInfo} onOpenChange={setShowScoreInfo}>
         <DialogContent className="sm:max-w-[480px] border-border bg-card p-8 max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold italic font-serif">The AI Resilience Score™</DialogTitle>
+            <DialogTitle className="text-2xl font-bold italic font-serif">The AI Resilience Score</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
