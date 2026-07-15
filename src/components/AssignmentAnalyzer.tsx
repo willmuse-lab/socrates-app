@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Loader2, Shield, Zap, Sparkles, Share2, FileText, FileDown, Copy, Check, ThumbsUp, ThumbsDown, Replace, BookOpen, RotateCcw, Save, ExternalLink, HelpCircle } from 'lucide-react';
+import { Loader2, Shield, Zap, Sparkles, Share2, FileText, FileDown, Copy, Check, ThumbsUp, ThumbsDown, Replace, BookOpen, RotateCcw, Save, ExternalLink, HelpCircle, ArrowRight, TrendingUp } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
@@ -58,6 +58,9 @@ export function AssignmentAnalyzer({
   const [editedTexts, setEditedTexts] = useState<Record<number, string>>({});
   const [refineInputs, setRefineInputs] = useState<Record<number, string>>({});
   const [refining, setRefining] = useState<number | null>(null);
+  // Holds the analysis of the ORIGINAL assignment when a redesign is applied,
+  // so the next analysis can show the before→after "transformation" jump.
+  const [previousResult, setPreviousResult] = useState<AnalysisResult | null>(null);
   const suggestionsRef = React.useRef<HTMLDivElement>(null);
 
   const getChangeSummary = (original: string, modified: string): string[] => {
@@ -95,8 +98,10 @@ export function AssignmentAnalyzer({
   };
 
   const applyVersion = (content: string, index: number) => {
+    // Stash the current (original) analysis so the next run can show before→after.
+    setPreviousResult(result);
     setText(content); setApplied(index); setResult(null);
-    toast.success('Version applied! Re-analyze to see the new score.', { action: { label: 'Analyze Now', onClick: () => handleAnalyze(content) } });
+    toast.success('Version applied! Re-analyze to see your score jump.', { action: { label: 'Analyze Now', onClick: () => handleAnalyze(content) } });
   };
 
   const handleFeedback = (index: number, vote: 'up' | 'down') => {
@@ -173,7 +178,15 @@ export function AssignmentAnalyzer({
     onSave({ title: displayTitle, fullText: text, resilience: result.resilienceScore, status: activeLevel });
     toast.success('Assignment saved to your library!');
   };
-  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); onReset?.(); };
+  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); onReset?.(); };
+
+  // Which dimensions improved between the original and the redesigned analysis.
+  const improvedDimensions = (): string[] => {
+    if (!previousResult || !result) return [];
+    return result.dimensions
+      .filter(d => { const prev = previousResult.dimensions.find(p => p.name === d.name); return prev && d.score > prev.score; })
+      .map(d => d.name);
+  };
   const scoreColor = result ? result.resilienceScore >= 70 ? 'text-[#708D81]' : result.resilienceScore >= 40 ? 'text-[#D4A373]' : 'text-red-400' : '';
 
   return (
@@ -257,7 +270,7 @@ export function AssignmentAnalyzer({
               <Card className="border border-border shadow-sm flex flex-col">
                 <CardHeader><CardTitle className="text-lg font-serif italic">Paste Text</CardTitle><CardDescription>Directly input your prompt.</CardDescription></CardHeader>
                 <CardContent className="space-y-4 flex-1 flex flex-col">
-                  <Textarea placeholder="Paste your assignment here..." className="flex-1 min-h-[150px] resize-none border-border focus-visible:ring-accent" value={text} onChange={(e) => setText(e.target.value)} />
+                  <Textarea placeholder="Paste your assignment here..." className="flex-1 min-h-[150px] resize-none border-border focus-visible:ring-accent" value={text} onChange={(e) => { setText(e.target.value); if (previousResult) setPreviousResult(null); }} />
                   <Button className="w-full h-12 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-md" onClick={handleAnalyze} disabled={isAnalyzing || !text.trim()}>
                     {isAnalyzing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analyzing...</> : 'Analyze Assignment'}
                   </Button>
@@ -282,6 +295,53 @@ export function AssignmentAnalyzer({
                 <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-accent gap-1.5 text-xs" onClick={handleShare}><Share2 className="w-3.5 h-3.5" />Share</Button>
               </div>
             </div>
+            {previousResult && (() => {
+              const before = previousResult.resilienceScore;
+              const after = result.resilienceScore;
+              const delta = after - before;
+              const improved = improvedDimensions();
+              const gains = [
+                ...improved.map(name => `${name} strengthened`),
+                ...(delta > 0 ? ['Fewer AI shortcuts', 'More authentic student thinking'] : []),
+              ].slice(0, 5);
+              return (
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  className="rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/5 to-transparent p-6 md:p-8">
+                  <div className="flex items-center gap-2 justify-center mb-4">
+                    <TrendingUp className="w-4 h-4 text-accent" />
+                    <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Your Transformation</p>
+                  </div>
+                  <div className="flex items-center justify-center gap-5 md:gap-8">
+                    <div className="text-center">
+                      <div className="text-3xl md:text-4xl font-bold text-muted-foreground/70">{before}</div>
+                      <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mt-1">Original</div>
+                    </div>
+                    <ArrowRight className="w-6 h-6 text-accent shrink-0" />
+                    <div className="text-center">
+                      <div className="text-4xl md:text-5xl font-bold text-accent">{after}</div>
+                      <div className="text-[10px] uppercase tracking-widest text-accent font-bold mt-1">Redesigned</div>
+                    </div>
+                    {delta > 0 && (
+                      <div className="ml-1 px-3 py-1.5 rounded-full bg-[#708D81]/15 text-[#708D81] text-sm font-bold flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5" />+{delta}
+                      </div>
+                    )}
+                  </div>
+                  {gains.length > 0 && (
+                    <div className="mt-6 pt-5 border-t border-accent/15">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-center mb-3">What Improved</p>
+                      <div className="flex flex-wrap justify-center gap-2">
+                        {gains.map((g, k) => (
+                          <span key={k} className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-card border border-border">
+                            <Check className="w-3.5 h-3.5 text-[#708D81]" />{g}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })()}
             {result.aiFailureBreakdown && <AIFailureBreakdown headline={result.aiFailureBreakdown.headline} failures={result.aiFailureBreakdown.failures} />}
             <Card ref={suggestionsRef} className="p-6 md:p-8 border border-border shadow-sm bg-card rounded-xl flex-1">
               <div className="flex items-center justify-between mb-6">

@@ -20,8 +20,10 @@ list has BOTH https://socratesiq.com/** and the old netlify.app/** entry.
 SocratesIQ helps teachers redesign assignments so AI
 can't do the work for students. Teacher pastes/uploads an assignment → gets a
 0–100 "resilience" score, an AI-failure breakdown, and Bronze/Silver/Gold
-redesigns → (feature branch) aligns to uploaded SCOS standards → generates a
-Section I–VI lesson plan + student-facing directions.
+redesigns (steered by three AI strategies) → optionally revises them via a
+chat box → aligns to uploaded SCOS standards → generates a CCSS-template
+lesson plan + student-facing directions, all downloadable as PDF/Word/Google
+Doc. Applying a redesign and re-analyzing shows a before→after score jump.
 
 Owner: Will Muse (willmuse@greensboroday.org) — a teacher, NOT a developer.
 **Explain things step-by-step, no jargon, one action at a time.** He clicks
@@ -183,6 +185,29 @@ every dashboard task with exact click paths, one step per message, and wait.
    (LESSON_PLAN_TEMPLATE) for restorability. Do not loosen the template lock.
 
 ## Product decisions already made (don't relitigate)
+
+- **Positioning sharpen (July 13 2026, from a CPO-style review Will shared):**
+  hero is now "Transform Yesterday's Assignments into Tomorrow's Learning" +
+  "Wisdom in the Age of Artificial Intelligence" tagline + "Curriculum
+  Transformation Platform" badge; the three homepage steps are Analyze /
+  Transform / Teach under "Your curriculum already has value — we strengthen
+  it"; the score is branded "AI Resilience Score(TM)" (pursue real trademark
+  via attorney — parked); the saved-work area is "Curriculum Library"; a
+  teacher-trust block ("Your expertise comes first… built by a teacher, not a
+  tech company") sits under the steps. Category to own: Curriculum
+  Transformation Platform. Full rationale in the Positioning & Messaging Guide
+  doc. DECISION STILL OPEN: "AI-Free Learning" (shipped, clearer) vs the CPO's
+  warmer "Human-Centered Learning".
+- **Before/after score moment (July 13 2026):** applying a redesign stashes
+  the original analysis (previousResult); re-analyzing shows a "Your
+  Transformation" card at the top of results — Original → Redesigned scores,
+  the +delta, and a "What Improved" chip row derived from which dimensions
+  actually rose. Cleared on New Assignment or manual textarea edits.
+- **Competitive note:** Anthropic launched free "Claude for Teachers" (a
+  lesson GENERATOR, auto-aligned to all 50 states) July 14 2026. SocratesIQ's
+  wedge is the opposite job — TRANSFORMING existing assignments, with the AI
+  Resilience Score as the diagnosis they don't offer. Lean into
+  transformation + teacher-built credibility; don't try to out-generate them.
 
 - **AI strategy names (July 12 2026, from the ChatGPT SaaS-strategy doc Will
   shared):** display labels are now "AI-Free Learning" / "AI-Assisted
