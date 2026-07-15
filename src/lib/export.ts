@@ -5,7 +5,11 @@ import { AnalysisResult } from './gemini';
 import { LessonPlan, StudentDirections } from './standards';
 import { createGoogleDoc } from './google';
 
-export async function exportToPDF(result: AnalysisResult, originalText: string) {
+// Optional before→after summary shown at the top of a report when the teacher
+// applied a redesign and re-analyzed (the "Your Transformation" moment).
+export interface TransformationSummary { before: number; after: number; gains: string[]; }
+
+export async function exportToPDF(result: AnalysisResult, originalText: string, transformation?: TransformationSummary) {
   const doc = new jsPDF();
   let y = 20;
   const margin = 20;
@@ -16,6 +20,24 @@ export async function exportToPDF(result: AnalysisResult, originalText: string) 
   doc.setTextColor(79, 70, 229);
   doc.text('SocratesIQ Analysis Report', margin, y);
   y += 15;
+
+  if (transformation) {
+    doc.setFontSize(13);
+    doc.setTextColor(79, 70, 229);
+    doc.text('Your Transformation', margin, y);
+    y += 7;
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    const delta = transformation.after - transformation.before;
+    doc.text(`AI Resilience Score: ${transformation.before}/100  ->  ${transformation.after}/100${delta > 0 ? `  (+${delta})` : ''}`, margin, y);
+    y += 7;
+    if (transformation.gains.length) {
+      doc.setFontSize(11);
+      transformation.gains.forEach(g => { doc.text(`- ${g}`, margin + 4, y); y += 5.5; });
+    }
+    y += 6;
+    doc.setFontSize(14);
+  }
 
   doc.setFontSize(14);
   doc.setTextColor(0, 0, 0);
@@ -69,12 +91,18 @@ export async function exportToPDF(result: AnalysisResult, originalText: string) 
   doc.save('socrates-analysis.pdf');
 }
 
-export async function exportToDocx(result: AnalysisResult, originalText: string) {
+export async function exportToDocx(result: AnalysisResult, originalText: string, transformation?: TransformationSummary) {
+  const transformBlocks = transformation ? [
+    new Paragraph({ children: [new TextRun({ text: "Your Transformation", bold: true, color: "4F46E5", size: 24 })], spacing: { before: 300, after: 120 } }),
+    new Paragraph({ children: [new TextRun({ text: `AI Resilience Score: ${transformation.before}/100  →  ${transformation.after}/100${transformation.after - transformation.before > 0 ? `  (+${transformation.after - transformation.before})` : ''}`, bold: true })], spacing: { after: 120 } }),
+    ...transformation.gains.map(g => new Paragraph({ text: g, bullet: { level: 0 }, spacing: { after: 60 } })),
+  ] : [];
   const doc = new Document({
     sections: [{
       properties: {},
       children: [
         new Paragraph({ text: "SocratesIQ Analysis Report", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+        ...transformBlocks,
         new Paragraph({ children: [new TextRun({ text: `Resilience Score: ${result.resilienceScore}/100`, bold: true, size: 28 })], spacing: { before: 400, after: 200 } }),
         new Paragraph({ text: result.summary, spacing: { after: 400 } }),
         new Paragraph({ text: "Analysis Dimensions", heading: HeadingLevel.HEADING_2, spacing: { before: 400, after: 200 } }),
@@ -395,8 +423,13 @@ export function directionsToBlocks(d: StudentDirections): DocBlock[] {
 // Full analysis report → Google Doc (client-side; replaces the old backend
 // call). Same shape the PDF/DOCX reports use.
 // ---------------------------------------------------------------------------
-export async function exportToGoogleDocs(result: AnalysisResult, originalText: string, docTitle: string): Promise<{ docUrl: string } | null> {
+export async function exportToGoogleDocs(result: AnalysisResult, originalText: string, docTitle: string, transformation?: TransformationSummary): Promise<{ docUrl: string } | null> {
+  const delta = transformation ? transformation.after - transformation.before : 0;
   const blocks: DocBlock[] = [
+    ...(transformation ? [{
+      heading: 'Your Transformation',
+      text: `AI Resilience Score: ${transformation.before}/100 → ${transformation.after}/100${delta > 0 ? ` (+${delta})` : ''}\n${transformation.gains.map(g => '• ' + g).join('\n')}`,
+    }] : []),
     { text: `Resilience Score: ${result.resilienceScore}/100\n\n${result.summary}` },
     { heading: 'Analysis Dimensions' },
     ...result.dimensions.map(dim => ({ heading: `${dim.name}: ${dim.score}%`, text: dim.explanation })),

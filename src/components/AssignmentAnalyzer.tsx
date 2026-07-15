@@ -119,14 +119,14 @@ export function AssignmentAnalyzer({
     } catch { toast.error('Could not generate share link.'); }
   };
 
-  const handleExportPDF = async () => { if (!result) return; try { await exportToPDF(result, text); toast.success('PDF exported!'); } catch { toast.error('Failed to export PDF.'); } };
-  const handleExportDocx = async () => { if (!result) return; try { await exportToDocx(result, text); toast.success('DOCX exported!'); } catch { toast.error('Failed to export DOCX.'); } };
+  const handleExportPDF = async () => { if (!result) return; try { await exportToPDF(result, text, buildTransformation()); toast.success('PDF exported!'); } catch { toast.error('Failed to export PDF.'); } };
+  const handleExportDocx = async () => { if (!result) return; try { await exportToDocx(result, text, buildTransformation()); toast.success('DOCX exported!'); } catch { toast.error('Failed to export DOCX.'); } };
   const handleExportGoogleDocs = async () => {
     if (!result) return;
     const title = `SocratesIQ Analysis — ${text.trim().split('\n')[0].substring(0, 40)}`;
     try {
       toast.info('Creating Google Doc…');
-      const res = await exportToGoogleDocs(result, text, title);
+      const res = await exportToGoogleDocs(result, text, title, buildTransformation());
       if (res?.docUrl) { window.open(res.docUrl, '_blank'); toast.success('Saved to your Google Drive!'); }
     } catch (err: any) {
       toast.error(err?.message || 'Google Docs export failed.');
@@ -186,6 +186,18 @@ export function AssignmentAnalyzer({
     return result.dimensions
       .filter(d => { const prev = previousResult.dimensions.find(p => p.name === d.name); return prev && d.score > prev.score; })
       .map(d => d.name);
+  };
+
+  // The before→after summary passed into report downloads (undefined when the
+  // teacher hasn't applied a redesign + re-analyzed).
+  const buildTransformation = () => {
+    if (!previousResult || !result) return undefined;
+    const delta = result.resilienceScore - previousResult.resilienceScore;
+    const gains = [
+      ...improvedDimensions().map(name => `${name} strengthened`),
+      ...(delta > 0 ? ['Fewer AI shortcuts', 'More authentic student thinking'] : []),
+    ].slice(0, 5);
+    return { before: previousResult.resilienceScore, after: result.resilienceScore, gains };
   };
   const scoreColor = result ? result.resilienceScore >= 70 ? 'text-[#708D81]' : result.resilienceScore >= 40 ? 'text-[#D4A373]' : 'text-red-400' : '';
 
