@@ -227,6 +227,21 @@ every dashboard task with exact click paths, one step per message, and wait.
 - Pricing: Teacher $9.99/mo or $99.99/yr only; School/District = "Call for
   pricing" → mailto socratesiqed@gmail.com (changed from hello@socratesmuse.com
   July 12 2026). No payment processing exists yet — "Get started" is a stub.
+- **AI choice collapsed 6 → 3 (July 13 2026, Will's decision):** the six AI
+  permission categories are GONE from the UI. The teacher's ONE choice at the
+  start — the three strategies (AI-Free / AI-Assisted / AI-Integrated, keys
+  avoid/augment/embrace) — now drives EVERYTHING: analysis, redesigns, the
+  lesson plan's AI guidance, and the student directions' AI rules. Each
+  strategy carries a rich rule definition in AI_STRATEGY_RULES (standards.ts);
+  generateLessonPlan/generateStudentDirections take the strategy key and pass
+  that rule text to generate.ts (which still receives it in its
+  `permissionCategory` field — unchanged server-side). LessonPlanPanel shows
+  the chosen strategy READ-ONLY (no picker); to change it the teacher re-picks
+  at the top and re-analyzes. The old six categories (PermissionCategory /
+  PERMISSION_CATEGORIES) are kept dormant in standards.ts for restorability.
+- **Analyze auto-scrolls to top (July 13 2026):** handleAnalyze does
+  window.scrollTo top so the progress screen is visible instead of leaving the
+  viewport mid-page where the Analyze button was clicked.
 - **HIDDEN from all users (Will, July 12 2026):** the Microsoft login button
   (LoginDialog.tsx — commented out; Azure was never enabled so it only errored),
   and the Admin dashboard + Research Library menu items (App.tsx — the

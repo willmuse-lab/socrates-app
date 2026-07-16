@@ -9,8 +9,8 @@ import {
   AlignmentResult,
   LessonPlan,
   StudentDirections,
-  PermissionCategory,
-  PERMISSION_CATEGORIES,
+  AIStrategyKey,
+  AI_STRATEGY_RULES,
   alignToStandards,
   generateLessonPlan,
   generateStudentDirections,
@@ -26,6 +26,8 @@ interface LessonPlanPanelProps {
   standardsDoc: StandardsDocument | null;
   subject?: string;
   gradeLevel?: string;
+  /** The teacher's single AI choice, made at the start — drives the whole flow. */
+  aiStrategy: AIStrategyKey;
   /** From the teacher's profile — stamped into the plan header CLIENT-SIDE only. */
   teacherName?: string;
   schoolName?: string;
@@ -46,8 +48,7 @@ function scrubMarkdown(obj: Record<string, any>) {
   }
 }
 
-export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLevel, teacherName, schoolName }: LessonPlanPanelProps) {
-  const [permission, setPermission] = useState<PermissionCategory>('AI as Feedback Partner');
+export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLevel, aiStrategy, teacherName, schoolName }: LessonPlanPanelProps) {
   const [step, setStep] = useState<Step>('idle');
   const [error, setError] = useState('');
   const [alignment, setAlignment] = useState<AlignmentResult | null>(null);
@@ -72,7 +73,7 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
       const lp = await generateLessonPlan(
         assignmentText,
         alignResult?.alignedStandards ?? null,
-        permission,
+        aiStrategy,
         subject,
         gradeLevel
       );
@@ -88,7 +89,7 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
 
       // Step 3 — Student directions
       setStep('directions');
-      const dir = await generateStudentDirections(assignmentText, permission, gradeLevel);
+      const dir = await generateStudentDirections(assignmentText, aiStrategy, gradeLevel);
       scrubMarkdown(dir);
       setDirections(dir);
 
@@ -159,23 +160,12 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
         <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Lesson Plan Package</p>
       </div>
 
-      {/* Permission category picker — drives Section III and the AI rules in directions */}
-      <div className="space-y-2">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">AI permission for this assignment</p>
-        <div className="grid grid-cols-2 gap-2">
-          {PERMISSION_CATEGORIES.map(cat => (
-            <button
-              key={cat.value}
-              onClick={() => setPermission(cat.value)}
-              disabled={busy}
-              className={`p-2.5 rounded-xl border-2 text-left transition-all ${
-                permission === cat.value ? 'border-teal-400 bg-teal-50' : 'border-border bg-card hover:border-teal-200'
-              }`}
-            >
-              <div className="text-[11px] font-bold leading-tight">{cat.value}</div>
-              <div className="text-[9px] text-muted-foreground leading-snug mt-0.5">{cat.description}</div>
-            </button>
-          ))}
+      {/* The AI strategy was chosen once at the start; it drives the lesson
+          plan's AI guidance and the student directions. Shown read-only here. */}
+      <div className="flex items-start gap-2 p-3 rounded-xl bg-teal-50 border border-teal-200">
+        <Sparkles className="w-3.5 h-3.5 mt-0.5 shrink-0 text-teal-600" />
+        <div className="text-[11px] text-teal-800">
+          <span className="font-bold">{AI_STRATEGY_RULES[aiStrategy].label}</span> — this is the AI approach you chose for this assignment, and it shapes the lesson plan and student directions. To change it, pick a different AI strategy at the top and re-analyze.
         </div>
       </div>
 

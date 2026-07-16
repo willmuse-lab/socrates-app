@@ -80,6 +80,9 @@ export function AssignmentAnalyzer({
   const handleAnalyze = async (overrideText?: unknown) => {
     const input = typeof overrideText === 'string' ? overrideText : text;
     if (!input.trim()) return;
+    // Scroll to the top so the progress screen is front-and-center, rather
+    // than leaving the viewport wherever the Analyze button was clicked.
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsAnalyzing(true); setFeedback({}); setApplied(null);
     try {
       setProgressStage('Reading your assignment...'); setProgressPercent(5);
@@ -481,7 +484,7 @@ export function AssignmentAnalyzer({
                   ) : (
                     <p className="text-[11px] text-muted-foreground italic">Sign in with a real account to save and reuse your standards documents.</p>
                   )}
-                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} teacherName={teacherName} schoolName={schoolName} />
+                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} aiStrategy={aiPreference} teacherName={teacherName} schoolName={schoolName} />
                 </Card>
               );
             })()}

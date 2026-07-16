@@ -73,6 +73,29 @@ export interface StudentDirections {
   grading: string;
 }
 
+// The teacher's single AI choice, made once at the start (keys unchanged for
+// backward compatibility). Since July 13 2026 this ONE choice drives the whole
+// workflow — analysis, redesigns, lesson plan, and student directions —
+// replacing the old six permission categories (kept below, dormant).
+export type AIStrategyKey = 'avoid' | 'augment' | 'embrace';
+
+export const AI_STRATEGY_RULES: Record<AIStrategyKey, { label: string; rule: string }> = {
+  avoid: {
+    label: 'AI-Free Learning',
+    rule: 'AI-Free Learning: students complete this work entirely on their own, with NO AI at any point. The lesson and directions must emphasize independent reasoning, in-class process, and human-only evidence of thinking. Student directions must state clearly that AI use is not permitted for this assignment.',
+  },
+  augment: {
+    label: 'AI-Assisted Learning',
+    rule: 'AI-Assisted Learning: students MAY use AI as a support tool for brainstorming, feedback, and research, but they own and produce the final thinking themselves. The lesson should build AI in as a helper and assess the student\'s own synthesis and reflection. Student directions must explain what AI may be used for, that the final work must be the student\'s own, and that AI help must be briefly disclosed.',
+  },
+  embrace: {
+    label: 'AI-Integrated Learning',
+    rule: 'AI-Integrated Learning: students use AI as a tool they analyze, critique, and improve, and they document the collaboration. The lesson should have students evaluate, fact-check, or strengthen AI output and reflect on it. Student directions must explain how to use AI, how to critique its output, and how to document and disclose the collaboration.',
+  },
+};
+
+// --- RETIRED July 13 2026 (kept for restorability): the six AI permission
+// categories, replaced by the three AI strategies above. ---
 export type PermissionCategory =
   | 'No Use'
   | 'AI as Tutor or Coach'
@@ -160,10 +183,12 @@ export async function alignToStandards(
 export async function generateLessonPlan(
   assignmentText: string,
   alignedStandards: AlignedStandard[] | null,
-  permissionCategory: PermissionCategory,
+  aiStrategy: AIStrategyKey,
   subject?: string,
   gradeLevel?: string
 ): Promise<LessonPlan> {
+  // The chosen strategy's full rule text is what drives the plan's AI guidance.
+  const permissionCategory = AI_STRATEGY_RULES[aiStrategy].rule;
   const r = await callGenerate({ mode: 'lesson_plan', assignmentText, alignedStandards, permissionCategory, subject, gradeLevel });
   if (!r.lessonPlan?.targets || !r.lessonPlan?.activities) throw new Error('Unexpected lesson plan response shape.');
   return r.lessonPlan as LessonPlan;
@@ -184,9 +209,10 @@ export async function refineAssignment(
 
 export async function generateStudentDirections(
   assignmentText: string,
-  permissionCategory: PermissionCategory,
+  aiStrategy: AIStrategyKey,
   gradeLevel?: string
 ): Promise<StudentDirections> {
+  const permissionCategory = AI_STRATEGY_RULES[aiStrategy].rule;
   const r = await callGenerate({ mode: 'directions', assignmentText, permissionCategory, gradeLevel });
   if (!r.studentDirections?.steps) throw new Error('Unexpected directions response shape.');
   return r.studentDirections as StudentDirections;
