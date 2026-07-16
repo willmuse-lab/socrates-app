@@ -432,6 +432,16 @@ Privacy page + Help page already describe the feature accurately.
 
 ## Parked tasks (Will's backlog, roughly by priority)
 
+0. **Redesign version history in the "Revise" box (requested July 13 2026).**
+   Today the Revise box under each redesign OVERWRITES the current version
+   (handleRefine sets editedTexts[i]); no history, no compare, no undo. Build:
+   keep a running list of versions per redesign (Original → Rev 1 → Rev 2…),
+   each Revise ADDS a version instead of overwriting; teacher clicks chips (or
+   a dropdown) to view/compare/revert; the selected version flows into
+   downloads + lesson plan + re-analysis. All in-browser for the session,
+   nothing extra stored. Moderate front-end change. Will leaned chips for the
+   first few versions. Also enables "give me two different takes" comparisons.
+
 1. SCOS → lesson plan flow: tested 3x on preview (no timeouts) and published
    live July 4 2026. Optional: one confirmation run on the LIVE site after the
    Netlify deploy, just to be sure the production build behaves like preview.
