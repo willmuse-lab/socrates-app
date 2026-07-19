@@ -65,7 +65,18 @@ select
   9.99                                                                                                    as revenue_per_user_assumed,
   round(100.0 * (9.99 - (select coalesce(sum(cost_usd),0) / nullif(count(distinct user_id),0)
      from public.usage_events where user_id is not null and created_at > now() - interval '30 days'))
-     / 9.99, 1)                                                                                           as implied_gross_margin_pct;
+     / 9.99, 1)                                                                                           as implied_gross_margin_pct,
+  -- Token columns added July 19 2026 (appended at the end — create or replace
+  -- view only allows NEW columns after the existing ones).
+  (select coalesce(sum(input_tokens),0) from public.usage_events
+     where created_at > now() - interval '30 days')                                                       as input_tokens_30d,
+  (select coalesce(sum(output_tokens),0) from public.usage_events
+     where created_at > now() - interval '30 days')                                                       as output_tokens_30d,
+  (select coalesce(sum(cache_read_tokens),0) from public.usage_events
+     where created_at > now() - interval '30 days')                                                       as cached_tokens_30d,
+  (select (coalesce(sum(input_tokens),0) + coalesce(sum(output_tokens),0))
+       / nullif(count(distinct request_group),0)
+     from public.usage_events where created_at > now() - interval '30 days')                              as avg_tokens_per_workflow_30d;
 
 -- Per-account engagement (retention).
 create or replace view public.metrics_by_user as
