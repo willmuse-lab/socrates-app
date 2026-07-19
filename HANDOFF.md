@@ -1,7 +1,7 @@
 # SOCRATES — Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: July 12 2026.
+session. Read this whole file before making changes. Last updated: July 19 2026.
 
 ## What this is
 
@@ -463,12 +463,21 @@ BUILT (code shipped):
   (retention), metrics_by_subject. Real cost check: a full transformation
   (~4 calls) ≈ $0.04 → ~99% margin on one $9.99, ~92% at 20/month.
 
-WILL'S DASHBOARD STEPS (not yet done — walk him through):
-1. Supabase → SQL Editor → paste + run `supabase/migration-usage.sql` (creates
-   the table). Then paste + run `supabase/views-metrics.sql` (creates the views).
-2. Trigger a Netlify deploy so the logging code goes live. Data starts
-   accumulating immediately. To view: Supabase → Table Editor → open a
-   `metrics_*` view.
+WILL'S DASHBOARD STEPS — IN PROGRESS (walk him through, one step per message):
+- Step 1 of 3 (DELIVERED July 19 2026, awaiting his "Success"): Supabase → SQL
+  Editor → New query → paste + run `supabase/migration-usage.sql`. Expected
+  result: "Success. No rows returned." Creates the `usage_events` table.
+- Step 2 of 3 (NEXT): SQL Editor → New query → paste + run
+  `supabase/views-metrics.sql`. Creates the 5 metrics views.
+- Step 3 of 3: Trigger a Netlify deploy (Deploys → Trigger deploy → Deploy site)
+  so the logging code goes live. Data starts accumulating immediately.
+OBJECT NAMES (already set by the SQL — Will does NOT type these; they're created
+automatically): table = `usage_events`; views = `metrics_overview`,
+`metrics_growth`, `metrics_unit_economics`, `metrics_by_user`,
+`metrics_by_subject`. The only thing Will names is the cosmetic SQL Editor
+"query" tab label (suggested: "SocratesIQ – usage table" and "SocratesIQ –
+metrics views") — purely for his own reference, affects nothing. To view later:
+Supabase → Table Editor → click any `metrics_*` view.
 NOTE: no new env var needed — the functions log with the existing anon key
 (RLS insert policy). START LOGGING ASAP — history can't be backfilled.
 OPEN QUESTIONS for Will: (a) also want a weekly EMAIL digest (push, zero login)?
