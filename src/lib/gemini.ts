@@ -57,8 +57,14 @@ export async function analyzeAssignment(
   bloomsLevel?: BloomsLevel,
   subject?: string,
   gradeLevel?: string,
-  onProgress?: (stage: string, percent: number) => void
+  onProgress?: (stage: string, percent: number) => void,
+  userId?: string
 ): Promise<AnalysisResult> {
+  // request_group ties the two parallel halves into one logical analysis for
+  // usage metrics; anon_id counts anonymous visitors. Metadata only.
+  const requestGroup = (crypto as any)?.randomUUID?.() || String(Date.now());
+  let anonId = "anon";
+  try { anonId = localStorage.getItem("siq_anon_id") || (() => { const v = requestGroup; localStorage.setItem("siq_anon_id", v); return v; })(); } catch {}
   const common = {
     text,
     aiPreference,
@@ -67,6 +73,9 @@ export async function analyzeAssignment(
     bloomsLevel: bloomsLevel || "Analyze",
     subject: subject || "",
     gradeLevel: gradeLevel || "",
+    user_id: userId || null,
+    anon_id: anonId,
+    request_group: requestGroup,
   };
 
   const call = async (part: "diagnosis" | "redesigns") => {

@@ -12,8 +12,19 @@ import {
   PERMISSION_CATEGORIES,
   SCOE_LESSON_PLAN_TEMPLATE,
 } from "./_shared/research-base";
+import { logUsage, usageFromResponse } from "./_shared/usage";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 27000, maxRetries: 0 });
+
+// Best-effort usage logging shared by every generate mode (never logs content).
+async function logGen(body: any, mode: string, response: any) {
+  await logUsage({
+    event_type: mode,
+    user_id: body.user_id ?? null, anon_id: body.anon_id ?? null, request_group: body.request_group ?? null,
+    ai_strategy: body.aiStrategy ?? null, subject: body.subject ?? null, grade_level: body.gradeLevel ?? null,
+    status: "success", ...usageFromResponse(response?.usage),
+  });
+}
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   return Promise.race([
@@ -124,6 +135,7 @@ Do NOT use double-quote characters (") inside any string value — use single qu
   });
   const response = await withTimeout(stream.finalMessage(), 26000, "Alignment request");
   requireComplete(response, "standards alignment");
+  await logGen(body, "align", response);
   const textBlock = response.content.find(b => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("Empty response from alignment model");
   return extractJSON(textBlock.text);
@@ -212,6 +224,7 @@ Use \\n for line breaks inside content strings. Do NOT use double-quote characte
   });
   const response = await withTimeout(stream.finalMessage(), 26000, "Lesson plan request");
   requireComplete(response, "lesson plan");
+  await logGen(body, "lesson_plan", response);
   const textBlock = response.content.find(b => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("Empty response from lesson plan model");
   return extractJSON(textBlock.text);
@@ -268,6 +281,7 @@ Use \\n for line breaks. Do NOT use double-quote characters (") inside any strin
   });
   const response = await withTimeout(stream.finalMessage(), 26000, "Directions request");
   requireComplete(response, "student directions");
+  await logGen(body, "directions", response);
   const textBlock = response.content.find(b => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("Empty response from directions model");
   return extractJSON(textBlock.text);
@@ -312,6 +326,7 @@ Use \\n for line breaks. Do NOT use double-quote characters (") inside the value
   });
   const response = await withTimeout(stream.finalMessage(), 26000, "Revision request");
   requireComplete(response, "revision");
+  await logGen(body, "refine", response);
   const textBlock = response.content.find(b => b.type === "text");
   if (!textBlock || textBlock.type !== "text") throw new Error("Empty response from revision model");
   return extractJSON(textBlock.text);

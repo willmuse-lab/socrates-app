@@ -5,6 +5,25 @@ export const supabaseEnabled = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
 
 let _supabase: any = null;
 
+// A stable random id for this browser, so anonymous/demo usage can be counted
+// as distinct visitors without knowing who they are. Metadata only.
+export function getAnonId(): string {
+  try {
+    let id = localStorage.getItem('siq_anon_id');
+    if (!id) { id = (crypto.randomUUID?.() || String(Date.now()) + Math.random()); localStorage.setItem('siq_anon_id', id); }
+    return id;
+  } catch { return 'anon'; }
+}
+
+/** Fire-and-forget client-side usage event (e.g. downloads). Never throws. */
+export async function logClientUsage(row: Record<string, any>): Promise<void> {
+  try {
+    const sb = await getClient();
+    if (!sb) return;
+    await sb.from('usage_events').insert({ anon_id: getAnonId(), ...row });
+  } catch { /* best-effort only */ }
+}
+
 async function getClient() {
   if (!supabaseEnabled) return null;
   if (_supabase) return _supabase;

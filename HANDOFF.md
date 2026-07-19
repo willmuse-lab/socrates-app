@@ -430,6 +430,51 @@ Privacy page + Help page already describe the feature accurately.
   real support volume exists — the Help page content is written to become the
   bot's knowledge base later. Keep the Help page updated when features change.
 
+## Usage analytics / investor metrics (Phase 1 built July 13 2026)
+
+Goal: track users, usage, tokens, and cost for investor metrics — "behind the
+scenes," no app UI (Will's requirement). Data lives in Supabase; Will reads it
+via his existing Supabase console. Metadata ONLY — no assignment/lesson/student
+content is ever logged.
+
+BUILT (code shipped):
+- `supabase/migration-usage.sql` — `usage_events` table (one row per AI call or
+  download): id, created_at, user_id, anon_id, event_type
+  (analyze/align/lesson_plan/directions/refine/download), request_group, model,
+  input/output/cache tokens, cost_usd, ai_strategy, subject, grade_level,
+  duration_ms, status, error_detail, download_format. RLS = INSERT-only for
+  anon/authenticated, NO select (so the API keys can't read it; Will reads via
+  the console/service role which bypasses RLS).
+- `netlify/functions/_shared/usage.ts` — best-effort `logUsage()` (2.5s cap, all
+  errors swallowed, never blocks a request) + Haiku 4.5 pricing constants
+  (input $1.00 / output $5.00 per 1M; cache read 0.1x, cache write 1.25x).
+  `usageFromResponse()` reads Claude's `usage` object (incl. cache tokens).
+- analyze.ts logs each half (success/parse-fail/error) with response.usage +
+  request_group + user_id + anon_id + strategy/subject/grade. generate.ts logs
+  each mode (align/lesson_plan/directions/refine) via logGen().
+- Client: gemini.ts sends user_id/anon_id/request_group; standards.ts
+  setUsageUserId()+anon_id on every generate call (AssignmentAnalyzer sets the
+  user id in an effect); download events logged client-side via
+  supabase.ts logClientUsage() (RLS insert policy allows it). anon_id stored in
+  localStorage 'siq_anon_id'.
+- `supabase/views-metrics.sql` — Phase 2 read views (open in Supabase Table
+  Editor): metrics_overview (headline KPIs), metrics_growth (weekly),
+  metrics_unit_economics (cost + implied margin at $9.99), metrics_by_user
+  (retention), metrics_by_subject. Real cost check: a full transformation
+  (~4 calls) ≈ $0.04 → ~99% margin on one $9.99, ~92% at 20/month.
+
+WILL'S DASHBOARD STEPS (not yet done — walk him through):
+1. Supabase → SQL Editor → paste + run `supabase/migration-usage.sql` (creates
+   the table). Then paste + run `supabase/views-metrics.sql` (creates the views).
+2. Trigger a Netlify deploy so the logging code goes live. Data starts
+   accumulating immediately. To view: Supabase → Table Editor → open a
+   `metrics_*` view.
+NOTE: no new env var needed — the functions log with the existing anon key
+(RLS insert policy). START LOGGING ASAP — history can't be backfilled.
+OPEN QUESTIONS for Will: (a) also want a weekly EMAIL digest (push, zero login)?
+(b) any field changes? Phase 3 (retention cohorts, CSV export, optional PostHog)
+is future work.
+
 ## Parked tasks (Will's backlog, roughly by priority)
 
 0. **Redesign version history in the "Revise" box (requested July 13 2026).**

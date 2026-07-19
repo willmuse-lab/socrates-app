@@ -19,7 +19,8 @@ import { AIFailureBreakdown } from './AIFailureBreakdown';
 import { StreamingProgress } from './StreamingProgress';
 import { StandardsManager } from './StandardsManager';
 import { LessonPlanPanel } from './LessonPlanPanel';
-import { StandardsDocument, refineAssignment } from '@/src/lib/standards';
+import { StandardsDocument, refineAssignment, setUsageUserId } from '@/src/lib/standards';
+import { logClientUsage } from '@/src/lib/supabase';
 import { getTemplatesBySubject } from '@/src/lib/templates';
 
 type FeedbackMap = Record<number, 'up' | 'down' | null>;
@@ -70,6 +71,8 @@ export function AssignmentAnalyzer({
     return added.slice(0, 4);
   };
 
+  // Make the signed-in id available to generate-usage logging (metadata only).
+  React.useEffect(() => { setUsageUserId(userId || null); }, [userId]);
   React.useEffect(() => { if (!text && !result) setAiPreference(defaultPreference); }, [defaultPreference]);
   React.useEffect(() => { if (initialText) { setText(initialText); setResult(null); } }, [initialText]);
 
@@ -87,7 +90,7 @@ export function AssignmentAnalyzer({
     try {
       setProgressStage('Reading your assignment...'); setProgressPercent(5);
       const analysis = await analyzeAssignment(input, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
-        (stage, pct) => { setProgressStage(stage); setProgressPercent(pct); });
+        (stage, pct) => { setProgressStage(stage); setProgressPercent(pct); }, userId);
       setResult(analysis); setActiveLevel('Bronze');
     } catch (error: any) {
       console.error('Analysis failed:', error);
@@ -151,6 +154,7 @@ export function AssignmentAnalyzer({
         const url = await exportSimpleDocToGoogle(title, redesignToBlocks(body));
         window.open(url, '_blank'); toast.success('Saved to your Google Drive!');
       }
+      logClientUsage({ event_type: 'download', user_id: userId || null, download_format: format });
     } catch (err: any) { toast.error(err?.message || 'Download failed. Please try again.'); }
   };
 

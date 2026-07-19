@@ -143,7 +143,17 @@ export async function deleteStandardsDocument(id: string) {
 // function timeout. Call them in order; each later step consumes the
 // earlier step's output.
 // ---------------------------------------------------------------------------
+// The signed-in user id, set once by the UI so every generate event can be
+// attributed for usage metrics (analytics metadata only).
+let _currentUserId: string | null = null;
+export function setUsageUserId(id: string | null) { _currentUserId = id || null; }
+function anonId(): string {
+  try { let v = localStorage.getItem('siq_anon_id'); if (!v) { v = (crypto as any)?.randomUUID?.() || String(Date.now()); localStorage.setItem('siq_anon_id', v); } return v; } catch { return 'anon'; }
+}
+
 async function callGenerate(payload: Record<string, unknown>) {
+  // Attach usage metadata (never content) to every generate request.
+  payload = { ...payload, user_id: _currentUserId, anon_id: anonId() };
   // Same transient-status retry as gemini.ts, with longer backoffs: these
   // calls often run right after an analysis, so a per-minute rate limit may
   // need several seconds to clear. Each attempt is a fresh function
@@ -189,7 +199,7 @@ export async function generateLessonPlan(
 ): Promise<LessonPlan> {
   // The chosen strategy's full rule text is what drives the plan's AI guidance.
   const permissionCategory = AI_STRATEGY_RULES[aiStrategy].rule;
-  const r = await callGenerate({ mode: 'lesson_plan', assignmentText, alignedStandards, permissionCategory, subject, gradeLevel });
+  const r = await callGenerate({ mode: 'lesson_plan', assignmentText, alignedStandards, permissionCategory, aiStrategy, subject, gradeLevel });
   if (!r.lessonPlan?.targets || !r.lessonPlan?.activities) throw new Error('Unexpected lesson plan response shape.');
   return r.lessonPlan as LessonPlan;
 }
@@ -213,7 +223,7 @@ export async function generateStudentDirections(
   gradeLevel?: string
 ): Promise<StudentDirections> {
   const permissionCategory = AI_STRATEGY_RULES[aiStrategy].rule;
-  const r = await callGenerate({ mode: 'directions', assignmentText, permissionCategory, gradeLevel });
+  const r = await callGenerate({ mode: 'directions', assignmentText, permissionCategory, aiStrategy, gradeLevel });
   if (!r.studentDirections?.steps) throw new Error('Unexpected directions response shape.');
   return r.studentDirections as StudentDirections;
 }

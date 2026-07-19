@@ -8,6 +8,7 @@ import {
   STRATEGY_CATALOG,
   SCORING_GUIDANCE,
 } from "./_shared/research-base";
+import { logUsage, usageFromResponse } from "./_shared/usage";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 27000, maxRetries: 0 });
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || "";
@@ -145,6 +146,9 @@ export default async function handler(req: Request) {
   }
 
   const { text, aiPreference = "avoid", dimensions = [], activeFramework = "triple-a", bloomsLevel = "Analyze", subject = "", gradeLevel = "" } = body;
+  // Usage-logging metadata (never content). Best-effort; see _shared/usage.ts.
+  const usageMeta = { user_id: body.user_id ?? null, anon_id: body.anon_id ?? null, request_group: body.request_group ?? null, ai_strategy: aiPreference, subject, grade_level: gradeLevel };
+  const startedAt = Date.now();
   // The client splits one analysis into two parallel halves so each stays far
   // below the function time limit: "diagnosis" (score/failures/dimensions) and
   // "redesigns" (the three suggestions). Absent/unknown = full (backward compat).
@@ -324,14 +328,17 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
         // diagnosed from the function logs (5 hit live on July 12 2026).
         const clean = (s: string) => s.replace(/\s+/g, " ");
         console.error(`analyze v3: JSON parse failed (part=${part}, len=${raw.length}, stop=${response.stop_reason}) head: ${clean(raw.substring(0, 300))} ... tail: ${clean(raw.substring(Math.max(0, raw.length - 200)))}`);
+        await logUsage({ ...usageMeta, event_type: "analyze", duration_ms: Date.now() - startedAt, status: "error", error_detail: "json_parse_failed", ...usageFromResponse(response.usage) });
         return new Response(JSON.stringify({ error: "The analysis came back in an unexpected format. Please try again." }), { status: 502, headers });
       }
     }
     console.log("analyze v3: done");
+    await logUsage({ ...usageMeta, event_type: "analyze", duration_ms: Date.now() - startedAt, status: "success", ...usageFromResponse(response.usage) });
     return new Response(JSON.stringify(result), { status: 200, headers });
   } catch (e: any) {
     const detail = e?.error?.error?.message || e?.message || String(e);
     console.error("Analysis failed:", detail);
+    await logUsage({ ...usageMeta, event_type: "analyze", duration_ms: Date.now() - startedAt, status: "error", error_detail: (detail || "").substring(0, 300) });
     const isTimeout = e?.name === "APIConnectionTimeoutError" || /timeout|timed out|aborted/i.test(detail);
     const status = isTimeout ? 504 : e?.status === 429 ? 429 : e?.status || 502;
     const message = isTimeout
