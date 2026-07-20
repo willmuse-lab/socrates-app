@@ -430,6 +430,57 @@ Privacy page + Help page already describe the feature accurately.
   real support volume exists — the Help page content is written to become the
   bot's knowledge base later. Keep the Help page updated when features change.
 
+## Assignment credits / monthly allowance (built July 20 2026)
+
+Goal: move teachers toward a paid plan — **$9.99/month = 20 assignments**, resets
+monthly, NO rollover. Because signup/login is already REQUIRED (LoginDialog is
+non-dismissable), every user is a known account with an email on file (Will's
+follow-up list). The plan Will chose:
+- **Trial = 3 assignments (lifetime, no reset)** → then a WALL: "You've used your
+  3 free assignments. $9.99/mo plans launching soon — we'll email you." (Payments
+  aren't live yet, so the wall collects interest; email already captured at signup.)
+- **Paid = 20/month, resets monthly, no rollover.** No teacher is on 'paid' until
+  Stripe is wired OR Will manually upgrades them (SQL snippet at the bottom of
+  migration-credits.sql).
+- **"1 assignment" = analyzing ONE new assignment.** Every follow-up for that same
+  assignment — re-analysis, revisions, lesson plan, student directions, downloads
+  — is FREE. Detected client-side by a 120-char prefix of the assignment text
+  (lastChargedRef); applyVersion + New Assignment + opening from library reset it.
+
+BUILT (code shipped):
+- `supabase/migration-credits.sql` — `user_credits` table (user_id, plan, used,
+  period_start) + two SECURITY DEFINER functions: `get_assignment_credits()`
+  (read balance, auto-creates the row, applies monthly reset for paid) and
+  `consume_assignment_credit()` (atomically spends 1, returns allowed=false at 0
+  WITHOUT charging). RLS = teacher can SELECT own row only; NO direct update, so
+  **the counter can't be tampered with** — the functions (run as owner) are the
+  only writers. `credit_allowance(plan)` = 3 trial / 20 paid, in one place.
+- `src/lib/supabase.ts` — `getCredits()` / `consumeCredit()` call those RPCs;
+  fail OPEN (return null → analyzer lets the run through) so an infra hiccup or a
+  not-yet-migrated DB never blocks a teacher.
+- `AssignmentAnalyzer.tsx` — spends a credit only on a NEW assignment; shows a
+  live "X of N assignments left" counter under the Analyze button; a wall Dialog
+  at 0 (trial: "launching soon / Notify me"; paid: "resets next month").
+- `App.tsx` Settings — a counter card under the teacher's profile (remaining /
+  allowance, progress bar, "See plans" link, reset rules).
+- `supabase/views-metrics.sql` — new `metrics_credits` view (email, plan, used,
+  allowance, remaining) for the behind-the-scenes dashboard.
+
+GRACEFUL ROLLOUT: before Will runs the migration the RPCs 404 → getCredits/
+consumeCredit return null → app behaves exactly as before (no counter, no limit).
+Limits switch on the moment `migration-credits.sql` is run. So the code is safe to
+deploy first and activate later.
+
+WILL'S STEPS (do IN THIS ORDER, walk him through one at a time):
+1. Supabase → SQL Editor → New query → paste + run `supabase/migration-credits.sql`
+   (creates user_credits + the 3 functions). Expect "Success. No rows returned."
+2. Re-run `supabase/views-metrics.sql` (now includes metrics_credits). Same result.
+3. Trigger a Netlify deploy so the counter/wall UI goes live.
+KNOWN LIMIT (acceptable pre-revenue): enforcement is the DB functions, but a teacher
+can't edit their own counter (SELECT-only RLS). Real billing lands with Stripe;
+see parked task. To hand-upgrade a teacher to paid: run the update statement at the
+bottom of migration-credits.sql with their uuid (Authentication → Users).
+
 ## Usage analytics / investor metrics (Phase 1 built July 13 2026)
 
 Goal: track users, usage, tokens, and cost for investor metrics — "behind the
@@ -518,7 +569,11 @@ is future work.
 6. Custom domain (he wanted "socrates.ai.com" — explained invalid; choose
    socrates.ai (~$70-100/yr) vs socratesai.com (~$12/yr); not decided).
 7. Payments (Stripe) when ready to charge; ToS page exists but needs lawyer
-   review before charging.
+   review before charging. NOTE (July 20 2026): the credit/allowance system it
+   plugs into is now BUILT (see "Assignment credits" section) — trial=3, paid=20/
+   mo. Stripe's job is just: on successful checkout, flip the teacher's
+   user_credits row to plan='paid' (a webhook, or a Netlify function calling the
+   same update statement). The wall + counter + monthly reset already exist.
 8. Admin password is a soft gate (VITE_ADMIN_PASSWORD, default socrates2025,
    visible in bundle — known limitation).
 9. Four-role buyer review exercise (teacher/principal/head/acquirer) was

@@ -91,6 +91,22 @@ from auth.users u
 left join public.usage_events e on e.user_id = u.id
 group by u.email, u.created_at order by last_active desc nulls last;
 
+-- Assignment-allowance / plan mix (added July 20 2026). One row per teacher who
+-- has a credits record, plus their plan and how much of the allowance is used.
+-- Depends on user_credits (migration-credits.sql). Safe to skip if not created.
+create or replace view public.metrics_credits as
+select
+  u.email,
+  c.plan,
+  c.used,
+  public.credit_allowance(c.plan)                       as allowance,
+  greatest(public.credit_allowance(c.plan) - c.used, 0) as remaining,
+  c.period_start,
+  c.updated_at                                          as last_change
+from public.user_credits c
+join auth.users u on u.id = c.user_id
+order by c.updated_at desc;
+
 -- Segmentation by subject.
 create or replace view public.metrics_by_subject as
 select

@@ -15,6 +15,46 @@ export function getAnonId(): string {
   } catch { return 'anon'; }
 }
 
+// ---- Assignment credits (monthly allowance) --------------------------------
+// Trial = 3 lifetime, Paid = 20/month (no rollover). The real allowance/reset
+// logic lives in Postgres (migration-credits.sql) so it can't be tampered with;
+// these just call the RPCs. See "1 assignment = 1 credit" rule in the analyzer.
+export interface Credits {
+  plan: 'trial' | 'paid';
+  used: number;
+  allowance: number;
+  remaining: number;
+  periodStart?: string;
+}
+
+/** Read the signed-in teacher's current balance (for the on-screen counter). */
+export async function getCredits(): Promise<Credits | null> {
+  try {
+    const sb = await getClient();
+    if (!sb) return null;
+    const { data, error } = await sb.rpc('get_assignment_credits');
+    if (error || !data || !data.length) return null;
+    const r = data[0];
+    return { plan: r.plan, used: r.used, allowance: r.allowance, remaining: r.remaining, periodStart: r.period_start };
+  } catch { return null; }
+}
+
+/**
+ * Spend one assignment credit. Returns `allowed=false` (without charging) when
+ * the teacher is out of allowance. Returns null on an infrastructure error, in
+ * which case the caller should fail OPEN (never block a teacher on a hiccup).
+ */
+export async function consumeCredit(): Promise<{ allowed: boolean; credits: Credits } | null> {
+  try {
+    const sb = await getClient();
+    if (!sb) return null;
+    const { data, error } = await sb.rpc('consume_assignment_credit');
+    if (error || !data || !data.length) return null;
+    const r = data[0];
+    return { allowed: r.allowed, credits: { plan: r.plan, used: r.used, allowance: r.allowance, remaining: r.remaining, periodStart: r.period_start } };
+  } catch { return null; }
+}
+
 /** Fire-and-forget client-side usage event (e.g. downloads). Never throws. */
 export async function logClientUsage(row: Record<string, any>): Promise<void> {
   try {
