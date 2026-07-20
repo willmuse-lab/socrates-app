@@ -348,21 +348,27 @@ export default function App() {
               {credits && (
                 <div className="space-y-2 p-4 bg-secondary/30 rounded-xl border border-border">
                   <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-                    {credits.plan === 'paid' ? 'Monthly assignments' : 'Free trial'}
+                    {credits.plan === 'unlimited' ? 'Your plan' : credits.plan === 'paid' ? 'Monthly assignments' : 'Free trial'}
                   </p>
-                  <div className="flex items-end justify-between">
-                    <p className="text-sm">
-                      <span className="text-2xl font-bold text-foreground">{credits.remaining}</span>
-                      <span className="text-muted-foreground"> of {credits.allowance} {credits.plan === 'trial' ? 'free ' : ''}left{credits.plan === 'paid' ? ' this month' : ''}</span>
-                    </p>
-                    {credits.plan === 'trial' && (
-                      <button onClick={() => { setIsSettingsOpen(false); setViewMode('pricing'); }} className="text-xs font-semibold text-accent hover:underline">See plans</button>
-                    )}
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
-                    <div className="h-full bg-accent rounded-full transition-all" style={{ width: `${Math.max(0, Math.min(100, (credits.remaining / credits.allowance) * 100))}%` }} />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground italic">One assignment covers its analysis, every revision, the lesson plan, student directions, and downloads. {credits.plan === 'trial' ? 'Resets never — it’s a one-time trial.' : 'Resets monthly; unused assignments don’t roll over.'}</p>
+                  {credits.plan === 'unlimited' ? (
+                    <p className="text-sm"><span className="text-2xl font-bold text-green-600">Unlimited</span> <span className="text-muted-foreground">assignments ✦</span></p>
+                  ) : (
+                    <>
+                      <div className="flex items-end justify-between">
+                        <p className="text-sm">
+                          <span className="text-2xl font-bold text-foreground">{credits.remaining}</span>
+                          <span className="text-muted-foreground"> of {credits.allowance} {credits.plan === 'trial' ? 'free ' : ''}left{credits.plan === 'paid' ? ' this month' : ''}</span>
+                        </p>
+                        {credits.plan === 'trial' && (
+                          <button onClick={() => { setIsSettingsOpen(false); setViewMode('pricing'); }} className="text-xs font-semibold text-accent hover:underline">See plans</button>
+                        )}
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                        <div className="h-full bg-accent rounded-full transition-all" style={{ width: `${Math.max(0, Math.min(100, (credits.remaining / credits.allowance) * 100))}%` }} />
+                      </div>
+                    </>
+                  )}
+                  <p className="text-[10px] text-muted-foreground italic">One assignment covers its analysis, every revision, the lesson plan, student directions, and downloads. {credits.plan === 'unlimited' ? 'Your account is comped — no limits.' : credits.plan === 'trial' ? 'Resets never — it’s a one-time trial.' : 'Resets monthly; unused assignments don’t roll over.'}</p>
                 </div>
               )}
               {user?.id && supabaseEnabled && (

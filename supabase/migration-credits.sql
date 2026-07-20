@@ -2,6 +2,7 @@
 --  user_credits — per-teacher monthly assignment allowance (added July 20 2026).
 --  Model: TRIAL = 3 assignments (lifetime, no reset) → then a wall until they
 --  upgrade. PAID = 20 assignments per month, resets monthly, NO rollover.
+--  UNLIMITED = comp/staff/beta accounts that never wall (Will grants by hand).
 --  "1 assignment" = analyzing one new assignment; every follow-up for that same
 --  assignment (re-analysis, revisions, lesson plan, directions, downloads) is
 --  free. Enforced server-side via SECURITY DEFINER functions so a teacher can
@@ -10,7 +11,7 @@
 -- ============================================================================
 create table if not exists public.user_credits (
   user_id      uuid primary key references auth.users(id) on delete cascade,
-  plan         text not null default 'trial',   -- trial | paid
+  plan         text not null default 'trial',   -- trial | paid | unlimited
   used         int  not null default 0,          -- assignments used in the current period
   period_start date not null default current_date, -- anchor for the monthly reset (paid)
   created_at   timestamptz not null default now(),
@@ -28,10 +29,11 @@ create policy "user_credits self read"
   to authenticated
   using (auth.uid() = user_id);
 
--- Allowance per plan, in one place.
+-- Allowance per plan, in one place. 'unlimited' uses a huge number so the
+-- teacher never hits the wall (the app also special-cases it to show "Unlimited").
 create or replace function public.credit_allowance(p text)
 returns int language sql immutable as $$
-  select case when p = 'paid' then 20 else 3 end;
+  select case p when 'paid' then 20 when 'unlimited' then 1000000 else 3 end;
 $$;
 
 -- Read-only: current balance, creating the row on first call and applying a
@@ -92,6 +94,23 @@ grant execute on function public.credit_allowance(text)          to authenticate
 grant execute on function public.get_assignment_credits()        to authenticated;
 grant execute on function public.consume_assignment_credit()     to authenticated;
 
--- To upgrade a teacher to the paid plan by hand (until Stripe is wired up), run:
---   update public.user_credits set plan = 'paid', used = 0, period_start = current_date where user_id = '<their-uuid>';
--- Find the uuid in Authentication → Users, or the metrics_by_user view (email).
+-- ---------------------------------------------------------------------------
+-- Granting plans BY HAND (until Stripe is wired up). The person must have signed
+-- up first (so they exist in auth.users). Match on their EMAIL — no uuid needed.
+-- Works whether or not they already have a credits row (upsert).
+--
+-- Make someone UNLIMITED (comp / staff / beta — never walls):
+--   insert into public.user_credits (user_id, plan)
+--   select id, 'unlimited' from auth.users where email = 'someone@school.edu'
+--   on conflict (user_id) do update set plan = 'unlimited', updated_at = now();
+--
+-- Put someone on the PAID plan (20/month):
+--   insert into public.user_credits (user_id, plan, used, period_start)
+--   select id, 'paid', 0, current_date from auth.users where email = 'someone@school.edu'
+--   on conflict (user_id) do update set plan = 'paid', used = 0, period_start = current_date, updated_at = now();
+--
+-- Send someone BACK to the free trial:
+--   update public.user_credits set plan = 'trial'
+--   where user_id = (select id from auth.users where email = 'someone@school.edu');
+--
+-- See who's on what: select * from public.metrics_credits;   (in views-metrics.sql)

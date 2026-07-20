@@ -20,7 +20,7 @@ export function getAnonId(): string {
 // logic lives in Postgres (migration-credits.sql) so it can't be tampered with;
 // these just call the RPCs. See "1 assignment = 1 credit" rule in the analyzer.
 export interface Credits {
-  plan: 'trial' | 'paid';
+  plan: 'trial' | 'paid' | 'unlimited';
   used: number;
   allowance: number;
   remaining: number;

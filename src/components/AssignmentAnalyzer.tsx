@@ -322,10 +322,12 @@ export function AssignmentAnalyzer({
                   </Button>
                   {credits && (
                     <p className="text-[11px] text-center text-muted-foreground">
-                      {credits.remaining > 0 ? (
+                      {credits.plan === 'unlimited' ? (
+                        <span className="font-semibold text-green-600">Unlimited assignments ✦</span>
+                      ) : credits.remaining > 0 ? (
                         <><span className="font-bold text-foreground">{credits.remaining}</span> of {credits.allowance} {credits.plan === 'trial' ? 'free ' : ''}assignments left{credits.plan === 'paid' ? ' this month' : ''}</>
                       ) : (
-                        <span className="text-amber-600 font-semibold">{credits.plan === 'trial' ? "You've used your 3 free assignments" : 'Monthly limit reached'}</span>
+                        <span className="text-amber-600 font-semibold">{credits.plan === 'trial' ? `You've used your ${credits.allowance} free assignments` : 'Monthly limit reached'}</span>
                       )}
                       {credits.plan === 'trial' && credits.remaining > 0 && <span className="block text-muted-foreground/70">Analyzing, revising & downloading one assignment is included.</span>}
                     </p>

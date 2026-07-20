@@ -99,8 +99,8 @@ select
   u.email,
   c.plan,
   c.used,
-  public.credit_allowance(c.plan)                       as allowance,
-  greatest(public.credit_allowance(c.plan) - c.used, 0) as remaining,
+  case when c.plan = 'unlimited' then null else public.credit_allowance(c.plan) end                       as allowance,
+  case when c.plan = 'unlimited' then null else greatest(public.credit_allowance(c.plan) - c.used, 0) end as remaining,
   c.period_start,
   c.updated_at                                          as last_change
 from public.user_credits c

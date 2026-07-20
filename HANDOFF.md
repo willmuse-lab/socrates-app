@@ -442,6 +442,11 @@ follow-up list). The plan Will chose:
 - **Paid = 20/month, resets monthly, no rollover.** No teacher is on 'paid' until
   Stripe is wired OR Will manually upgrades them (SQL snippet at the bottom of
   migration-credits.sql).
+- **Unlimited = comp/staff/beta accounts** that never wall. There is NO special
+  login for these — the person signs up normally, then Will flips their plan with
+  one email-matched SQL line (upsert snippet at the bottom of migration-credits.sql).
+  `credit_allowance('unlimited')` = 1,000,000 so it never runs out; the UI and the
+  metrics_credits view special-case it to show "Unlimited"/null rather than a number.
 - **"1 assignment" = analyzing ONE new assignment.** Every follow-up for that same
   assignment — re-analysis, revisions, lesson plan, student directions, downloads
   — is FREE. Detected client-side by a 120-char prefix of the assignment text
