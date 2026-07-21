@@ -335,6 +335,10 @@ export function AssignmentAnalyzer({
                 </CardContent>
               </Card>
             </div>
+            <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+              <Shield className="w-3.5 h-3.5 shrink-0" />
+              Do not submit personally identifiable student information. For FERPA reasons, include only your assignment or text.
+            </p>
           </motion.div>
         </div>
       ) : (
