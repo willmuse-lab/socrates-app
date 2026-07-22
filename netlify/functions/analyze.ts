@@ -118,6 +118,30 @@ const ANALYSIS_SCHEMA = {
   additionalProperties: false,
 } as const;
 
+// Build the JSON schema for one analysis half. Structured outputs
+// (output_config.format) CONSTRAIN the model to emit valid JSON matching this
+// shape — this eliminates the "json_parse_failed" errors that came from the
+// model returning slightly-malformed JSON as free text (added July 22 2026).
+// Each half only requires the fields it actually asks for. Strict mode needs
+// every property listed in `required` and additionalProperties:false — both
+// already hold in ANALYSIS_SCHEMA.
+function schemaForPart(part: "diagnosis" | "redesigns" | "full") {
+  const p = ANALYSIS_SCHEMA.properties as any;
+  const properties: any = {};
+  const required: string[] = [];
+  if (part !== "redesigns") {
+    for (const k of ["resilienceScore", "summary", "aiFailureBreakdown", "dimensions"]) {
+      properties[k] = p[k];
+      required.push(k);
+    }
+  }
+  if (part !== "diagnosis") {
+    properties.suggestions = p.suggestions;
+    required.push("suggestions");
+  }
+  return { type: "object", properties, required, additionalProperties: false };
+}
+
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   return Promise.race([
     promise,
@@ -269,7 +293,10 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
       // time — cuts token load and eases rate-limit pressure from the two-call split.
       system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: userMessage }],
-    });
+      // Constrain the model to valid JSON in exactly our shape (Haiku 4.5 supports
+      // structured outputs). This is what stops the json_parse_failed errors.
+      output_config: { format: { type: "json_schema", schema: schemaForPart(part) } },
+    } as any);
     const response = await withTimeout(stream.finalMessage(), 26000, "Model request");
     console.log("analyze v3: model returned");
 
