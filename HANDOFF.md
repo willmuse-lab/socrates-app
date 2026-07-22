@@ -486,6 +486,33 @@ can't edit their own counter (SELECT-only RLS). Real billing lands with Stripe;
 see parked task. To hand-upgrade a teacher to paid: run the update statement at the
 bottom of migration-credits.sql with their uuid (Authentication → Users).
 
+## Saved assignment reports (built July 22 2026)
+
+Problem Will hit: opening a saved library item just dumped the redesigned text
+back into the analyzer input (inviting a pointless second redesign). Fix: a
+saved item is now a full SNAPSHOT, and opening it shows a READ-ONLY report.
+- On "Save to Library", AssignmentAnalyzer now stores `report` (the AnalysisResult),
+  `lessonPlan`, `directions`, `aiStrategy`, `subject`, `gradeLevel` alongside the
+  existing title/fullText/score/level. Lesson plan + directions are lifted out of
+  LessonPlanPanel via a new `onGenerated` callback (and can be re-hydrated with the
+  new `initialPlan`/`initialDirections` props).
+- `SavedReportView.tsx` (new) renders it read-only: redesigned assignment (+PDF/Word/
+  GDoc), the report (summary + AIFailureBreakdown + dimensions, +PDF/Word), and the
+  lesson plan + student directions. If the plan/directions weren't generated before
+  saving, LessonPlanPanel shows its Generate button — FREE (lesson plans never cost a
+  credit; only a new analyze does). A "Redesign again" button loads it back into the
+  analyzer (which would count as a new assignment / 1 credit).
+- App.tsx: new `report` viewMode + `openedReport` state. LibraryView `onOpen` branches:
+  items WITH a `report` open the read-only view; older items without one fall back to
+  the analyzer input (backward compatible).
+- Storage: cloud `assignments` gets a `payload jsonb` column (the snapshot). saveAssignmentToCloud
+  writes it and FALLS BACK to a base-only upsert if the column doesn't exist yet, so
+  saving never breaks pre-migration. fetchAssignmentsFromCloud spreads `row.payload`.
+  localStorage just serializes the extra fields.
+- WILL'S STEP: run `supabase/migration-assignment-report.sql` (one line —
+  `alter table assignments add column if not exists payload jsonb`). Until then, newly
+  saved items store the snapshot only in the browser (cloud saves the base row).
+
 ## Usage analytics / investor metrics (Phase 1 built July 13 2026)
 
 Goal: track users, usage, tokens, and cost for investor metrics — "behind the

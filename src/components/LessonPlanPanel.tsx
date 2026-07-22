@@ -31,6 +31,11 @@ interface LessonPlanPanelProps {
   /** From the teacher's profile — stamped into the plan header CLIENT-SIDE only. */
   teacherName?: string;
   schoolName?: string;
+  /** Pre-generated plan/directions to hydrate from (a saved library report). */
+  initialPlan?: LessonPlan | null;
+  initialDirections?: StudentDirections | null;
+  /** Fired whenever the plan/directions change, so the parent can save them. */
+  onGenerated?: (plan: LessonPlan | null, directions: StudentDirections | null) => void;
 }
 
 type Step = 'idle' | 'aligning' | 'planning' | 'directions' | 'done' | 'error';
@@ -48,13 +53,17 @@ function scrubMarkdown(obj: Record<string, any>) {
   }
 }
 
-export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLevel, aiStrategy, teacherName, schoolName }: LessonPlanPanelProps) {
-  const [step, setStep] = useState<Step>('idle');
+export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLevel, aiStrategy, teacherName, schoolName, initialPlan = null, initialDirections = null, onGenerated }: LessonPlanPanelProps) {
+  const [step, setStep] = useState<Step>(initialPlan || initialDirections ? 'done' : 'idle');
   const [error, setError] = useState('');
   const [alignment, setAlignment] = useState<AlignmentResult | null>(null);
-  const [plan, setPlan] = useState<LessonPlan | null>(null);
-  const [directions, setDirections] = useState<StudentDirections | null>(null);
+  const [plan, setPlan] = useState<LessonPlan | null>(initialPlan);
+  const [directions, setDirections] = useState<StudentDirections | null>(initialDirections);
   const [copied, setCopied] = useState<'plan' | 'directions' | null>(null);
+
+  // Let the parent (analyzer) capture the generated plan/directions so they can
+  // be saved to the library alongside the report.
+  React.useEffect(() => { onGenerated?.(plan, directions); }, [plan, directions]);
 
   const run = async () => {
     setError(''); setAlignment(null); setPlan(null); setDirections(null);

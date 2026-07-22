@@ -140,14 +140,33 @@ export async function fetchAssignmentsFromCloud(userId: string) {
     id: row.id, title: row.title, fullText: row.full_text,
     status: row.status, resilience: row.resilience,
     date: new Date(row.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    // The report/lesson plan/directions snapshot (added July 22 2026). Absent on
+    // older rows saved before the `payload` column existed — harmlessly spreads nothing.
+    ...(row.payload || {}),
   }));
 }
 
-export async function saveAssignmentToCloud(userId: string, assignment: { id: string; title: string; fullText: string; status: string; resilience: number }) {
+export async function saveAssignmentToCloud(userId: string, assignment: any) {
   const sb = await getClient();
   if (!sb) return null;
-  const { data, error } = await sb.from('assignments').upsert({ id: assignment.id, user_id: userId, title: assignment.title, full_text: assignment.fullText, status: assignment.status, resilience: assignment.resilience });
-  if (error) { console.error('Save error:', error); return null; }
+  const base = { id: assignment.id, user_id: userId, title: assignment.title, full_text: assignment.fullText, status: assignment.status, resilience: assignment.resilience };
+  // Everything needed to render the read-only report later, in one jsonb column.
+  const payload = {
+    report: assignment.report ?? null,
+    lessonPlan: assignment.lessonPlan ?? null,
+    directions: assignment.directions ?? null,
+    aiStrategy: assignment.aiStrategy ?? null,
+    subject: assignment.subject ?? null,
+    gradeLevel: assignment.gradeLevel ?? null,
+  };
+  let { data, error } = await sb.from('assignments').upsert({ ...base, payload });
+  if (error) {
+    // Older schema without the `payload` column — still save the base row so the
+    // teacher never loses their work; the full report snapshot needs the migration.
+    console.warn('Save with payload failed; retrying base-only:', error.message);
+    ({ data, error } = await sb.from('assignments').upsert(base));
+    if (error) { console.error('Save error:', error); return null; }
+  }
   return data;
 }
 

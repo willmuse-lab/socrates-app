@@ -14,7 +14,8 @@ import { ResetPasswordDialog } from './components/ResetPasswordDialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
-import { FrameworkDimension, DEFAULT_DIMENSIONS, BloomsLevel, BLOOMS_LEVELS } from '@/src/lib/gemini';
+import { FrameworkDimension, DEFAULT_DIMENSIONS, BloomsLevel, BLOOMS_LEVELS, AnalysisResult } from '@/src/lib/gemini';
+import { SavedReportView } from './components/SavedReportView';
 import { loadAssignments, saveAssignments, loadSettings, saveSettings, loadUser, saveUser, clearUser, AppSettings } from '@/src/lib/storage';
 import { supabaseEnabled, onAuthStateChange, fetchAssignmentsFromCloud, saveAssignmentToCloud, deleteAssignmentFromCloud, signOut, getCredits, Credits } from '@/src/lib/supabase';
 import { loadProfile, saveProfile, clearProfile, TeacherProfile } from '@/src/lib/profile';
@@ -23,12 +24,21 @@ import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'luci
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
-type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy' | 'scoring' | 'terms' | 'feedback' | 'help';
+type ViewMode = 'studio' | 'library' | 'admin-research' | 'admin-dashboard' | 'pricing' | 'about' | 'privacy' | 'scoring' | 'terms' | 'feedback' | 'help' | 'report';
 type AIPreference = 'avoid' | 'augment' | 'embrace';
 
 export interface SavedAssignment {
   id: string; title: string; fullText: string;
   status: 'Bronze' | 'Silver' | 'Gold'; resilience: number; date: string;
+  // Full snapshot (added July 22 2026) so the library can show a read-only
+  // report + lesson plan + directions without re-running the AI. Optional —
+  // assignments saved before this feature won't have it.
+  report?: AnalysisResult | null;
+  lessonPlan?: any | null;
+  directions?: any | null;
+  aiStrategy?: AIPreference;
+  subject?: string;
+  gradeLevel?: string;
 }
 
 export default function App() {
@@ -41,6 +51,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('studio');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [openedAssignment, setOpenedAssignment] = useState<SavedAssignment | null>(null);
+  const [openedReport, setOpenedReport] = useState<SavedAssignment | null>(null);
   const [activeFramework, setActiveFramework] = useState<'triple-a' | 'blooms'>('triple-a');
   const [defaultPreference, setDefaultPreference] = useState<AIPreference>('avoid');
   const [bloomsLevel, setBloomsLevel] = useState<BloomsLevel>('Analyze');
@@ -265,12 +276,34 @@ export default function App() {
           {viewMode === 'library' && (
             <motion.div key="library" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col">
               <LibraryView onBack={() => setViewMode('studio')} assignments={savedAssignments}
-                onOpen={a => { setOpenedAssignment(a); setViewMode('studio'); }}
+                onOpen={a => {
+                  // Saved with a full snapshot → open the read-only report. Older
+                  // items (no report) fall back to loading into the analyzer.
+                  if (a.report) { setOpenedReport(a); setViewMode('report'); }
+                  else { setOpenedAssignment(a); setViewMode('studio'); }
+                }}
                 onDelete={async id => {
                   setSavedAssignments(p => p.filter(a => a.id !== id));
                   if (supabaseEnabled && user?.id) await deleteAssignmentFromCloud(id);
                   toast.info('Removed from library');
                 }} />
+            </motion.div>
+          )}
+          {viewMode === 'report' && openedReport && (
+            <motion.div key="report" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
+              <SavedReportView
+                assignment={openedReport}
+                userId={user?.id || ''}
+                teacherName={profile?.name || ''}
+                schoolName={profile?.schoolName || ''}
+                onBack={() => { setOpenedReport(null); setViewMode('library'); }}
+                onRedesignAgain={() => {
+                  // Load the saved redesign back into the analyzer for a fresh
+                  // pass (re-analyzing counts as a new assignment / 1 credit).
+                  setOpenedAssignment({ ...openedReport, id: `${Date.now()}` });
+                  setOpenedReport(null); setViewMode('studio');
+                }}
+              />
             </motion.div>
           )}
           {viewMode === 'admin-research' && (

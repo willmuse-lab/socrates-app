@@ -62,6 +62,10 @@ export function AssignmentAnalyzer({
   // Holds the analysis of the ORIGINAL assignment when a redesign is applied,
   // so the next analysis can show the before→after "transformation" jump.
   const [previousResult, setPreviousResult] = useState<AnalysisResult | null>(null);
+  // Lifted from LessonPlanPanel so "Save to Library" can store the generated
+  // lesson plan + student directions with the report (view later, no re-run).
+  const [lessonPlan, setLessonPlan] = useState<any | null>(null);
+  const [studentDirections, setStudentDirections] = useState<any | null>(null);
   const suggestionsRef = React.useRef<HTMLDivElement>(null);
 
   // Monthly assignment allowance. A credit is spent only when a teacher analyzes
@@ -88,7 +92,7 @@ export function AssignmentAnalyzer({
   // Make the signed-in id available to generate-usage logging (metadata only).
   React.useEffect(() => { setUsageUserId(userId || null); }, [userId]);
   React.useEffect(() => { if (!text && !result) setAiPreference(defaultPreference); }, [defaultPreference]);
-  React.useEffect(() => { if (initialText) { setText(initialText); setResult(null); lastChargedRef.current = ''; } }, [initialText]);
+  React.useEffect(() => { if (initialText) { setText(initialText); setResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; } }, [initialText]);
 
   // overrideText lets callers analyze text that was JUST set in state (React
   // state updates land asynchronously, so reading `text` right after setText
@@ -111,7 +115,7 @@ export function AssignmentAnalyzer({
     // Scroll to the top so the progress screen is front-and-center, rather
     // than leaving the viewport wherever the Analyze button was clicked.
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setIsAnalyzing(true); setFeedback({}); setApplied(null);
+    setIsAnalyzing(true); setFeedback({}); setApplied(null); setLessonPlan(null); setStudentDirections(null);
     try {
       setProgressStage('Reading your assignment...'); setProgressPercent(5);
       const analysis = await analyzeAssignment(input, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
@@ -209,10 +213,15 @@ export function AssignmentAnalyzer({
     if (!result || !onSave) return;
     const firstLine = text.trim().split('\n')[0];
     const displayTitle = firstLine.length > 50 ? firstLine.substring(0, 47) + '...' : (firstLine || 'Untitled Assignment');
-    onSave({ title: displayTitle, fullText: text, resilience: result.resilienceScore, status: activeLevel });
+    onSave({
+      title: displayTitle, fullText: text, resilience: result.resilienceScore, status: activeLevel,
+      // Full snapshot so the library can show a read-only report later.
+      report: result, lessonPlan, directions: studentDirections,
+      aiStrategy: aiPreference, subject, gradeLevel,
+    });
     toast.success('Assignment saved to your library!');
   };
-  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); lastChargedRef.current = ''; onReset?.(); };
+  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; onReset?.(); };
 
   // Which dimensions improved between the original and the redesigned analysis.
   const improvedDimensions = (): string[] => {
@@ -531,7 +540,7 @@ export function AssignmentAnalyzer({
                   ) : (
                     <p className="text-[11px] text-muted-foreground italic">Sign in with a real account to save and reuse your standards documents.</p>
                   )}
-                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} aiStrategy={aiPreference} teacherName={teacherName} schoolName={schoolName} />
+                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} aiStrategy={aiPreference} teacherName={teacherName} schoolName={schoolName} onGenerated={(p, d) => { setLessonPlan(p); setStudentDirections(d); }} />
                 </Card>
               );
             })()}
