@@ -32,7 +32,7 @@ create policy "user_credits self read"
 -- Allowance per plan, in one place. 'unlimited' uses a huge number so the
 -- teacher never hits the wall (the app also special-cases it to show "Unlimited").
 create or replace function public.credit_allowance(p text)
-returns int language sql immutable as $$
+returns int language sql immutable set search_path = '' as $$
   select case p when 'paid' then 20 when 'unlimited' then 1000000 else 3 end;
 $$;
 
@@ -90,6 +90,13 @@ begin
   return query select rec.plan, rec.used, allow, greatest(allow - rec.used, 0), true, rec.period_start;
 end; $$;
 
+-- Least privilege: only SIGNED-IN users may run these (not the anonymous key).
+-- Postgres grants EXECUTE to PUBLIC by default on create — revoke that first,
+-- then grant to authenticated only. Clears the "Public Can Execute SECURITY
+-- DEFINER Function" advisor warning; the app only calls them when logged in.
+revoke execute on function public.credit_allowance(text)         from public;
+revoke execute on function public.get_assignment_credits()       from public;
+revoke execute on function public.consume_assignment_credit()    from public;
 grant execute on function public.credit_allowance(text)          to authenticated;
 grant execute on function public.get_assignment_credits()        to authenticated;
 grant execute on function public.consume_assignment_credit()     to authenticated;
