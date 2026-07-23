@@ -1,7 +1,7 @@
 # SOCRATES — Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: July 12 2026.
+session. Read this whole file before making changes. Last updated: July 19 2026.
 
 ## What this is
 
@@ -430,6 +430,89 @@ Privacy page + Help page already describe the feature accurately.
   real support volume exists — the Help page content is written to become the
   bot's knowledge base later. Keep the Help page updated when features change.
 
+## Assignment credits / monthly allowance (built July 20 2026)
+
+Goal: move teachers toward a paid plan — **$9.99/month = 20 assignments**, resets
+monthly, NO rollover. Because signup/login is already REQUIRED (LoginDialog is
+non-dismissable), every user is a known account with an email on file (Will's
+follow-up list). The plan Will chose:
+- **Trial = 3 assignments (lifetime, no reset)** → then a WALL: "You've used your
+  3 free assignments. $9.99/mo plans launching soon — we'll email you." (Payments
+  aren't live yet, so the wall collects interest; email already captured at signup.)
+- **Paid = 20/month, resets monthly, no rollover.** No teacher is on 'paid' until
+  Stripe is wired OR Will manually upgrades them (SQL snippet at the bottom of
+  migration-credits.sql).
+- **Unlimited = comp/staff/beta accounts** that never wall. There is NO special
+  login for these — the person signs up normally, then Will flips their plan with
+  one email-matched SQL line (upsert snippet at the bottom of migration-credits.sql).
+  `credit_allowance('unlimited')` = 1,000,000 so it never runs out; the UI and the
+  metrics_credits view special-case it to show "Unlimited"/null rather than a number.
+- **"1 assignment" = analyzing ONE new assignment.** Every follow-up for that same
+  assignment — re-analysis, revisions, lesson plan, student directions, downloads
+  — is FREE. Detected client-side by a 120-char prefix of the assignment text
+  (lastChargedRef); applyVersion + New Assignment + opening from library reset it.
+
+BUILT (code shipped):
+- `supabase/migration-credits.sql` — `user_credits` table (user_id, plan, used,
+  period_start) + two SECURITY DEFINER functions: `get_assignment_credits()`
+  (read balance, auto-creates the row, applies monthly reset for paid) and
+  `consume_assignment_credit()` (atomically spends 1, returns allowed=false at 0
+  WITHOUT charging). RLS = teacher can SELECT own row only; NO direct update, so
+  **the counter can't be tampered with** — the functions (run as owner) are the
+  only writers. `credit_allowance(plan)` = 3 trial / 20 paid, in one place.
+- `src/lib/supabase.ts` — `getCredits()` / `consumeCredit()` call those RPCs;
+  fail OPEN (return null → analyzer lets the run through) so an infra hiccup or a
+  not-yet-migrated DB never blocks a teacher.
+- `AssignmentAnalyzer.tsx` — spends a credit only on a NEW assignment; shows a
+  live "X of N assignments left" counter under the Analyze button; a wall Dialog
+  at 0 (trial: "launching soon / Notify me"; paid: "resets next month").
+- `App.tsx` Settings — a counter card under the teacher's profile (remaining /
+  allowance, progress bar, "See plans" link, reset rules).
+- `supabase/views-metrics.sql` — new `metrics_credits` view (email, plan, used,
+  allowance, remaining) for the behind-the-scenes dashboard.
+
+GRACEFUL ROLLOUT: before Will runs the migration the RPCs 404 → getCredits/
+consumeCredit return null → app behaves exactly as before (no counter, no limit).
+Limits switch on the moment `migration-credits.sql` is run. So the code is safe to
+deploy first and activate later.
+
+WILL'S STEPS (do IN THIS ORDER, walk him through one at a time):
+1. Supabase → SQL Editor → New query → paste + run `supabase/migration-credits.sql`
+   (creates user_credits + the 3 functions). Expect "Success. No rows returned."
+2. Re-run `supabase/views-metrics.sql` (now includes metrics_credits). Same result.
+3. Trigger a Netlify deploy so the counter/wall UI goes live.
+KNOWN LIMIT (acceptable pre-revenue): enforcement is the DB functions, but a teacher
+can't edit their own counter (SELECT-only RLS). Real billing lands with Stripe;
+see parked task. To hand-upgrade a teacher to paid: run the update statement at the
+bottom of migration-credits.sql with their uuid (Authentication → Users).
+
+## Saved assignment reports (built July 22 2026)
+
+Problem Will hit: opening a saved library item just dumped the redesigned text
+back into the analyzer input (inviting a pointless second redesign). Fix: a
+saved item is now a full SNAPSHOT, and opening it shows a READ-ONLY report.
+- On "Save to Library", AssignmentAnalyzer now stores `report` (the AnalysisResult),
+  `lessonPlan`, `directions`, `aiStrategy`, `subject`, `gradeLevel` alongside the
+  existing title/fullText/score/level. Lesson plan + directions are lifted out of
+  LessonPlanPanel via a new `onGenerated` callback (and can be re-hydrated with the
+  new `initialPlan`/`initialDirections` props).
+- `SavedReportView.tsx` (new) renders it read-only: redesigned assignment (+PDF/Word/
+  GDoc), the report (summary + AIFailureBreakdown + dimensions, +PDF/Word), and the
+  lesson plan + student directions. If the plan/directions weren't generated before
+  saving, LessonPlanPanel shows its Generate button — FREE (lesson plans never cost a
+  credit; only a new analyze does). A "Redesign again" button loads it back into the
+  analyzer (which would count as a new assignment / 1 credit).
+- App.tsx: new `report` viewMode + `openedReport` state. LibraryView `onOpen` branches:
+  items WITH a `report` open the read-only view; older items without one fall back to
+  the analyzer input (backward compatible).
+- Storage: cloud `assignments` gets a `payload jsonb` column (the snapshot). saveAssignmentToCloud
+  writes it and FALLS BACK to a base-only upsert if the column doesn't exist yet, so
+  saving never breaks pre-migration. fetchAssignmentsFromCloud spreads `row.payload`.
+  localStorage just serializes the extra fields.
+- WILL'S STEP: run `supabase/migration-assignment-report.sql` (one line —
+  `alter table assignments add column if not exists payload jsonb`). Until then, newly
+  saved items store the snapshot only in the browser (cloud saves the base row).
+
 ## Usage analytics / investor metrics (Phase 1 built July 13 2026)
 
 Goal: track users, usage, tokens, and cost for investor metrics — "behind the
@@ -463,12 +546,21 @@ BUILT (code shipped):
   (retention), metrics_by_subject. Real cost check: a full transformation
   (~4 calls) ≈ $0.04 → ~99% margin on one $9.99, ~92% at 20/month.
 
-WILL'S DASHBOARD STEPS (not yet done — walk him through):
-1. Supabase → SQL Editor → paste + run `supabase/migration-usage.sql` (creates
-   the table). Then paste + run `supabase/views-metrics.sql` (creates the views).
-2. Trigger a Netlify deploy so the logging code goes live. Data starts
-   accumulating immediately. To view: Supabase → Table Editor → open a
-   `metrics_*` view.
+WILL'S DASHBOARD STEPS — IN PROGRESS (walk him through, one step per message):
+- Step 1 of 3 (DELIVERED July 19 2026, awaiting his "Success"): Supabase → SQL
+  Editor → New query → paste + run `supabase/migration-usage.sql`. Expected
+  result: "Success. No rows returned." Creates the `usage_events` table.
+- Step 2 of 3 (NEXT): SQL Editor → New query → paste + run
+  `supabase/views-metrics.sql`. Creates the 5 metrics views.
+- Step 3 of 3: Trigger a Netlify deploy (Deploys → Trigger deploy → Deploy site)
+  so the logging code goes live. Data starts accumulating immediately.
+OBJECT NAMES (already set by the SQL — Will does NOT type these; they're created
+automatically): table = `usage_events`; views = `metrics_overview`,
+`metrics_growth`, `metrics_unit_economics`, `metrics_by_user`,
+`metrics_by_subject`. The only thing Will names is the cosmetic SQL Editor
+"query" tab label (suggested: "SocratesIQ – usage table" and "SocratesIQ –
+metrics views") — purely for his own reference, affects nothing. To view later:
+Supabase → Table Editor → click any `metrics_*` view.
 NOTE: no new env var needed — the functions log with the existing anon key
 (RLS insert policy). START LOGGING ASAP — history can't be backfilled.
 OPEN QUESTIONS for Will: (a) also want a weekly EMAIL digest (push, zero login)?
@@ -509,7 +601,11 @@ is future work.
 6. Custom domain (he wanted "socrates.ai.com" — explained invalid; choose
    socrates.ai (~$70-100/yr) vs socratesai.com (~$12/yr); not decided).
 7. Payments (Stripe) when ready to charge; ToS page exists but needs lawyer
-   review before charging.
+   review before charging. NOTE (July 20 2026): the credit/allowance system it
+   plugs into is now BUILT (see "Assignment credits" section) — trial=3, paid=20/
+   mo. Stripe's job is just: on successful checkout, flip the teacher's
+   user_credits row to plan='paid' (a webhook, or a Netlify function calling the
+   same update statement). The wall + counter + monthly reset already exist.
 8. Admin password is a soft gate (VITE_ADMIN_PASSWORD, default socrates2025,
    visible in bundle — known limitation).
 9. Four-role buyer review exercise (teacher/principal/head/acquirer) was
@@ -527,6 +623,15 @@ is future work.
     login setup" step 2 — but note the official account is now SocratesIQEd
     (the old socratesaiedu Microsoft/Azure attempts are moot).
 11. `marketing/brand-brief.md` exists for Claude.ai marketing Projects.
+12. Security-advisor follow-ups (July 22 2026): the CRITICAL findings are fixed
+    (metrics views set to security_invoker + revoked from anon/authenticated;
+    credit functions have pinned search_path + execute restricted to authenticated).
+    REMAINING (low priority): (a) "Leaked Password Protection" — Pro-plan only, so
+    deferred until Will upgrades (not a hole; passwords are already hashed). (b)
+    `research_papers` has "RLS Policy Always True" policies from the old admin
+    Research Library — not user/student data, low risk, but tighten the read/write
+    rules when convenient. (c) "Signed-in users can execute" the credit functions
+    and the `usage_events` insert-only `true` policy are BY DESIGN — safe to dismiss.
 
 ## Working conventions
 

@@ -65,7 +65,18 @@ select
   9.99                                                                                                    as revenue_per_user_assumed,
   round(100.0 * (9.99 - (select coalesce(sum(cost_usd),0) / nullif(count(distinct user_id),0)
      from public.usage_events where user_id is not null and created_at > now() - interval '30 days'))
-     / 9.99, 1)                                                                                           as implied_gross_margin_pct;
+     / 9.99, 1)                                                                                           as implied_gross_margin_pct,
+  -- Token columns added July 19 2026 (appended at the end — create or replace
+  -- view only allows NEW columns after the existing ones).
+  (select coalesce(sum(input_tokens),0) from public.usage_events
+     where created_at > now() - interval '30 days')                                                       as input_tokens_30d,
+  (select coalesce(sum(output_tokens),0) from public.usage_events
+     where created_at > now() - interval '30 days')                                                       as output_tokens_30d,
+  (select coalesce(sum(cache_read_tokens),0) from public.usage_events
+     where created_at > now() - interval '30 days')                                                       as cached_tokens_30d,
+  (select (coalesce(sum(input_tokens),0) + coalesce(sum(output_tokens),0))
+       / nullif(count(distinct request_group),0)
+     from public.usage_events where created_at > now() - interval '30 days')                              as avg_tokens_per_workflow_30d;
 
 -- Per-account engagement (retention).
 create or replace view public.metrics_by_user as
@@ -80,6 +91,22 @@ from auth.users u
 left join public.usage_events e on e.user_id = u.id
 group by u.email, u.created_at order by last_active desc nulls last;
 
+-- Assignment-allowance / plan mix (added July 20 2026). One row per teacher who
+-- has a credits record, plus their plan and how much of the allowance is used.
+-- Depends on user_credits (migration-credits.sql). Safe to skip if not created.
+create or replace view public.metrics_credits as
+select
+  u.email,
+  c.plan,
+  c.used,
+  case when c.plan = 'unlimited' then null else public.credit_allowance(c.plan) end                       as allowance,
+  case when c.plan = 'unlimited' then null else greatest(public.credit_allowance(c.plan) - c.used, 0) end as remaining,
+  c.period_start,
+  c.updated_at                                          as last_change
+from public.user_credits c
+join auth.users u on u.id = c.user_id
+order by c.updated_at desc;
+
 -- Segmentation by subject.
 create or replace view public.metrics_by_subject as
 select
@@ -88,3 +115,30 @@ select
   count(*) filter (where event_type = 'lesson_plan')                       as lesson_plans,
   round(coalesce(sum(cost_usd),0)::numeric, 4)                             as cost_usd
 from public.usage_events group by 1 order by analyses desc nulls last;
+
+-- ============================================================================
+--  SECURITY HARDENING (added July 22 2026). These views reference auth.users and
+--  live in the API-exposed `public` schema, so by default they were readable via
+--  the anon/authenticated API keys and ran with elevated (owner) privileges —
+--  flagged CRITICAL by Supabase's advisor ("Exposed Auth Users" / "Security
+--  Definer View"). Two fixes:
+--    1. security_invoker = on  → the view runs as the caller, not the owner, so
+--       RLS on the underlying tables applies. Will's console (postgres/service
+--       role) still bypasses RLS and sees everything; the anon/auth keys can't.
+--    2. revoke from anon, authenticated → the API can't read them at all. These
+--       are console-only "behind the scenes" metrics (Will's requirement).
+--  Nothing in the app reads these views, so this breaks nothing. Safe to re-run.
+-- ============================================================================
+alter view public.metrics_overview       set (security_invoker = on);
+alter view public.metrics_growth         set (security_invoker = on);
+alter view public.metrics_unit_economics set (security_invoker = on);
+alter view public.metrics_by_user        set (security_invoker = on);
+alter view public.metrics_by_subject     set (security_invoker = on);
+alter view public.metrics_credits        set (security_invoker = on);
+
+revoke all on public.metrics_overview       from anon, authenticated;
+revoke all on public.metrics_growth         from anon, authenticated;
+revoke all on public.metrics_unit_economics from anon, authenticated;
+revoke all on public.metrics_by_user        from anon, authenticated;
+revoke all on public.metrics_by_subject     from anon, authenticated;
+revoke all on public.metrics_credits        from anon, authenticated;

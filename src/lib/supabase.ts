@@ -15,6 +15,46 @@ export function getAnonId(): string {
   } catch { return 'anon'; }
 }
 
+// ---- Assignment credits (monthly allowance) --------------------------------
+// Trial = 3 lifetime, Paid = 20/month (no rollover). The real allowance/reset
+// logic lives in Postgres (migration-credits.sql) so it can't be tampered with;
+// these just call the RPCs. See "1 assignment = 1 credit" rule in the analyzer.
+export interface Credits {
+  plan: 'trial' | 'paid' | 'unlimited';
+  used: number;
+  allowance: number;
+  remaining: number;
+  periodStart?: string;
+}
+
+/** Read the signed-in teacher's current balance (for the on-screen counter). */
+export async function getCredits(): Promise<Credits | null> {
+  try {
+    const sb = await getClient();
+    if (!sb) return null;
+    const { data, error } = await sb.rpc('get_assignment_credits');
+    if (error || !data || !data.length) return null;
+    const r = data[0];
+    return { plan: r.plan, used: r.used, allowance: r.allowance, remaining: r.remaining, periodStart: r.period_start };
+  } catch { return null; }
+}
+
+/**
+ * Spend one assignment credit. Returns `allowed=false` (without charging) when
+ * the teacher is out of allowance. Returns null on an infrastructure error, in
+ * which case the caller should fail OPEN (never block a teacher on a hiccup).
+ */
+export async function consumeCredit(): Promise<{ allowed: boolean; credits: Credits } | null> {
+  try {
+    const sb = await getClient();
+    if (!sb) return null;
+    const { data, error } = await sb.rpc('consume_assignment_credit');
+    if (error || !data || !data.length) return null;
+    const r = data[0];
+    return { allowed: r.allowed, credits: { plan: r.plan, used: r.used, allowance: r.allowance, remaining: r.remaining, periodStart: r.period_start } };
+  } catch { return null; }
+}
+
 /** Fire-and-forget client-side usage event (e.g. downloads). Never throws. */
 export async function logClientUsage(row: Record<string, any>): Promise<void> {
   try {
@@ -100,14 +140,33 @@ export async function fetchAssignmentsFromCloud(userId: string) {
     id: row.id, title: row.title, fullText: row.full_text,
     status: row.status, resilience: row.resilience,
     date: new Date(row.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+    // The report/lesson plan/directions snapshot (added July 22 2026). Absent on
+    // older rows saved before the `payload` column existed — harmlessly spreads nothing.
+    ...(row.payload || {}),
   }));
 }
 
-export async function saveAssignmentToCloud(userId: string, assignment: { id: string; title: string; fullText: string; status: string; resilience: number }) {
+export async function saveAssignmentToCloud(userId: string, assignment: any) {
   const sb = await getClient();
   if (!sb) return null;
-  const { data, error } = await sb.from('assignments').upsert({ id: assignment.id, user_id: userId, title: assignment.title, full_text: assignment.fullText, status: assignment.status, resilience: assignment.resilience });
-  if (error) { console.error('Save error:', error); return null; }
+  const base = { id: assignment.id, user_id: userId, title: assignment.title, full_text: assignment.fullText, status: assignment.status, resilience: assignment.resilience };
+  // Everything needed to render the read-only report later, in one jsonb column.
+  const payload = {
+    report: assignment.report ?? null,
+    lessonPlan: assignment.lessonPlan ?? null,
+    directions: assignment.directions ?? null,
+    aiStrategy: assignment.aiStrategy ?? null,
+    subject: assignment.subject ?? null,
+    gradeLevel: assignment.gradeLevel ?? null,
+  };
+  let { data, error } = await sb.from('assignments').upsert({ ...base, payload });
+  if (error) {
+    // Older schema without the `payload` column — still save the base row so the
+    // teacher never loses their work; the full report snapshot needs the migration.
+    console.warn('Save with payload failed; retrying base-only:', error.message);
+    ({ data, error } = await sb.from('assignments').upsert(base));
+    if (error) { console.error('Save error:', error); return null; }
+  }
   return data;
 }
 

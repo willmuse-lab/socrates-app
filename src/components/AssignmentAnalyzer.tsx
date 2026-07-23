@@ -20,7 +20,7 @@ import { StreamingProgress } from './StreamingProgress';
 import { StandardsManager } from './StandardsManager';
 import { LessonPlanPanel } from './LessonPlanPanel';
 import { StandardsDocument, refineAssignment, setUsageUserId } from '@/src/lib/standards';
-import { logClientUsage } from '@/src/lib/supabase';
+import { logClientUsage, getCredits, consumeCredit, supabaseEnabled, Credits } from '@/src/lib/supabase';
 import { getTemplatesBySubject } from '@/src/lib/templates';
 
 type FeedbackMap = Record<number, 'up' | 'down' | null>;
@@ -62,7 +62,25 @@ export function AssignmentAnalyzer({
   // Holds the analysis of the ORIGINAL assignment when a redesign is applied,
   // so the next analysis can show the before→after "transformation" jump.
   const [previousResult, setPreviousResult] = useState<AnalysisResult | null>(null);
+  // Lifted from LessonPlanPanel so "Save to Library" can store the generated
+  // lesson plan + student directions with the report (view later, no re-run).
+  const [lessonPlan, setLessonPlan] = useState<any | null>(null);
+  const [studentDirections, setStudentDirections] = useState<any | null>(null);
   const suggestionsRef = React.useRef<HTMLDivElement>(null);
+
+  // Monthly assignment allowance. A credit is spent only when a teacher analyzes
+  // a NEW assignment; re-analysis, revisions, lesson plans and downloads for the
+  // same assignment are free. lastChargedRef holds a prefix of the assignment we
+  // already charged for this session so we don't double-charge on re-analysis.
+  const [credits, setCredits] = useState<Credits | null>(null);
+  const [showWall, setShowWall] = useState(false);
+  const lastChargedRef = React.useRef<string>('');
+  const gated = !!userId && supabaseEnabled;
+  const refreshCredits = React.useCallback(async () => {
+    if (!gated) { setCredits(null); return; }
+    setCredits(await getCredits());
+  }, [gated]);
+  React.useEffect(() => { refreshCredits(); }, [refreshCredits]);
 
   const getChangeSummary = (original: string, modified: string): string[] => {
     const origSentences = original.match(/[^.!?]+[.!?]+/g) || original.split('\n').filter(Boolean);
@@ -74,19 +92,30 @@ export function AssignmentAnalyzer({
   // Make the signed-in id available to generate-usage logging (metadata only).
   React.useEffect(() => { setUsageUserId(userId || null); }, [userId]);
   React.useEffect(() => { if (!text && !result) setAiPreference(defaultPreference); }, [defaultPreference]);
-  React.useEffect(() => { if (initialText) { setText(initialText); setResult(null); } }, [initialText]);
+  React.useEffect(() => { if (initialText) { setText(initialText); setResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; } }, [initialText]);
 
   // overrideText lets callers analyze text that was JUST set in state (React
   // state updates land asynchronously, so reading `text` right after setText
   // returns the old value — the cause of the "analyze twice" bug). Guarded by
   // typeof because button onClick passes a click event, not a string.
-  const handleAnalyze = async (overrideText?: unknown) => {
+  const handleAnalyze = async (overrideText?: unknown, opts?: { free?: boolean }) => {
     const input = typeof overrideText === 'string' ? overrideText : text;
     if (!input.trim()) return;
+    // Spend one credit only when this is a genuinely NEW assignment. Re-analysis
+    // of the same assignment (or of a redesign we just applied — see applyVersion)
+    // shares the same 120-char prefix and is free, as is anything flagged free.
+    const prefix = input.trim().slice(0, 120);
+    const isNewAssignment = !opts?.free && prefix !== lastChargedRef.current;
+    if (isNewAssignment && gated) {
+      const res = await consumeCredit();
+      if (res && !res.allowed) { setCredits(res.credits); setShowWall(true); return; }
+      if (res) setCredits(res.credits); // null = infra hiccup → fail open, let it through
+      lastChargedRef.current = prefix; // this assignment is now paid for this session
+    }
     // Scroll to the top so the progress screen is front-and-center, rather
     // than leaving the viewport wherever the Analyze button was clicked.
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    setIsAnalyzing(true); setFeedback({}); setApplied(null);
+    setIsAnalyzing(true); setFeedback({}); setApplied(null); setLessonPlan(null); setStudentDirections(null);
     try {
       setProgressStage('Reading your assignment...'); setProgressPercent(5);
       const analysis = await analyzeAssignment(input, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
@@ -107,7 +136,9 @@ export function AssignmentAnalyzer({
     // Stash the current (original) analysis so the next run can show before→after.
     setPreviousResult(result);
     setText(content); setApplied(index); setResult(null);
-    toast.success('Version applied! Re-analyze to see your score jump.', { action: { label: 'Analyze Now', onClick: () => handleAnalyze(content) } });
+    // Re-analyzing an applied redesign is part of the SAME assignment — free.
+    lastChargedRef.current = content.trim().slice(0, 120);
+    toast.success('Version applied! Re-analyze to see your score jump.', { action: { label: 'Analyze Now', onClick: () => handleAnalyze(content, { free: true }) } });
   };
 
   const handleFeedback = (index: number, vote: 'up' | 'down') => {
@@ -182,10 +213,15 @@ export function AssignmentAnalyzer({
     if (!result || !onSave) return;
     const firstLine = text.trim().split('\n')[0];
     const displayTitle = firstLine.length > 50 ? firstLine.substring(0, 47) + '...' : (firstLine || 'Untitled Assignment');
-    onSave({ title: displayTitle, fullText: text, resilience: result.resilienceScore, status: activeLevel });
+    onSave({
+      title: displayTitle, fullText: text, resilience: result.resilienceScore, status: activeLevel,
+      // Full snapshot so the library can show a read-only report later.
+      report: result, lessonPlan, directions: studentDirections,
+      aiStrategy: aiPreference, subject, gradeLevel,
+    });
     toast.success('Assignment saved to your library!');
   };
-  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); onReset?.(); };
+  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; onReset?.(); };
 
   // Which dimensions improved between the original and the redesigned analysis.
   const improvedDimensions = (): string[] => {
@@ -293,9 +329,25 @@ export function AssignmentAnalyzer({
                   <Button className="w-full h-12 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-md" onClick={handleAnalyze} disabled={isAnalyzing || !text.trim()}>
                     {isAnalyzing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Analyzing...</> : 'Analyze Assignment'}
                   </Button>
+                  {credits && (
+                    <p className="text-[11px] text-center text-muted-foreground">
+                      {credits.plan === 'unlimited' ? (
+                        <span className="font-semibold text-green-600">Unlimited assignments ✦</span>
+                      ) : credits.remaining > 0 ? (
+                        <><span className="font-bold text-foreground">{credits.remaining}</span> of {credits.allowance} {credits.plan === 'trial' ? 'free ' : ''}assignments left{credits.plan === 'paid' ? ' this month' : ''}</>
+                      ) : (
+                        <span className="text-amber-600 font-semibold">{credits.plan === 'trial' ? `You've used your ${credits.allowance} free assignments` : 'Monthly limit reached'}</span>
+                      )}
+                      {credits.plan === 'trial' && credits.remaining > 0 && <span className="block text-muted-foreground/70">Analyzing, revising & downloading one assignment is included.</span>}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             </div>
+            <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+              <Shield className="w-3.5 h-3.5 shrink-0" />
+              Do not submit personally identifiable student information. For FERPA reasons, include only your assignment or text.
+            </p>
           </motion.div>
         </div>
       ) : (
@@ -488,7 +540,7 @@ export function AssignmentAnalyzer({
                   ) : (
                     <p className="text-[11px] text-muted-foreground italic">Sign in with a real account to save and reuse your standards documents.</p>
                   )}
-                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} aiStrategy={aiPreference} teacherName={teacherName} schoolName={schoolName} />
+                  <LessonPlanPanel assignmentText={lessonText} standardsDoc={standardsDoc} subject={subject} gradeLevel={gradeLevel} aiStrategy={aiPreference} teacherName={teacherName} schoolName={schoolName} onGenerated={(p, d) => { setLessonPlan(p); setStudentDirections(d); }} />
                 </Card>
               );
             })()}
@@ -583,6 +635,40 @@ export function AssignmentAnalyzer({
               ))}
             </div>
             <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut — and the Bronze/Silver/Gold redesigns that raise it.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Trial/allowance wall — shown when a teacher tries to analyze a new
+          assignment with no credits left. Payments aren't live yet, so this
+          collects interest; Will already has their email from signup. */}
+      <Dialog open={showWall} onOpenChange={setShowWall}>
+        <DialogContent className="sm:max-w-[440px] border-border bg-card p-8">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold italic font-serif">
+              {credits?.plan === 'paid' ? "You've used this month's assignments" : `You've used your ${credits?.allowance ?? 3} free assignments`}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
+            <p>{credits?.plan === 'paid'
+              ? 'Your plan includes 20 assignments a month. It resets at the start of your next month — everything you already created stays available.'
+              : 'Nice work — you got the full experience. To keep transforming assignments, a paid plan is on the way.'}</p>
+            <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-1">
+              <p className="text-lg font-bold text-foreground">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+              <p className="text-xs"><strong className="text-foreground">20 assignments every month.</strong> Each one includes unlimited revisions, lesson plans, student directions, and downloads.</p>
+            </div>
+            {credits?.plan !== 'paid' && (
+              <p className="text-xs bg-secondary/40 border border-border rounded-lg p-3">
+                💌 <strong className="text-foreground">Paid plans are launching soon.</strong> We'll email you the moment they're ready — no need to do anything.
+              </p>
+            )}
+            <div className="flex gap-2 pt-1">
+              <Button variant="outline" className="flex-1" onClick={() => setShowWall(false)}>Got it</Button>
+              <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={() => { setShowWall(false); toast.success("You're on the list — we'll email you when plans go live."); }}>
+                Notify me
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

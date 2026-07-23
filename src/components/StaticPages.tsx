@@ -35,6 +35,7 @@ export function AboutPage({ onBack }: PageProps) {
           ))}
         </div>
         <p className="text-xs text-muted-foreground italic">How these sources are combined into SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
+        <p className="text-xs text-muted-foreground/80 border-t border-border pt-4">SocratesIQ cites this research to describe its methodology. It is not affiliated with, sponsored by, or endorsed by these researchers or institutions.</p>
       </div>
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
@@ -99,6 +100,8 @@ export function ScoringPage({ onBack }: PageProps) {
         <h2 className="text-base font-bold">A note on what the score is — and isn't</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">Because the score is an expert AI judgment against a rubric rather than a fixed calculation, it is consistent in the ballpark but the exact number can shift a few points run to run. Treat it as a <strong>diagnostic guide, not a final grade</strong>. The real value is the breakdown of how an assignment could be shortcut — and the Bronze, Silver, and Gold redesigns that show you how to strengthen it.</p>
       </div>
+
+      <p className="text-xs text-muted-foreground/80">SocratesIQ cites published research to describe its methodology. It is not affiliated with, sponsored by, or endorsed by the researchers or institutions referenced.</p>
     </motion.div>
   );
 }
