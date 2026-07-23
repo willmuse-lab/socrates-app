@@ -115,3 +115,30 @@ select
   count(*) filter (where event_type = 'lesson_plan')                       as lesson_plans,
   round(coalesce(sum(cost_usd),0)::numeric, 4)                             as cost_usd
 from public.usage_events group by 1 order by analyses desc nulls last;
+
+-- ============================================================================
+--  SECURITY HARDENING (added July 22 2026). These views reference auth.users and
+--  live in the API-exposed `public` schema, so by default they were readable via
+--  the anon/authenticated API keys and ran with elevated (owner) privileges —
+--  flagged CRITICAL by Supabase's advisor ("Exposed Auth Users" / "Security
+--  Definer View"). Two fixes:
+--    1. security_invoker = on  → the view runs as the caller, not the owner, so
+--       RLS on the underlying tables applies. Will's console (postgres/service
+--       role) still bypasses RLS and sees everything; the anon/auth keys can't.
+--    2. revoke from anon, authenticated → the API can't read them at all. These
+--       are console-only "behind the scenes" metrics (Will's requirement).
+--  Nothing in the app reads these views, so this breaks nothing. Safe to re-run.
+-- ============================================================================
+alter view public.metrics_overview       set (security_invoker = on);
+alter view public.metrics_growth         set (security_invoker = on);
+alter view public.metrics_unit_economics set (security_invoker = on);
+alter view public.metrics_by_user        set (security_invoker = on);
+alter view public.metrics_by_subject     set (security_invoker = on);
+alter view public.metrics_credits        set (security_invoker = on);
+
+revoke all on public.metrics_overview       from anon, authenticated;
+revoke all on public.metrics_growth         from anon, authenticated;
+revoke all on public.metrics_unit_economics from anon, authenticated;
+revoke all on public.metrics_by_user        from anon, authenticated;
+revoke all on public.metrics_by_subject     from anon, authenticated;
+revoke all on public.metrics_credits        from anon, authenticated;
