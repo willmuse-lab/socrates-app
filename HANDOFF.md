@@ -623,6 +623,15 @@ is future work.
     login setup" step 2 — but note the official account is now SocratesIQEd
     (the old socratesaiedu Microsoft/Azure attempts are moot).
 11. `marketing/brand-brief.md` exists for Claude.ai marketing Projects.
+12. Security-advisor follow-ups (July 22 2026): the CRITICAL findings are fixed
+    (metrics views set to security_invoker + revoked from anon/authenticated;
+    credit functions have pinned search_path + execute restricted to authenticated).
+    REMAINING (low priority): (a) "Leaked Password Protection" — Pro-plan only, so
+    deferred until Will upgrades (not a hole; passwords are already hashed). (b)
+    `research_papers` has "RLS Policy Always True" policies from the old admin
+    Research Library — not user/student data, low risk, but tighten the read/write
+    rules when convenient. (c) "Signed-in users can execute" the credit functions
+    and the `usage_events` insert-only `true` policy are BY DESIGN — safe to dismiss.
 
 ## Working conventions
 
