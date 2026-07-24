@@ -28,8 +28,8 @@ async function fetchUploadedResearch(): Promise<string> {
     const parts: string[] = [];
     let total = 0;
     for (const paper of data as any[]) {
-      const entry = `RESEARCH PAPER: ${paper.title}\nAuthors: ${paper.authors} (${paper.year})\n${paper.content.substring(0, 4000)}`;
-      if (total + entry.length > 8000) break;
+      const entry = `RESEARCH PAPER: ${paper.title}\nAuthors: ${paper.authors} (${paper.year})\n${paper.content.substring(0, 2500)}`;
+      if (total + entry.length > 3500) break;
       parts.push(entry);
       total += entry.length;
     }
@@ -231,10 +231,7 @@ ${uploadedResearch ? `\nADDITIONAL UPLOADED RESEARCH:\n${uploadedResearch}\n` : 
 ${wantDiagnosis ? `SCORING GUIDANCE:
 ${SCORING_GUIDANCE}
 ` : ""}
-${wantRedesigns ? `REDESIGN STRATEGY CATALOG:
-${STRATEGY_CATALOG}
-
-${PERMISSION_CATEGORIES}` : STRATEGY_INDEX}
+${STRATEGY_INDEX}
 
 FRAMEWORK LOCKING RULES — these are requirements, not suggestions:
 ${wantDiagnosis ? `- Every dimension score's explanation must reference the specific framework criterion it measures (Triple-A pillar, Ai-RACE component, or Bloom's level) by name.
@@ -265,8 +262,8 @@ ${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bro
    - Fit the SUBJECT and GRADE LEVEL${subject ? ` (${subject})` : ""}${gradeLevel ? ` at ${gradeLevel}` : ""} in vocabulary, complexity, and expectations — a redesign for young students must read differently from one for advanced students.
    - Preserve the teacher's original topic and learning goal — improve HOW it's done, don't replace WHAT it teaches.
    - Be realistically SHORT to complete: the whole redesigned assignment must fit within ONE class period (Gold may use at most two). NEVER spread the work across days or weeks, and never write a multi-week or "Week 1 / Week 2 / Day 1" timeline. Keep it to what a student can finish in a class or two.
-   Length: Bronze ~3-4 sentences, Silver ~4-6, Gold ~5-7 — specific and usable but TIGHT; every sentence must add a concrete detail, no filler. Give a 1-sentence description of the concrete change.
-   Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy from the catalog; name the strategy category (A-G) in the description.` : ""}
+   Length: Bronze ~2-3 sentences, Silver ~3-4, Gold ~4-5 — specific and usable but TIGHT; every sentence must add a concrete detail, no filler. Give a ONE-sentence description of the concrete change. Do not exceed these lengths — brevity keeps the tool fast.
+   Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy; name the strategy category (A-G) in the description.` : ""}
 
 ASSIGNMENT TEXT:
 """
@@ -287,7 +284,7 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
     console.log("analyze v3: calling model");
     const stream = client.messages.stream({
       model: "claude-haiku-4-5",
-      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 1800 : 2500,
+      max_tokens: part === "diagnosis" ? 900 : part === "redesigns" ? 1400 : 2200,
       // Cache the large, identical system prompt (research base + catalog) so
       // repeat/re-analyses reuse it at ~0.1x cost instead of re-sending it every
       // time — cuts token load and eases rate-limit pressure from the two-call split.
