@@ -267,7 +267,7 @@ ${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bro
 
 ASSIGNMENT TEXT:
 """
-${text.substring(0, 6000)}
+${text.substring(0, 8000)}
 """
 
 OUTPUT FORMAT — return ONLY a single valid JSON object, no markdown, no code fences, no commentary before or after. Use exactly this shape:
