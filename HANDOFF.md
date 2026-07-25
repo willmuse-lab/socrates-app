@@ -1,7 +1,51 @@
 # SOCRATES — Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: July 19 2026.
+session. Read this whole file before making changes. Last updated: July 25 2026.
+
+## Session status (July 22–25 2026) — all LIVE on main
+
+Everything below shipped and is merged to `main` (PRs #3–#8). The full teacher
+journey works in production: analyze → transform → re-analyze (before→after) →
+lesson plan + student directions → save → reopen as a read-only report.
+
+SHIPPED THIS SESSION:
+- **Monthly assignment credits** — $9.99/mo = 20 assignment redesigns (trial = 3
+  free → wall; unlimited = comp accounts). Tamper-proof (SECURITY DEFINER RPCs).
+  See "Assignment credits" section. Stripe not built — "Get started"/wall are
+  informational; grant plans by hand via SQL in migration-credits.sql.
+- **Saved assignment reports** — library items open read-only (report + lesson
+  plan + directions + downloads). See that section.
+- **Legal notices** — non-endorsement disclaimer (About/Scoring) + FERPA "no
+  student data" note under the analyzer inputs.
+- **Analytics hardened** — metrics views set to security_invoker + revoked from
+  the API (console-only); credit functions search_path-pinned + execute limited
+  to authenticated. Supabase advisor CRITICALs cleared.
+- **Analyze reliability** — REMOVED structured outputs (it truncated JSON →
+  consistent failures); back on the free-text + repair path. DO NOT re-add it —
+  see "Analyze reliability" section. Speed trims kept (compact strategy index,
+  shorter redesigns). Remaining latency is Haiku's own speed → lever is the
+  Anthropic account TIER.
+- **Pricing copy** — now says "$9.99 = 20 assignment redesigns a month" (was a
+  stale "Unlimited assignment analyses"); trial FAQ fixed to "3 free redesigns".
+- **Profile persistence** — teacher profile now saved to a per-account
+  `profiles` table so onboarding runs ONCE (was localStorage-only → Safari/iOS
+  evicts after ~7 days → re-onboarding; a pilot teacher hit this). Falls back to
+  local if cloud unavailable.
+
+SUPABASE MIGRATIONS RUN THIS SESSION (all applied to live by Will): migration-usage.sql,
+views-metrics.sql (+ the security-hardening block), migration-credits.sql (+ the
+search_path/execute hardening), migration-assignment-report.sql (assignments.payload),
+migration-profiles.sql. Will's own account granted plan='unlimited'.
+
+REMINDER: after ANY push to main, Will must Netlify → Deploys → Trigger deploy.
+Confirm the profile fix (PR #8) was deployed.
+
+OPEN / NEXT (see Parked tasks for full list): Stripe checkout (unlocks real
+payment; ToS needs a lawyer first); Anthropic tier bump if analysis speed needs
+improving; get real beta teachers on it (comp them unlimited) to fill the
+investor metrics; leaked-password protection (Pro plan); tighten research_papers
+RLS.
 
 ## What this is
 
