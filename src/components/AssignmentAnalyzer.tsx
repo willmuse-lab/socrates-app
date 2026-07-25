@@ -646,16 +646,16 @@ export function AssignmentAnalyzer({
         <DialogContent className="sm:max-w-[440px] border-border bg-card p-8">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold italic font-serif">
-              {credits?.plan === 'paid' ? "You've used this month's assignments" : `You've used your ${credits?.allowance ?? 3} free assignments`}
+              {credits?.plan === 'paid' ? "You've used this month's redesigns" : `You've used your ${credits?.allowance ?? 3} free redesigns`}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>{credits?.plan === 'paid'
-              ? 'Your plan includes 20 assignments a month. It resets at the start of your next month — everything you already created stays available.'
+              ? 'Your plan includes 20 assignment redesigns a month. It resets at the start of your next month — everything you already created stays available.'
               : 'Nice work — you got the full experience. To keep transforming assignments, a paid plan is on the way.'}</p>
             <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-1">
               <p className="text-lg font-bold text-foreground">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-              <p className="text-xs"><strong className="text-foreground">20 assignments every month.</strong> Each one includes unlimited revisions, lesson plans, student directions, and downloads.</p>
+              <p className="text-xs"><strong className="text-foreground">20 assignment redesigns every month.</strong> Each one includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
             </div>
             {credits?.plan !== 'paid' && (
               <p className="text-xs bg-secondary/40 border border-border rounded-lg p-3">

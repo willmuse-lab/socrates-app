@@ -40,11 +40,12 @@ export function Pricing({ onBack }: PricingProps) {
             <h3 className="text-xl font-bold">Teacher</h3>
             <div className="flex items-end gap-1 mt-2"><span className="text-4xl font-bold">${teacherPerMonth}</span><span className="text-muted-foreground text-sm mb-1">/month</span></div>
             {billing === 'annual' && <p className="text-xs text-green-600 font-medium">Billed as ${teacherAnnual}/year</p>}
-            <p className="text-sm text-muted-foreground pt-1">Everything you need, for one teacher.</p>
+            <p className="text-sm font-semibold text-foreground pt-1">20 assignment redesigns every month.</p>
+            <p className="text-xs text-muted-foreground">Each includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
           </div>
           <Button className="w-full gap-2 font-bold bg-accent hover:bg-accent/90">Get started <ArrowRight className="w-4 h-4" /></Button>
           <div className="space-y-2.5">
-            {['Unlimited assignment analyses','Bronze, Silver & Gold redesigns','Personal assignment library','PDF & Word export','Research-backed suggestions'].map(f => (
+            {['20 assignment redesigns a month','Bronze, Silver & Gold redesigns','Lesson plans & student directions','Personal assignment library','PDF, Word & Google Doc export'].map(f => (
               <div key={f} className="flex items-start gap-2.5 text-xs"><Check className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />{f}</div>
             ))}
             {['School admin dashboard','Teacher management','LMS integration'].map(f => (
@@ -93,7 +94,7 @@ export function Pricing({ onBack }: PricingProps) {
       <div className="max-w-2xl mx-auto space-y-4">
         <h2 className="text-xl font-bold text-center font-serif italic">Common questions</h2>
         {[
-          { q: 'Is there a free trial?', a: 'Yes — sign up and use SocratesIQ free for 14 days with no credit card required.' },
+          { q: 'Is there a free trial?', a: 'Yes — sign up and get 3 free assignment redesigns, no credit card required. After that it\'s $9.99/month for 20 redesigns a month.' },
           { q: 'How does school and district pricing work?', a: "Every school is different, so we price school and district plans individually. Email socratesiqed@gmail.com and we'll put together a quote for your size and needs." },
           { q: 'Is student work sent to AI companies?', a: "Assignment text is sent to Anthropic's Claude API for analysis only — it is not stored or used for training. We never collect student PII." },
           { q: 'Do you offer discounts for Title I schools?', a: 'Yes. Email socratesiqed@gmail.com and we\'ll work something out.' },
