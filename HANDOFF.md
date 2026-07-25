@@ -47,6 +47,26 @@ every dashboard task with exact click paths, one step per message, and wait.
   (client-side Google Drive: Picker import + create-Google-Doc export,
   drive.file scope, NO backend functions — see "Google Drive integration")
 
+## Analyze reliability — DO NOT re-add structured outputs (July 22 2026)
+
+Hard-won lesson. The analyze function returns JSON as free text, then parses it
+with a control-char/stray-quote repair pass + client retry (gemini.ts backoffs).
+This is the KNOWN-GOOD path. During this session structured outputs
+(`output_config.format` / json_schema) were tried to kill `json_parse_failed`,
+but combined with a lowered `max_tokens` it TRUNCATED the JSON on every call →
+CONSISTENT "unexpected format" + minute-long stacked retries on live. It was
+removed (PR #5). If you revisit structured outputs: use the proper
+`client.messages.parse()` path (NOT `stream()` + reading the text block), keep
+`max_tokens` generous (diagnosis 1100 / redesigns 1800) so nothing truncates,
+and test on a PREVIEW against the real API before deploying — you cannot judge
+latency/format from the sandbox (no API key + Anthropic reachable but unauth).
+Speed levers that ARE safe & shipped: compact STRATEGY_INDEX instead of the full
+catalog on the redesign half, halved uploaded-research cap (2500/3500), tighter
+redesign lengths (Bronze 2-3 / Silver 3-4 / Gold 4-5). The remaining latency is
+Haiku's own output speed — if more speed is needed, the lever is the Anthropic
+account TIER (higher = faster/priority), not the prompt. Research Library is
+EMPTY (no uploaded papers) so research size is not the bottleneck.
+
 ## Deployment facts (IMPORTANT — non-obvious)
 
 - **Live site:** Netlify project `brilliant-mandazi-3937f4`
