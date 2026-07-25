@@ -176,6 +176,29 @@ export async function deleteAssignmentFromCloud(id: string) {
   await sb.from('assignments').delete().eq('id', id);
 }
 
+// ---- Teacher profile (cloud) -----------------------------------------------
+// The profile (subjects, grades, school, onboarding-complete) is stored per
+// account so onboarding happens ONCE, not every time a browser clears local
+// storage (e.g. Safari/iOS evicts it after ~7 days). Returns the stored profile
+// object, or null (no row OR any error — callers keep the local cache on null).
+export async function fetchProfileFromCloud(userId: string): Promise<any | null> {
+  try {
+    const sb = await getClient();
+    if (!sb) return null;
+    const { data, error } = await sb.from('profiles').select('data').eq('user_id', userId).maybeSingle();
+    if (error || !data) return null;
+    return data.data || null;
+  } catch { return null; }
+}
+
+export async function saveProfileToCloud(userId: string, profile: any): Promise<void> {
+  try {
+    const sb = await getClient();
+    if (!sb) return;
+    await sb.from('profiles').upsert({ user_id: userId, data: profile, updated_at: new Date().toISOString() });
+  } catch (e) { console.warn('Profile cloud save skipped:', (e as any)?.message || e); }
+}
+
 export interface ResearchPaper {
   id: string; title: string; authors: string; year: string; filename: string; content: string; created_at: string;
 }

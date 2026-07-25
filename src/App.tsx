@@ -17,7 +17,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { FrameworkDimension, DEFAULT_DIMENSIONS, BloomsLevel, BLOOMS_LEVELS, AnalysisResult } from '@/src/lib/gemini';
 import { SavedReportView } from './components/SavedReportView';
 import { loadAssignments, saveAssignments, loadSettings, saveSettings, loadUser, saveUser, clearUser, AppSettings } from '@/src/lib/storage';
-import { supabaseEnabled, onAuthStateChange, fetchAssignmentsFromCloud, saveAssignmentToCloud, deleteAssignmentFromCloud, signOut, getCredits, Credits } from '@/src/lib/supabase';
+import { supabaseEnabled, onAuthStateChange, fetchAssignmentsFromCloud, saveAssignmentToCloud, deleteAssignmentFromCloud, signOut, getCredits, Credits, fetchProfileFromCloud, saveProfileToCloud } from '@/src/lib/supabase';
 import { loadProfile, saveProfile, clearProfile, TeacherProfile } from '@/src/lib/profile';
 import { StandardsManager } from './components/StandardsManager';
 import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'lucide-react';
@@ -99,6 +99,20 @@ export default function App() {
         setUser(newUser); saveUser(newUser); setIsLoginOpen(false);
         const cloud = await fetchAssignmentsFromCloud(sbUser.id);
         if (cloud) { setSavedAssignments(cloud); setCloudSynced(true); }
+        // Load the profile from the account so onboarding runs ONCE, even if the
+        // browser cleared local storage (Safari/iOS eviction, new device, etc.).
+        const cloudProfile = await fetchProfileFromCloud(sbUser.id);
+        if (cloudProfile?.onboardingComplete) {
+          setProfile(cloudProfile); saveProfile(cloudProfile);
+        } else {
+          const local = loadProfile();
+          if (local?.onboardingComplete) {
+            // Profile exists locally but not in the cloud yet — back it up.
+            setProfile(local); saveProfileToCloud(sbUser.id, local);
+          } else {
+            setShowOnboarding(true);
+          }
+        }
       }
     }).then(fn => { unsub = fn; });
     return () => unsub();
@@ -112,16 +126,20 @@ export default function App() {
   const handleLogin = (name: string, email: string, id?: string) => {
     const newUser = { name, email, id };
     setUser(newUser); saveUser(newUser); setIsLoginOpen(false);
-    const existingProfile = loadProfile();
-    if (!existingProfile?.onboardingComplete) {
-      setShowOnboarding(true);
-    } else {
-      toast.success(`Welcome back, ${name}!`);
+    // With Supabase, the auth listener above loads the profile from the account
+    // and decides onboarding (so it runs once, cross-device). Only the demo path
+    // (no Supabase) needs the local-storage check here.
+    if (!supabaseEnabled) {
+      const existingProfile = loadProfile();
+      if (!existingProfile?.onboardingComplete) setShowOnboarding(true);
+      else toast.success(`Welcome back, ${name}!`);
     }
   };
 
   const handleOnboardingComplete = (p: TeacherProfile) => {
     setProfile(p); saveProfile(p); setShowOnboarding(false);
+    // Persist to the account so it survives local-storage clears and new devices.
+    if (supabaseEnabled && user?.id) saveProfileToCloud(user.id, p);
     toast.success(`You're all set, ${p.name.split(' ')[0]}! Analyses will now be tailored to ${p.subject}.`);
   };
 
