@@ -284,16 +284,13 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
     console.log("analyze v3: calling model");
     const stream = client.messages.stream({
       model: "claude-haiku-4-5",
-      max_tokens: part === "diagnosis" ? 900 : part === "redesigns" ? 1400 : 2200,
+      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 1800 : 2500,
       // Cache the large, identical system prompt (research base + catalog) so
       // repeat/re-analyses reuse it at ~0.1x cost instead of re-sending it every
       // time — cuts token load and eases rate-limit pressure from the two-call split.
       system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: userMessage }],
-      // Constrain the model to valid JSON in exactly our shape (Haiku 4.5 supports
-      // structured outputs). This is what stops the json_parse_failed errors.
-      output_config: { format: { type: "json_schema", schema: schemaForPart(part) } },
-    } as any);
+    });
     const response = await withTimeout(stream.finalMessage(), 26000, "Model request");
     console.log("analyze v3: model returned");
 
