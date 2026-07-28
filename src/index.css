@@ -1,36 +1,52 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @theme inline {
   --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  --font-serif: 'Georgia', serif;
-  
-  --color-background: #F9F9F7;
-  --color-foreground: #1A1A1A;
-  
-  --color-card: #FFFFFF;
-  --color-card-foreground: #1A1A1A;
-  
-  --color-popover: #FFFFFF;
-  --color-popover-foreground: #1A1A1A;
-  
-  --color-primary: #1A1A1A;
-  --color-primary-foreground: #FFFFFF;
-  
-  --color-secondary: #F0F0EE;
-  --color-secondary-foreground: #666666;
-  
-  --color-muted: #F0F0EE;
-  --color-muted-foreground: #666666;
-  
-  --color-accent: #FF6B6B;
+  --font-serif: 'Fraunces', 'Georgia', serif;
+
+  /* Warm-paper editorial theme (light). The old cream + four pastel
+     corner-glows + coral read as a generic AI-default look; this is a
+     deliberate editorial palette: warm paper, deep-navy ink, slate-blue. */
+  --color-background: #F4EFE4;
+  --color-foreground: #17213B;
+
+  --color-card: #FCFAF4;
+  --color-card-foreground: #17213B;
+
+  --color-popover: #FCFAF4;
+  --color-popover-foreground: #17213B;
+
+  --color-primary: #0E1626;
+  --color-primary-foreground: #F4EFE4;
+
+  --color-secondary: #EAE3D5;
+  --color-secondary-foreground: #4B4F5B;
+
+  --color-muted: #EAE3D5;
+  --color-muted-foreground: #6B6A63;
+
+  --color-accent: #3E5C86;
   --color-accent-foreground: #FFFFFF;
-  
-  --color-success: #6BCB77;
-  --color-warning: #FFD93D;
-  --color-info: #4D96FF;
+
+  --color-border: #DED6C7;
+  --color-input: #DED6C7;
+  --color-ring: #3E5C86;
+
+  --color-destructive: #B0442E;
+  --color-destructive-foreground: #FFFFFF;
+
+  --color-success: #2F7D5B;
+  --color-warning: #C0892E;
+  --color-info: #3E5C86;
+
+  /* Dark "ink" sections for the alternating editorial rhythm. */
+  --color-ink: #0E1626;
+  --color-ink-2: #141E33;
+  --color-on-ink: #ECE7DB;
+  --color-on-ink-muted: #9EAFC6;
+  --color-on-ink-accent: #A9C1DF;
 
   --radius-lg: 16px;
   --radius-md: 12px;
@@ -39,41 +55,63 @@
 
 @layer base {
   * {
-    border-color: #E5E5E1;
+    border-color: var(--color-border);
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(255, 107, 107, 0.08) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(77, 150, 255, 0.08) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(255, 217, 61, 0.08) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, rgba(107, 203, 119, 0.08) 0px, transparent 50%);
-    background-attachment: fixed;
+    /* Flat warm paper — no corner gradient "glows". */
+    background-color: var(--color-background);
   }
   h1, h2, h3, .font-serif {
-    @apply font-serif;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -0.012em;
   }
 }
 
+/* Uppercase, letter-spaced eyebrow label (sans). */
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+/* Full-bleed dark editorial section. */
+.section-ink {
+  background: var(--color-ink);
+  color: var(--color-on-ink);
+}
+.section-ink .eyebrow { color: var(--color-on-ink-muted); }
+.on-ink-muted { color: var(--color-on-ink-muted); }
+.on-ink-accent { color: var(--color-on-ink-accent); }
+.ink-card {
+  background: var(--color-ink-2);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+}
+
 .highlight {
-  background: rgba(255, 217, 61, 0.2);
-  border-bottom: 2px solid #FFD93D;
+  background: rgba(192, 137, 46, 0.18);
+  border-bottom: 2px solid #C0892E;
   padding: 2px 0;
-  color: #1A1A1A;
+  color: #17213B;
 }
 
 .score-circle {
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  border: 4px solid #F0F0EE;
+  border: 4px solid #E7E0D2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  background: white;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  background: #FCFAF4;
+  box-shadow: 0 12px 30px -12px rgba(14, 22, 38, 0.25);
   position: relative;
   overflow: hidden;
 }
@@ -85,7 +123,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #FF6B6B, #4D96FF, #FFD93D);
+  background: linear-gradient(90deg, #3E5C86, #0E1626);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -97,10 +135,10 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #E5E5E1;
+  background: #D8CFBE;
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #D1D1CD;
+  background: #C7BCA6;
 }

@@ -12,18 +12,18 @@ export function AboutPage({ onBack }: PageProps) {
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-5">
-          <h1 className="text-4xl font-bold font-serif italic leading-tight">Built by educators,<br />for educators.</h1>
+          <h1 className="text-4xl font-bold font-serif leading-tight">Built by educators,<br />for educators.</h1>
           <p className="text-muted-foreground leading-relaxed">SocratesIQ was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI — which is both impossible and counterproductive — we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
           <p className="text-muted-foreground leading-relaxed">Our methodology emerged from classroom research, consultation with pedagogical experts, and analysis of international AI-in-education guidance.</p>
         </div>
         <div className="bg-secondary/50 rounded-2xl border border-border p-8 space-y-4">
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Our philosophy</p>
-          <blockquote className="text-2xl font-serif italic text-accent leading-relaxed">"The unexamined assignment is not worth giving."</blockquote>
+          <blockquote className="text-2xl font-serif text-accent leading-relaxed">"The unexamined assignment is not worth giving."</blockquote>
           <p className="text-sm text-muted-foreground">— The Socratic Architect</p>
         </div>
       </div>
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold font-serif italic">The research behind SocratesIQ</h2>
+        <h2 className="text-2xl font-bold font-serif">The research behind SocratesIQ</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
         <div className="flex flex-wrap gap-2">
           {[
@@ -39,7 +39,7 @@ export function AboutPage({ onBack }: PageProps) {
       </div>
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
-        <h3 className="text-xl font-bold font-serif italic">Get in touch</h3>
+        <h3 className="text-xl font-bold font-serif">Get in touch</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">Questions about the framework, partnership opportunities, research collaboration, or school pricing.</p>
         <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com'} className="gap-2">
           <Mail className="w-4 h-4" />socratesiqed@gmail.com
@@ -61,7 +61,7 @@ export function ScoringPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-10">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-3">
-        <div className="flex items-center gap-3"><Gauge className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">How scoring works</h1></div>
+        <div className="flex items-center gap-3"><Gauge className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">How scoring works</h1></div>
         <p className="text-muted-foreground leading-relaxed">Every assignment gets a <strong>resilience score from 0 to 100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side: a low resilience score means high vulnerability.</p>
       </div>
 
@@ -111,7 +111,7 @@ export function PrivacyPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-2">
-        <div className="flex items-center gap-3"><Shield className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Data Privacy & Security</h1></div>
+        <div className="flex items-center gap-3"><Shield className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Data Privacy & Security</h1></div>
         <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
       </div>
       {[
@@ -139,7 +139,7 @@ export function FeedbackPage({ onBack }: PageProps) {
         <div className="flex justify-center gap-1">
           {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
         </div>
-        <h1 className="text-4xl font-bold font-serif italic">Teacher feedback</h1>
+        <h1 className="text-4xl font-bold font-serif">Teacher feedback</h1>
         <p className="text-muted-foreground">What teachers are telling us after using SocratesIQ in their classrooms.</p>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
@@ -147,13 +147,13 @@ export function FeedbackPage({ onBack }: PageProps) {
           <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
             className="bg-card border border-border rounded-2xl p-6 space-y-3 hover:border-accent/30 transition-colors">
             <Quote className="w-5 h-5 text-accent opacity-40" />
-            <p className="text-sm font-serif italic leading-relaxed text-foreground">"{c.quote}"</p>
+            <p className="text-sm font-serif leading-relaxed text-foreground">"{c.quote}"</p>
             <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">— {c.role}</p>
           </motion.div>
         ))}
       </div>
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-3">
-        <h3 className="text-xl font-bold font-serif italic">Using SocratesIQ in your classroom?</h3>
+        <h3 className="text-xl font-bold font-serif">Using SocratesIQ in your classroom?</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">We'd love to hear what's working. Send us your experience and it may appear here.</p>
         <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com?subject=My%20Socrates%20feedback'} className="gap-2">
           <Mail className="w-4 h-4" />Share your feedback
@@ -168,7 +168,7 @@ export function TermsPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-2">
-        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Terms of Service</h1></div>
+        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Terms of Service</h1></div>
         <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
       </div>
       {[
@@ -256,7 +256,7 @@ export function HelpPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-2">
-        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Help & How-To</h1></div>
+        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Help & How-To</h1></div>
         <p className="text-muted-foreground">Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.</p>
       </div>
       <input

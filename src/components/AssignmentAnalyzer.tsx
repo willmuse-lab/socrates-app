@@ -311,7 +311,7 @@ export function AssignmentAnalyzer({
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               <Card className="border border-border shadow-sm">
-                <CardHeader><CardTitle className="text-lg font-serif italic">Upload Document</CardTitle><CardDescription>PDF, DOCX, or TXT files.</CardDescription></CardHeader>
+                <CardHeader><CardTitle className="text-lg font-serif">Upload Document</CardTitle><CardDescription>PDF, DOCX, or TXT files.</CardDescription></CardHeader>
                 <CardContent className="space-y-4">
                   <FileUploader onTextExtracted={setText} />
                   {googleConfigured && (
@@ -323,7 +323,7 @@ export function AssignmentAnalyzer({
                 </CardContent>
               </Card>
               <Card className="border border-border shadow-sm flex flex-col">
-                <CardHeader><CardTitle className="text-lg font-serif italic">Paste Text</CardTitle><CardDescription>Directly input your prompt.</CardDescription></CardHeader>
+                <CardHeader><CardTitle className="text-lg font-serif">Paste Text</CardTitle><CardDescription>Directly input your prompt.</CardDescription></CardHeader>
                 <CardContent className="space-y-4 flex-1 flex flex-col">
                   <Textarea placeholder="Paste your assignment here..." className="flex-1 min-h-[150px] resize-none border-border focus-visible:ring-accent" value={text} onChange={(e) => { setText(e.target.value); if (previousResult) setPreviousResult(null); }} />
                   <Button className="w-full h-12 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-md" onClick={handleAnalyze} disabled={isAnalyzing || !text.trim()}>
@@ -463,7 +463,7 @@ export function AssignmentAnalyzer({
                 {result.suggestions.map((suggestion, i) => (
                   <TabsContent key={i} value={suggestion.level} className="mt-6 space-y-6">
                     <div className="space-y-1">
-                      <h3 className="text-2xl font-serif italic text-accent">{suggestion.title}</h3>
+                      <h3 className="text-2xl font-serif text-accent">{suggestion.title}</h3>
                       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
                     </div>
                     <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{editedTexts[i] ?? suggestion.modifiedAssignment}</div>
@@ -615,7 +615,7 @@ export function AssignmentAnalyzer({
       <Dialog open={showScoreInfo} onOpenChange={setShowScoreInfo}>
         <DialogContent className="sm:max-w-[480px] border-border bg-card p-8 max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold italic font-serif">The AI Resilience Score</DialogTitle>
+            <DialogTitle className="text-2xl font-bold font-serif">The AI Resilience Score</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
@@ -645,7 +645,7 @@ export function AssignmentAnalyzer({
       <Dialog open={showWall} onOpenChange={setShowWall}>
         <DialogContent className="sm:max-w-[440px] border-border bg-card p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold italic font-serif">
+            <DialogTitle className="text-2xl font-bold font-serif">
               {credits?.plan === 'paid' ? "You've used this month's redesigns" : `You've used your ${credits?.allowance ?? 3} free redesigns`}
             </DialogTitle>
           </DialogHeader>

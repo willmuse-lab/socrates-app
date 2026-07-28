@@ -100,7 +100,7 @@ export function AdminResearch({ onBack }: AdminResearchProps) {
       <Card className="w-full max-w-sm p-8 space-y-6 border border-border">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mx-auto"><ShieldCheck className="w-6 h-6 text-accent" /></div>
-          <h2 className="text-xl font-bold font-serif italic">Admin Access</h2>
+          <h2 className="text-xl font-bold font-serif">Admin Access</h2>
           <p className="text-sm text-muted-foreground">Research library management is restricted.</p>
         </div>
         <form onSubmit={handlePassword} className="space-y-4">
@@ -119,7 +119,7 @@ export function AdminResearch({ onBack }: AdminResearchProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto w-full p-6 md:p-10 space-y-8">
       <div className="flex items-center justify-between border-b border-border pb-6">
         <div>
-          <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Research Library</h1></div>
+          <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Research Library</h1></div>
           <p className="text-muted-foreground text-sm mt-1">Upload research PDFs here. Claude reads them automatically when analyzing assignments.</p>
         </div>
         <Button variant="outline" onClick={onBack} className="gap-2"><ArrowLeft className="w-4 h-4" />Back</Button>

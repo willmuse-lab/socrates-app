@@ -63,7 +63,7 @@ export function Testimonials({ compact = false }: TestimonialProps) {
           <div className="flex justify-center gap-1">
             {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
           </div>
-          <h2 className="text-3xl font-bold font-serif italic">What teachers are saying</h2>
+          <h2 className="text-3xl font-bold font-serif">What teachers are saying</h2>
           <p className="text-muted-foreground">Real feedback from real classrooms.</p>
         </div>
         <div className="relative">

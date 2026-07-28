@@ -51,7 +51,7 @@ export function SavedReportView({ assignment, onBack, onRedesignAgain, userId = 
       {/* Header */}
       <div className="space-y-2">
         <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Saved Assignment Report</p>
-        <h1 className="text-2xl md:text-3xl font-bold font-serif italic">{assignment.title}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold font-serif">{assignment.title}</h1>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <span>Saved {assignment.date}</span>
           {assignment.status && <span className="px-2 py-0.5 rounded-full bg-secondary font-bold uppercase tracking-widest text-[10px]">{assignment.status} redesign</span>}

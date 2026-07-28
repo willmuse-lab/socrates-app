@@ -61,7 +61,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
               className="bg-card border border-border rounded-2xl p-8 space-y-6 text-center">
               <div className="w-20 h-20 mx-auto"><img src="/logo.png" alt="SocratesIQ" className="w-full h-full object-contain" /></div>
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold font-serif italic">Welcome, {userName.split(' ')[0]}.</h1>
+                <h1 className="text-3xl font-bold font-serif">Welcome, {userName.split(' ')[0]}.</h1>
                 <p className="text-muted-foreground leading-relaxed">SocratesIQ helps you design assignments that <strong>AI cannot shortcut</strong>. This takes 90 seconds to set up.</p>
               </div>
               <div className="grid grid-cols-3 gap-4 text-left">
@@ -79,7 +79,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
           {step === 1 && (
             <motion.div key="profile" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6 max-h-[85vh] overflow-y-auto">
-              <div><h2 className="text-2xl font-bold font-serif italic">Tell us about your teaching</h2>
+              <div><h2 className="text-2xl font-bold font-serif">Tell us about your teaching</h2>
                 <p className="text-sm text-muted-foreground">SocratesIQ tailors every suggestion to your subject and students.</p></div>
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -135,7 +135,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
           {step === 2 && (
             <motion.div key="framework" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6">
-              <div><h2 className="text-2xl font-bold font-serif italic">The Triple-A Framework</h2>
+              <div><h2 className="text-2xl font-bold font-serif">The Triple-A Framework</h2>
                 <p className="text-sm text-muted-foreground">The three principles behind every SocratesIQ suggestion.</p></div>
               <div className="space-y-3">
                 {[
@@ -159,7 +159,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
           {step === 3 && (
             <motion.div key="demo" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6">
-              <div><h2 className="text-2xl font-bold font-serif italic">See it in action</h2>
+              <div><h2 className="text-2xl font-bold font-serif">See it in action</h2>
                 <p className="text-sm text-muted-foreground">How a typical {subjects[0] || 'assignment'} improves at each level.</p></div>
               <div className="space-y-3">
                 {[
@@ -191,7 +191,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
                 <CheckCircle2 className="w-8 h-8 text-green-600" />
               </motion.div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold font-serif italic">You're all set!</h2>
+                <h2 className="text-2xl font-bold font-serif">You're all set!</h2>
                 <p className="text-muted-foreground text-sm leading-relaxed">SocratesIQ will now tailor every analysis to <strong>{subjects.join(', ')}</strong> at the <strong>{gradeLevels.join(', ')}</strong> level{gradeLevels.length > 1 ? 's' : ''}.</p>
               </div>
               <div className="bg-secondary/40 rounded-xl p-4 text-left space-y-2">
