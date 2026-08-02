@@ -436,6 +436,7 @@ export function AssignmentAnalyzer({
                           <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${badges[i]}`}>{medals[i]} {sug.level}</div>
                           <p className="text-xs font-bold">{sug.title}</p>
                           <p className="text-[11px] text-muted-foreground leading-relaxed italic">{sug.description}</p>
+                          {sug.strengthens && <p className="text-[10px] font-bold uppercase tracking-wider text-accent">Strengthens: {sug.strengthens}</p>}
                           {changes.length > 0 && (
                             <div className="space-y-1.5 pt-1 border-t border-black/10">
                               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Key additions:</p>
@@ -465,6 +466,7 @@ export function AssignmentAnalyzer({
                     <div className="space-y-1">
                       <h3 className="text-2xl font-serif italic text-accent">{suggestion.title}</h3>
                       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
+                      {suggestion.strengthens && <p className="text-[11px] font-bold uppercase tracking-wider text-accent mt-1">Strengthens: {suggestion.strengthens}</p>}
                     </div>
                     <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{editedTexts[i] ?? suggestion.modifiedAssignment}</div>
                     {editedTexts[i] != null && editedTexts[i] !== suggestion.modifiedAssignment && (
