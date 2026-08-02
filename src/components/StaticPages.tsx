@@ -29,7 +29,7 @@ export function AboutPage({ onBack }: PageProps) {
           {[
             'UNESCO (2023)', 'Bearman & Luckin (2024)', 'Mollick & Mollick (2023)', 'Lodge et al. (2023)',
             'Dawson (2021)', 'TEQSA (2024)', 'Eaton (2023)', 'Perkins, Furze, Roe & MacVaugh (2024)',
-            'Awadallah Alkouk & Khlaif (2024)', 'Sperber et al. (2025)',
+            'Awadallah Alkouk & Khlaif (2024)', 'Sperber et al. (2025)', 'Loaiza & Rigobón, MIT (2025)',
           ].map(name => (
             <span key={name} className="px-3 py-1.5 rounded-full bg-secondary/60 border border-border text-xs font-medium text-foreground/80">{name}</span>
           ))}
