@@ -3,8 +3,10 @@
 @import "shadcn/tailwind.css";
 
 @theme inline {
-  --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  --font-serif: 'Fraunces', 'Georgia', serif;
+  /* Brand kit typeface is Sora everywhere. Headings keep the .font-serif
+     class for the heading treatment, but render in Sora (not a serif). */
+  --font-sans: 'Sora', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Sora', 'Helvetica Neue', Arial, sans-serif;
 
   /* Warm-paper editorial theme (light). The old cream + four pastel
      corner-glows + coral read as a generic AI-default look; this is a
@@ -65,7 +67,7 @@
   h1, h2, h3, .font-serif {
     font-family: var(--font-serif);
     font-weight: 600;
-    letter-spacing: -0.012em;
+    letter-spacing: -0.02em;
   }
 }
 
