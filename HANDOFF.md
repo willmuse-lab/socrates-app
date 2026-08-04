@@ -1,7 +1,85 @@
 # SOCRATES — Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: July 25 2026.
+session. Read this whole file before making changes. Last updated: August 4 2026.
+
+## Session status (August 4 2026) — UI reskin + EPOCH IN PROGRESS (branches, NOT merged)
+
+Nothing from this session is live or on `main` yet — it is all on branches / draft
+PRs. Will's live site is UNCHANGED. Two workstreams plus decisions:
+
+OPEN BRANCHES / PRs:
+- **PR #10 `claude/handoff-continuation-w2g10j` — UI RESKIN (ON HOLD; do NOT merge
+  without Will's explicit OK).** Why: a hired marketing team said the old UI "looks
+  too AI" (cream bg + four pastel corner-glow radial gradients + coral accent +
+  Georgia-italic headlines = a generic AI-default look). On the branch: warm-paper +
+  deep-navy + slate-blue editorial palette (`src/index.css` tokens), corner-glows
+  removed, ALL headings flipped italic→upright (38 spots), navy pill buttons, `.eyebrow`
+  labels + `.section-ink` dark bands, a dark "Built by a teacher" section on the
+  landing. THEN per the brand kit the font was switched Fraunces→**Sora** (whole UI is
+  Sora; `--font-serif` token repurposed to Sora so headings render in it; fonts load
+  via <link> in index.html). Also here: the **new owl brand logo** (`public/logo.png`,
+  transparent PNG, replaces the old; used by header, splash, favicon, onboarding,
+  loading). Design DIRECTION = the marketing team's Lovable mockup
+  https://socrates-spark-redo.lovable.app (editorial navy/paper, photography).
+- **PR #11 `claude/epoch-redesigns` — EPOCH redesigns (draft, ready to test).**
+  Folds the MIT Sloan EPOCH paper (Loaiza & Rigobón 2025) into the redesign engine,
+  ADDITIVE: one entry added to `RESEARCH_NOTES`, reinforcing — NOT replacing — the
+  existing strategies. Every redesign must now build a human capability AI can't
+  replicate; a short "Strengthens: …" tag renders on each Bronze/Silver/Gold card
+  (new optional `strengthens` field on the suggestion type in gemini.ts + analyze.ts
+  prompt bullet + OUTPUT FORMAT). About page gets ONE citation chip
+  (`Loaiza & Rigobón, MIT (2025)`) in the sources list. WILL'S RULES: MIT/EPOCH
+  appears ONLY in the research base + About citation, NEVER in redesign output (prompt:
+  "never name any framework, study, or acronym"); redesigns ONLY (0–100 score +
+  failure breakdown unchanged); always on; learning-and-thinking voice. Kept on a
+  SEPARATE branch from the reskin so it can ship independently. Builds pass (vite +
+  esbuild).
+
+ENVIRONMENT NOTE: the agent cannot reach lovable.app, socratesiq.com, or the netlify
+site (org network policy returns 403 CONNECT). Will must paste screenshots / publish
+for the agent to see anything external. Pasted IMAGES are visible to the agent but do
+NOT land on its filesystem — binary assets (logos, photos) must come in via GitHub
+upload; SVG/text can be pasted.
+
+DECISIONS MADE (don't relitigate):
+- **Font = Sora** (brand kit), NOT the Lovable serif. Brand kit: Sora typeface; palette
+  navy #0F1B2E / slate #33455E / blue #00A8E8 / green #2EBB57 / grey #E6EBF1; owl =
+  "Design 1 – Abstract" (navy→teal). Kit also has horizontal / owl-only / reversed
+  lockups.
+- **The app's OWN copy is CLEAN** — audited: no fabricated stats/testimonials
+  (testimonials already anonymized; pricing "Save %" is computed). The fake proof
+  ("87%→0%", "300+ institutions", "Dr. Sarah Jenkins") is ONLY in the Lovable draft
+  (marketing's to fix). NUANCE: "87%→0%" traces to REAL data in `RESEARCH_NOTES` (the
+  BUV / Furze et al. 2024 pilot) but Lovable misworded it (misconduct CASES → zero, not
+  "87% of students"); "300+ institutions" & "Dr. Sarah Jenkins" are AI-invented.
+- **Imagery:** no real classroom photos (no schools/pilots yet). Plan: PRODUCT
+  SCREENSHOTS + brand graphics + honest "materials" shots Will can take; licensed stock
+  only as honest mood, never captioned as real users; NO AI-generated people.
+- **Logo format:** the new logo is an AI-generated RASTER (PNG). Will's "Owllogo.svg"
+  upload was a WRAPPED BITMAP (a PNG embedded in an SVG, ~470KB, zero vector paths) —
+  removed it. A true vector needs a designer to redraw the owl; the PNG is fine for web.
+- A marketing **punch-list** was delivered to Will (scratchpad file) covering: strip the
+  Lovable draft's fake proof, use Sora, use product screenshots not classroom photos,
+  brand-kit colors/contrast, extend the design into the app (not just the homepage).
+
+NEXT STEPS (Will's stated plan, session paused here):
+1. **Fix the logo** — get an owl-only / horizontal lockup (ideally a REAL vector SVG)
+   from the designer; the tall stacked lockup renders small in the ~60px nav. Upload via
+   GitHub (`public/`), agent wires it into the header/loading spots.
+2. **Build the PUBLIC LANDING PAGE** — the top open product need: login is currently
+   FORCED before anything (non-dismissable LoginDialog in App.tsx), so marketers /
+   prospects / press / SEO can't see what SocratesIQ is. Build a public marketing
+   homepage (reskin + Sora + brand + HONEST content + product screenshots per the
+   punch-list) with "Get Started/Sign in" opening the login and login gating only the
+   TOOL (analyze/save). Email capture still happens at signup. Lovable mockup = layout
+   reference.
+3. Decide on merging PR #10 (reskin) and PR #11 (EPOCH), then trigger a Netlify deploy
+   (auto-deploy of main does NOT fire — see Deployment facts).
+
+PAUSED / UNFINISHED: a `/content-coach` social post — 5 viral angles were offered
+(AI-detectors-are-a-trap / a real number / teacher origin story / a classroom
+transformation / "stop telling students not to use AI"); Will never picked one.
 
 ## Session status (July 22–25 2026) — all LIVE on main
 
