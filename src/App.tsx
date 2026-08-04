@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AssignmentAnalyzer } from './components/AssignmentAnalyzer';
+import { LandingPage } from './components/LandingPage';
 import { LibraryView } from './components/LibraryView';
 import { AdminResearch } from './components/AdminResearch';
 import { AdminDashboard } from './components/AdminDashboard';
@@ -82,7 +83,6 @@ export default function App() {
     const hasShownSplash = sessionStorage.getItem('hasShownSplash');
     if (hasShownSplash) {
       setShowSplash(false);
-      if (!storedUser) setIsLoginOpen(true);
     }
   }, []);
 
@@ -165,7 +165,6 @@ export default function App() {
   const handleSplashComplete = () => {
     setShowSplash(false);
     sessionStorage.setItem('hasShownSplash', 'true');
-    if (!user) setIsLoginOpen(true);
   };
 
   const handleSaveSettings = () => {
@@ -179,7 +178,7 @@ export default function App() {
       <AnimatePresence>{showOnboarding && user && (
         <Onboarding userName={user.name} userEmail={user.email} userId={user.id || ''} onComplete={handleOnboardingComplete} />
       )}</AnimatePresence>
-      <LoginDialog isOpen={isLoginOpen && !showSplash && !showOnboarding} onLogin={handleLogin} />
+      <LoginDialog isOpen={isLoginOpen && !showSplash && !showOnboarding} onLogin={handleLogin} onClose={() => setIsLoginOpen(false)} />
       <ResetPasswordDialog isOpen={showPasswordReset} onDone={() => setShowPasswordReset(false)} />
 
       <header className="h-16 md:h-20 px-4 md:px-10 flex items-center justify-between border-b border-border bg-card sticky top-0 z-40">
@@ -187,13 +186,19 @@ export default function App() {
           <img src="/logo.png" alt="SocratesIQ" className="h-10 md:h-[60px] w-auto object-contain" />
         </button>
         <nav className="hidden md:flex items-center gap-6">
-          {[
-            { label: 'Studio', view: 'studio' },
-            { label: 'Library', view: 'library' },
-            { label: 'Feedback', view: 'feedback' },
-            { label: 'Pricing', view: 'pricing' },
-            { label: 'About', view: 'about' },
-          ].map(({ label, view }) => (
+          {(user
+            ? [
+                { label: 'Studio', view: 'studio' },
+                { label: 'Library', view: 'library' },
+                { label: 'Feedback', view: 'feedback' },
+                { label: 'Pricing', view: 'pricing' },
+                { label: 'About', view: 'about' },
+              ]
+            : [
+                { label: 'Pricing', view: 'pricing' },
+                { label: 'About', view: 'about' },
+              ]
+          ).map(({ label, view }) => (
             <button key={view} onClick={() => setViewMode(view as ViewMode)}
               className={`text-sm font-medium transition-colors ${viewMode === view ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
               {label}
@@ -231,9 +236,9 @@ export default function App() {
               onViewDashboard={() => setViewMode('admin-dashboard')} */
             />
           ) : (
-            <div className="animate-pulse flex items-center gap-3">
-              <div className="w-20 h-4 bg-secondary rounded" />
-              <div className="w-8 h-8 rounded-full bg-secondary" />
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setIsLoginOpen(true)}>Sign in</Button>
+              <Button size="sm" onClick={() => setIsLoginOpen(true)}>Get started</Button>
             </div>
           )}
         </div>
@@ -241,7 +246,12 @@ export default function App() {
 
       <main className="flex-1 flex flex-col">
         <AnimatePresence mode="wait">
-          {viewMode === 'studio' && (
+          {viewMode === 'studio' && !user && (
+            <motion.div key="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <LandingPage onGetStarted={() => setIsLoginOpen(true)} onNavigate={(v) => setViewMode(v as ViewMode)} />
+            </motion.div>
+          )}
+          {viewMode === 'studio' && user && (
             <motion.div key="studio" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <AssignmentAnalyzer
                 defaultPreference={defaultPreference} dimensions={dimensions}

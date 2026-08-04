@@ -34,11 +34,12 @@ function MicrosoftIcon() {
 interface LoginDialogProps {
   isOpen: boolean;
   onLogin: (name: string, email: string, id?: string) => void;
+  onClose?: () => void;
 }
 
 type Mode = 'login' | 'signup' | 'forgot';
 
-export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
+export function LoginDialog({ isOpen, onLogin, onClose }: LoginDialogProps) {
   const [mode, setMode] = useState<Mode>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -112,7 +113,7 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
   const isDemo = !supabaseEnabled;
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose?.(); }}>
       <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden border-border bg-card shadow-2xl">
         <div className="relative h-32 bg-primary flex items-center justify-center overflow-hidden">
           <div className="relative flex flex-col items-center gap-2">
