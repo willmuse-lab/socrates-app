@@ -94,9 +94,9 @@ export function Pricing({ onBack }: PricingProps) {
       <div className="max-w-2xl mx-auto space-y-4">
         <h2 className="text-xl font-bold text-center font-serif">Common questions</h2>
         {[
-          { q: 'Is there a free trial?', a: 'Yes — sign up and get 3 free assignment redesigns, no credit card required. After that it\'s $9.99/month for 20 redesigns a month.' },
+          { q: 'Is there a free trial?', a: 'Yes, sign up and get 3 free assignment redesigns, no credit card required. After that it\'s $9.99/month for 20 redesigns a month.' },
           { q: 'How does school and district pricing work?', a: "Every school is different, so we price school and district plans individually. Email socratesiqed@gmail.com and we'll put together a quote for your size and needs." },
-          { q: 'Is student work sent to AI companies?', a: "Assignment text is sent to Anthropic's Claude API for analysis only — it is not stored or used for training. We never collect student PII." },
+          { q: 'Is student work sent to AI companies?', a: "Assignment text is sent to Anthropic's Claude API for analysis only. It is not stored or used for training. We never collect student PII." },
           { q: 'Do you offer discounts for Title I schools?', a: 'Yes. Email socratesiqed@gmail.com and we\'ll work something out.' },
         ].map(({ q, a }) => (
           <div key={q} className="bg-secondary/30 rounded-xl p-4 space-y-1 border border-border">

@@ -60,7 +60,7 @@ export function StreamingProgress({ percent, isVisible }: StreamingProgressProps
                 className="text-center space-y-3">
                 <Quote className="w-5 h-5 text-accent opacity-40 mx-auto" />
                 <p className="text-lg md:text-xl font-serif leading-relaxed text-foreground">"{comment.quote}"</p>
-                <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">— {comment.role}</p>
+                <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">{comment.role}</p>
               </motion.div>
             </AnimatePresence>
           </div>

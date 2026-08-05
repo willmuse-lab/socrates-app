@@ -61,7 +61,7 @@ export function LibraryView({ onBack, assignments, onOpen, onDelete }: LibraryVi
             <Library className="w-6 h-6 text-accent" />
             <h1 className="text-3xl font-bold font-serif">Curriculum Library</h1>
           </div>
-          <p className="text-muted-foreground">{assignments.length} transformed assignment{assignments.length !== 1 ? 's' : ''} — your evolving, AI-era curriculum workspace.</p>
+          <p className="text-muted-foreground">{assignments.length} transformed assignment{assignments.length !== 1 ? 's' : ''}. Your evolving, AI-era curriculum workspace.</p>
         </div>
         <Button variant="outline" onClick={onBack}>Back to Studio</Button>
       </div>

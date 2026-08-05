@@ -122,7 +122,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
                 {userId && supabaseEnabled && (
                   <div className="space-y-2 pt-2 border-t border-border">
                     <StandardsManager userId={userId} onSelect={() => {}} />
-                    <p className="text-[10px] text-muted-foreground italic">Optional — used to align your assignments and lesson plans to your standards. You can add or change this anytime in Settings.</p>
+                    <p className="text-[10px] text-muted-foreground italic">Optional: used to align your assignments and lesson plans to your standards. You can add or change this anytime in Settings.</p>
                   </div>
                 )}
               </div>
@@ -139,7 +139,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
                 <p className="text-sm text-muted-foreground">The three principles behind every SocratesIQ suggestion.</p></div>
               <div className="space-y-3">
                 {[
-                  { color: 'bg-accent', label: 'Anchor', icon: '⚓', desc: "Ground assignments in local, personal, or current context that AI cannot access — your classroom, this week's news, your students' own community." },
+                  { color: 'bg-accent', label: 'Anchor', icon: '⚓', desc: "Ground assignments in local, personal, or current context that AI cannot access: your classroom, this week's news, your students' own community." },
                   { color: 'bg-green-600', label: 'Audit', icon: '🔍', desc: 'Assess the process, not just the product. Require draft histories, revision memos, or what I tried and why it failed reflections.' },
                   { color: 'bg-amber-600', label: 'Agency', icon: '🎯', desc: "Make the student's own voice, experience, and stakes central. Personal perspective is the one thing AI genuinely cannot replicate." },
                 ].map((item, i) => (
@@ -163,8 +163,8 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
                 <p className="text-sm text-muted-foreground">How a typical {subjects[0] || 'assignment'} improves at each level.</p></div>
               <div className="space-y-3">
                 {[
-                  { medal: '🥉', level: 'Bronze', color: 'border-orange-200 bg-orange-50', badge: 'bg-orange-100 text-orange-700', label: 'Quick fix — 5 minutes', after: 'Write a 500-word essay referencing a news article from this week and one change you\'ve personally observed in your local environment.' },
-                  { medal: '🥈', level: 'Silver', color: 'border-slate-200 bg-slate-50', badge: 'bg-slate-100 text-slate-700', label: 'Deeper redesign — 15 minutes', after: 'Submit your essay AND a 200-word process note: what you tried first, why you changed direction, and one thing you\'d do differently.' },
+                  { medal: '🥉', level: 'Bronze', color: 'border-orange-200 bg-orange-50', badge: 'bg-orange-100 text-orange-700', label: 'Quick fix: 5 minutes', after: 'Write a 500-word essay referencing a news article from this week and one change you\'ve personally observed in your local environment.' },
+                  { medal: '🥈', level: 'Silver', color: 'border-slate-200 bg-slate-50', badge: 'bg-slate-100 text-slate-700', label: 'Deeper redesign: 15 minutes', after: 'Submit your essay AND a 200-word process note: what you tried first, why you changed direction, and one thing you\'d do differently.' },
                   { medal: '🥇', level: 'Gold', color: 'border-amber-200 bg-amber-50', badge: 'bg-amber-100 text-amber-700', label: 'Full transformation', after: 'Interview a family member about climate change they\'ve witnessed. Your essay must centre their voice and connect it to your own.' },
                 ].map(item => (
                   <div key={item.level} className={`p-4 border rounded-xl ${item.color} space-y-2`}>
@@ -204,7 +204,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
                 Open the Studio <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <button onClick={handleComplete} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                Skip for now — I'll set this up later in Settings
+                Skip for now. I'll set this up later in Settings
               </button>
             </motion.div>
           )}

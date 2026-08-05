@@ -23,7 +23,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
           <div className="space-y-6">
             <p className="eyebrow">For middle school, high school &amp; college teachers</p>
             <h1 className="text-4xl md:text-6xl font-semibold leading-[1.05]">The AI-resilient assignment redesign platform</h1>
-            <p className="on-ink-muted text-lg leading-relaxed max-w-xl">Your assignments stopped working. Students aren't struggling anymore — they're outsourcing. SocratesIQ redesigns the assignments you already use so the human thinking becomes unavoidable.</p>
+            <p className="on-ink-muted text-lg leading-relaxed max-w-xl">Your assignments stopped working. Students aren't struggling anymore. They're outsourcing. SocratesIQ redesigns the assignments you already use so the human thinking becomes unavoidable.</p>
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <Button onClick={onGetStarted} size="lg" className="gap-2 bg-on-ink text-ink hover:bg-on-ink/90">
                 Redesign an assignment free <ArrowRight className="w-4 h-4" />
@@ -32,7 +32,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
                 See how it works
               </a>
             </div>
-            <p className="text-xs on-ink-muted">Your first 3 redesigns are free — no credit card.</p>
+            <p className="text-xs on-ink-muted">Your first 3 redesigns are free. No credit card.</p>
           </div>
           {/* Product peek — a real before→after score */}
           <div className="ink-card p-6 md:p-8 space-y-5">
@@ -68,7 +68,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
             {[
               { Icon: ShieldOff, title: 'Ban it', body: 'Block AI and police every submission. But your students graduate into a world where every employer expects them to work alongside it.' },
               { Icon: EyeOff, title: 'Ignore it', body: "Students hand in polished work that isn't theirs. You grade thinking you never actually saw." },
-              { Icon: Sparkles, title: 'Redesign it', body: 'Rebuild the assignment so AI can assist but cannot replace the student. The thinking stays human — and the work gets better.', highlight: true },
+              { Icon: Sparkles, title: 'Redesign it', body: 'Rebuild the assignment so AI can assist but cannot replace the student. The thinking stays human, and the work gets better.', highlight: true },
             ].map(({ Icon, title, body, highlight }) => (
               <div key={title} className={`rounded-2xl border p-7 space-y-3 ${highlight ? 'border-accent bg-accent/5' : 'border-border bg-card'}`}>
                 <Icon className={`w-6 h-6 ${highlight ? 'text-accent' : 'text-muted-foreground'}`} />
@@ -90,7 +90,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
           <div className="grid sm:grid-cols-3 gap-6">
             {[
               { num: '1', title: 'Analyze', body: 'Paste or upload an assignment you already use. Get a 0–100 AI Resilience Score and exactly where AI can replace student thinking.' },
-              { num: '2', title: 'Transform', body: 'Choose a redesign — Bronze, Silver, or Gold — tuned to your AI strategy. Each one is rewritten and ready to hand out.' },
+              { num: '2', title: 'Transform', body: 'Choose a redesign (Bronze, Silver, or Gold) tuned to your AI strategy. Each one is rewritten and ready to hand out.' },
               { num: '3', title: 'Teach', body: 'Generate a full lesson plan and student directions, aligned to your standards. Download as PDF, Word, or Google Doc.' },
             ].map(s => (
               <div key={s.num} className="ink-card p-7 space-y-4">
@@ -109,14 +109,14 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
           <div className="space-y-5">
             <p className="eyebrow">Why it works</p>
             <h2 className="text-3xl md:text-4xl font-semibold">Built on research, not guesswork</h2>
-            <p className="text-muted-foreground leading-relaxed">Every score and redesign is grounded in published work on AI and assessment. The idea is simple: detection is a losing game — redesign the task instead, so the cost of using AI exceeds the cost of doing the work honestly.</p>
-            <p className="text-muted-foreground leading-relaxed">In a published university pilot (Furze et al., 2024), redesigning assignments this way — with no bans and no detection software — brought AI-related misconduct cases down to zero.</p>
+            <p className="text-muted-foreground leading-relaxed">Every score and redesign is grounded in published work on AI and assessment. The idea is simple: detection is a losing game. Redesign the task instead, so the cost of using AI exceeds the cost of doing the work honestly.</p>
+            <p className="text-muted-foreground leading-relaxed">In a published university pilot (Furze et al., 2024), redesigning assignments this way (with no bans and no detection software) brought AI-related misconduct cases down to zero.</p>
             <button onClick={() => onNavigate('scoring')} className="text-sm font-bold uppercase tracking-wider text-accent hover:underline">How the score works →</button>
           </div>
           <div className="bg-card rounded-2xl border border-border p-7 space-y-4">
             <p className="text-[0.72rem] font-bold uppercase tracking-[0.2em] text-muted-foreground">The four dimensions it scores</p>
             {[
-              ['Anchor', "Tied to your class, this week, this town — context AI can't know."],
+              ['Anchor', "Tied to your class, this week, this town: context AI can't know."],
               ['Proprietary', 'Built on your own classroom materials, not the open web.'],
               ['Audit', 'Grades the process and the thinking, not just the final product.'],
               ['Agency', "Requires the student's own voice, choices, and experience."],
@@ -135,7 +135,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
         <div className="max-w-3xl mx-auto text-center space-y-4">
           <p className="eyebrow">Built by a teacher</p>
           <h2 className="text-2xl md:text-4xl font-semibold">Your expertise comes first</h2>
-          <p className="on-ink-muted text-lg leading-relaxed">SocratesIQ doesn't replace your teaching. It helps you redesign the assignments you've refined for years — preserving your goals, your voice, and your judgment. Built by a teacher, not a tech company.</p>
+          <p className="on-ink-muted text-lg leading-relaxed">SocratesIQ doesn't replace your teaching. It helps you redesign the assignments you've refined for years, preserving your goals, your voice, and your judgment. Built by a teacher, not a tech company.</p>
         </div>
       </section>
 
@@ -144,7 +144,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <p className="eyebrow">Pricing</p>
           <h2 className="text-3xl md:text-4xl font-semibold">Start free. Upgrade when it earns its keep.</h2>
-          <p className="text-muted-foreground text-lg">Your first <strong>3 assignment redesigns are free</strong> — no credit card. After that, an individual teacher plan is <strong>$9.99/month</strong> (or $99.99/year) for 20 redesigns a month, with every follow-up free.</p>
+          <p className="text-muted-foreground text-lg">Your first <strong>3 assignment redesigns are free</strong>. No credit card. After that, an individual teacher plan is <strong>$9.99/month</strong> (or $99.99/year) for 20 redesigns a month, with every follow-up free.</p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button onClick={onGetStarted} size="lg" className="gap-2">Get started free <ArrowRight className="w-4 h-4" /></Button>
             <Button onClick={() => onNavigate('pricing')} variant="outline" size="lg">See full pricing</Button>
@@ -162,10 +162,10 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
           </div>
           <div className="space-y-4">
             {[
-              ['I already use AI detection tools. Isn’t that enough?', 'Detection is unreliable and punishes honest students. Redesigning the assignment makes detection irrelevant — the task itself can’t be outsourced.'],
+              ['I already use AI detection tools. Isn’t that enough?', 'Detection is unreliable and punishes honest students. Redesigning the assignment makes detection irrelevant. The task itself can’t be outsourced.'],
               ['Doesn’t this make teaching harder?', 'The opposite. You bring an assignment you already use; SocratesIQ does the redesign, the lesson plan, and the student directions. You keep what works.'],
-              ['What grades and subjects does it fit?', 'It tailors every redesign to your subject and grade level — middle school through college, across subjects.'],
-              ['Do you store student data?', 'No. SocratesIQ is for teachers analyzing their own assignment prompts — please don’t submit student names or work. See the Privacy page.'],
+              ['What grades and subjects does it fit?', 'It tailors every redesign to your subject and grade level, from middle school through college, across subjects.'],
+              ['Do you store student data?', 'No. SocratesIQ is for teachers analyzing their own assignment prompts. Please don’t submit student names or work. See the Privacy page.'],
             ].map(([q, a]) => (
               <div key={q} className="ink-card p-6 space-y-2">
                 <p className="font-serif text-lg font-semibold text-on-ink">{q}</p>
@@ -180,7 +180,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
       <section className="px-6 md:px-10 py-20 md:py-28">
         <div className="max-w-2xl mx-auto text-center space-y-6">
           <h2 className="text-4xl md:text-5xl font-semibold">Let's redesign your first assignment</h2>
-          <p className="text-muted-foreground text-lg">Take the free trial. Bring one assignment. See what happens — no credit card, no commitment.</p>
+          <p className="text-muted-foreground text-lg">Take the free trial. Bring one assignment. See what happens. No credit card, no commitment.</p>
           <Button onClick={onGetStarted} size="lg" className="gap-2">Get started free <ArrowRight className="w-4 h-4" /></Button>
           <p className="text-xs text-muted-foreground">Your first 3 redesigns are on us.</p>
         </div>
