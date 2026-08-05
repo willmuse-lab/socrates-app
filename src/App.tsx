@@ -182,8 +182,9 @@ export default function App() {
       <ResetPasswordDialog isOpen={showPasswordReset} onDone={() => setShowPasswordReset(false)} />
 
       <header className="h-16 md:h-20 px-4 md:px-10 flex items-center justify-between border-b border-border bg-card sticky top-0 z-40">
-        <button onClick={() => setViewMode('studio')} className="flex items-center gap-2">
-          <img src="/logo.png" alt="SocratesIQ" className="h-10 md:h-[60px] w-auto object-contain" />
+        <button onClick={() => setViewMode('studio')} className="flex items-center gap-2.5">
+          <img src="/owl.png" alt="" className="h-8 md:h-10 w-auto object-contain" />
+          <span className="font-serif text-xl md:text-2xl font-semibold tracking-tight">SocratesIQ</span>
         </button>
         <nav className="hidden md:flex items-center gap-6">
           {(user
