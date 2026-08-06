@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AssignmentAnalyzer } from './components/AssignmentAnalyzer';
+import { LandingPage } from './components/LandingPage';
 import { LibraryView } from './components/LibraryView';
 import { AdminResearch } from './components/AdminResearch';
 import { AdminDashboard } from './components/AdminDashboard';
@@ -47,6 +48,7 @@ export default function App() {
   const [user, setUser] = useState<{ name: string; email: string; id?: string } | null>(null);
   const [profile, setProfile] = useState<TeacherProfile | null>(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [loginMode, setLoginMode] = useState<'login' | 'signup'>('login');
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('studio');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -82,7 +84,6 @@ export default function App() {
     const hasShownSplash = sessionStorage.getItem('hasShownSplash');
     if (hasShownSplash) {
       setShowSplash(false);
-      if (!storedUser) setIsLoginOpen(true);
     }
   }, []);
 
@@ -123,6 +124,14 @@ export default function App() {
     if (hydrated) saveSettings({ activeFramework, defaultPreference, bloomsLevel, dimensions });
   }, [activeFramework, defaultPreference, bloomsLevel, dimensions, hydrated]);
 
+  // Open the auth dialog on the right form: "Get started" → Create Account,
+  // "Sign in" → Welcome Back. A first-time visitor should never land on the
+  // returning-user greeting.
+  const openLogin = (mode: 'login' | 'signup' = 'login') => {
+    setLoginMode(mode);
+    setIsLoginOpen(true);
+  };
+
   const handleLogin = (name: string, email: string, id?: string) => {
     const newUser = { name, email, id };
     setUser(newUser); saveUser(newUser); setIsLoginOpen(false);
@@ -147,7 +156,7 @@ export default function App() {
     if (supabaseEnabled) await signOut();
     setUser(null); clearUser(); clearProfile(); setProfile(null);
     setCloudSynced(false); setSavedAssignments(loadAssignments());
-    setIsLoginOpen(true); toast.info('Logged out successfully');
+    openLogin('login'); toast.info('Logged out successfully');
   };
 
   const handleSaveAssignment = useCallback(async (assignment: Omit<SavedAssignment, 'id' | 'date'>) => {
@@ -165,7 +174,6 @@ export default function App() {
   const handleSplashComplete = () => {
     setShowSplash(false);
     sessionStorage.setItem('hasShownSplash', 'true');
-    if (!user) setIsLoginOpen(true);
   };
 
   const handleSaveSettings = () => {
@@ -179,21 +187,28 @@ export default function App() {
       <AnimatePresence>{showOnboarding && user && (
         <Onboarding userName={user.name} userEmail={user.email} userId={user.id || ''} onComplete={handleOnboardingComplete} />
       )}</AnimatePresence>
-      <LoginDialog isOpen={isLoginOpen && !showSplash && !showOnboarding} onLogin={handleLogin} />
+      <LoginDialog isOpen={isLoginOpen && !showSplash && !showOnboarding} initialMode={loginMode} onLogin={handleLogin} onClose={() => setIsLoginOpen(false)} />
       <ResetPasswordDialog isOpen={showPasswordReset} onDone={() => setShowPasswordReset(false)} />
 
       <header className="h-16 md:h-20 px-4 md:px-10 flex items-center justify-between border-b border-border bg-card sticky top-0 z-40">
-        <button onClick={() => setViewMode('studio')} className="flex items-center gap-2">
-          <img src="/logo.png" alt="SocratesIQ" className="h-10 md:h-[60px] w-auto object-contain" />
+        <button onClick={() => setViewMode('studio')} className="flex items-center gap-2.5">
+          <img src="/owl.png" alt="" className="h-8 md:h-10 w-auto object-contain" />
+          <span className="font-serif text-xl md:text-2xl font-semibold tracking-tight">SocratesIQ</span>
         </button>
         <nav className="hidden md:flex items-center gap-6">
-          {[
-            { label: 'Studio', view: 'studio' },
-            { label: 'Library', view: 'library' },
-            { label: 'Feedback', view: 'feedback' },
-            { label: 'Pricing', view: 'pricing' },
-            { label: 'About', view: 'about' },
-          ].map(({ label, view }) => (
+          {(user
+            ? [
+                { label: 'Studio', view: 'studio' },
+                { label: 'Library', view: 'library' },
+                { label: 'Feedback', view: 'feedback' },
+                { label: 'Pricing', view: 'pricing' },
+                { label: 'About', view: 'about' },
+              ]
+            : [
+                { label: 'Pricing', view: 'pricing' },
+                { label: 'About', view: 'about' },
+              ]
+          ).map(({ label, view }) => (
             <button key={view} onClick={() => setViewMode(view as ViewMode)}
               className={`text-sm font-medium transition-colors ${viewMode === view ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
               {label}
@@ -231,9 +246,9 @@ export default function App() {
               onViewDashboard={() => setViewMode('admin-dashboard')} */
             />
           ) : (
-            <div className="animate-pulse flex items-center gap-3">
-              <div className="w-20 h-4 bg-secondary rounded" />
-              <div className="w-8 h-8 rounded-full bg-secondary" />
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => openLogin('login')}>Sign in</Button>
+              <Button size="sm" onClick={() => openLogin('signup')}>Get started</Button>
             </div>
           )}
         </div>
@@ -241,7 +256,12 @@ export default function App() {
 
       <main className="flex-1 flex flex-col">
         <AnimatePresence mode="wait">
-          {viewMode === 'studio' && (
+          {viewMode === 'studio' && !user && (
+            <motion.div key="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <LandingPage onGetStarted={() => openLogin('signup')} onNavigate={(v) => setViewMode(v as ViewMode)} />
+            </motion.div>
+          )}
+          {viewMode === 'studio' && user && (
             <motion.div key="studio" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <AssignmentAnalyzer
                 defaultPreference={defaultPreference} dimensions={dimensions}
@@ -252,30 +272,34 @@ export default function App() {
                 initialText={openedAssignment?.fullText || ''}
                 userId={user?.id || ''}
               />
-              <section id="how-to-use" className="py-20 px-6 md:px-10 bg-card border-t border-border">
-                <div className="max-w-4xl mx-auto space-y-12">
-                  <div className="text-center space-y-4">
-                    <h2 className="text-3xl font-bold font-serif italic">Your curriculum already has value.</h2>
-                    <p className="text-muted-foreground">We don't replace it. We strengthen it — in three steps.</p>
+              <section id="how-to-use" className="py-20 md:py-24 px-6 md:px-10 border-t border-border">
+                <div className="max-w-5xl mx-auto space-y-14">
+                  <div className="text-center space-y-4 max-w-2xl mx-auto">
+                    <p className="eyebrow">How it works</p>
+                    <h2 className="text-4xl md:text-5xl font-semibold">Your curriculum already has value.</h2>
+                    <p className="text-muted-foreground text-lg">We don't replace it. We strengthen it, in three steps.</p>
                   </div>
-                  <div className="grid sm:grid-cols-3 gap-8">
+                  <div className="grid sm:grid-cols-3 gap-6">
                     {[
-                      { num: '1', color: 'bg-accent', title: 'Analyze', desc: 'Upload your existing assignment and see exactly where AI can replace student thinking.' },
-                      { num: '2', color: 'bg-green-600', title: 'Transform', desc: 'Choose the redesign that best fits your classroom — AI-Free, AI-Assisted, or AI-Integrated.' },
-                      { num: '3', color: 'bg-amber-600', title: 'Teach', desc: 'Download ready-to-use lesson plans, student directions, and standards alignment.' },
+                      { num: '1', title: 'Analyze', desc: 'Upload your existing assignment and see exactly where AI can replace student thinking.' },
+                      { num: '2', title: 'Transform', desc: 'Choose the redesign that best fits your classroom: AI-Free, AI-Assisted, or AI-Integrated.' },
+                      { num: '3', title: 'Teach', desc: 'Download ready-to-use lesson plans, student directions, and standards alignment.' },
                     ].map(s => (
-                      <div key={s.num} className="space-y-3">
-                        <div className={`w-10 h-10 rounded-full ${s.color} text-white flex items-center justify-center font-bold`}>{s.num}</div>
-                        <h3 className="font-bold text-lg">{s.title}</h3>
-                        <p className="text-sm text-muted-foreground">{s.desc}</p>
+                      <div key={s.num} className="rounded-2xl border border-border bg-card p-7 space-y-4">
+                        <div className="w-11 h-11 rounded-full bg-secondary text-foreground flex items-center justify-center font-serif text-lg font-semibold">{s.num}</div>
+                        <h3 className="font-serif text-2xl font-semibold">{s.title}</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
                       </div>
                     ))}
                   </div>
-                  <div className="max-w-2xl mx-auto text-center space-y-3 pt-4">
-                    <h3 className="text-xl font-bold font-serif italic">Your expertise comes first.</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">SocratesIQ doesn't replace your teaching. It helps you redesign assignments while preserving your instructional goals, your classroom voice, and your professional judgment. Bring the assignment you've used for the last 10 years — we'll help you prepare it for the next 10.</p>
-                    <p className="text-xs font-bold uppercase tracking-widest text-accent">Built by a teacher, not a tech company.</p>
-                  </div>
+                </div>
+              </section>
+              <section className="section-ink py-20 md:py-24 px-6 md:px-10">
+                <div className="max-w-3xl mx-auto text-center space-y-5">
+                  <p className="eyebrow">Built by a teacher</p>
+                  <h3 className="text-3xl md:text-4xl font-semibold">Your expertise comes first.</h3>
+                  <p className="on-ink-muted leading-relaxed text-lg">SocratesIQ doesn't replace your teaching. It helps you redesign assignments while preserving your instructional goals, your classroom voice, and your professional judgment. Bring the assignment you've used for the last 10 years, and we'll help you prepare it for the next 10.</p>
+                  <p className="text-[0.72rem] font-bold uppercase tracking-[0.2em] on-ink-accent pt-2">Built by a teacher, not a tech company.</p>
                 </div>
               </section>
               <Testimonials />
@@ -376,7 +400,7 @@ export default function App() {
             <DialogHeader>
               <div className="flex items-center gap-3 mb-2">
                 <Settings className="w-5 h-5 text-accent" />
-                <DialogTitle className="text-2xl font-bold italic font-serif">Studio Settings</DialogTitle>
+                <DialogTitle className="text-2xl font-bold font-serif">Studio Settings</DialogTitle>
               </div>
               <DialogDescription>Preferences persist across sessions.</DialogDescription>
             </DialogHeader>
@@ -419,7 +443,7 @@ export default function App() {
                       </div>
                     </>
                   )}
-                  <p className="text-[10px] text-muted-foreground italic">One assignment covers its analysis, every revision, the lesson plan, student directions, and downloads. {credits.plan === 'unlimited' ? 'Your account is comped — no limits.' : credits.plan === 'trial' ? 'Resets never — it’s a one-time trial.' : 'Resets monthly; unused assignments don’t roll over.'}</p>
+                  <p className="text-[10px] text-muted-foreground italic">One assignment covers its analysis, every revision, the lesson plan, student directions, and downloads. {credits.plan === 'unlimited' ? 'Your account is comped, no limits.' : credits.plan === 'trial' ? 'Resets never. It’s a one-time trial.' : 'Resets monthly; unused assignments don’t roll over.'}</p>
                 </div>
               )}
               {user?.id && supabaseEnabled && (

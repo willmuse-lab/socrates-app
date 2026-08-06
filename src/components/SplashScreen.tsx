@@ -38,7 +38,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
           className="flex flex-col items-center gap-4"
         >
           <img src="/logo.png" alt="SocratesIQ" className="w-24 h-24 object-contain" />
-          <p className="text-white font-serif italic text-2xl">SocratesIQ</p>
+          <p className="text-white font-serif text-2xl">SocratesIQ</p>
         </motion.div>
       ) : (
         <video

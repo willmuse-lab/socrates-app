@@ -119,8 +119,8 @@ export async function analyzeAssignment(
     return r;
   };
   const [diagnosis, redesigns] = await Promise.all([
-    call("diagnosis").then(tick("Scoring done — writing redesigns...")),
-    call("redesigns").then(tick("Redesigns ready — assembling results...")),
+    call("diagnosis").then(tick("Scoring done, writing redesigns...")),
+    call("redesigns").then(tick("Redesigns ready, assembling results...")),
   ]);
 
   const result = { ...diagnosis, suggestions: redesigns?.suggestions };

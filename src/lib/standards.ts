@@ -106,7 +106,7 @@ export type PermissionCategory =
 
 export const PERMISSION_CATEGORIES: { value: PermissionCategory; description: string }[] = [
   { value: 'No Use', description: '100% student work, no AI at any point.' },
-  { value: 'AI as Tutor or Coach', description: 'AI explains concepts only — never touches the assignment.' },
+  { value: 'AI as Tutor or Coach', description: 'AI explains concepts only, and never touches the assignment.' },
   { value: 'Brainstorming Buddy', description: 'AI helps explore ideas; the student creates the final product.' },
   { value: 'AI as Feedback Partner', description: 'Student creates first; AI gives feedback only.' },
   { value: 'AI as Analyst', description: 'AI summarizes and analyzes; the student verifies everything.' },

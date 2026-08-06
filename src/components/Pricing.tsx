@@ -19,7 +19,7 @@ export function Pricing({ onBack }: PricingProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl mx-auto p-6 md:p-10 space-y-12">
       <div className="text-center space-y-4">
         <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
-        <h1 className="text-4xl font-bold font-serif italic">Pricing that scales with you</h1>
+        <h1 className="text-4xl font-bold font-serif">Pricing that scales with you</h1>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto">Simple pricing for individual teachers. Schools and districts: let's talk.</p>
         <div className="inline-flex items-center gap-1 bg-secondary rounded-full p-1">
           <button onClick={() => setBilling('annual')} className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${billing === 'annual' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'}`}>
@@ -59,7 +59,7 @@ export function Pricing({ onBack }: PricingProps) {
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Whole school</p>
             <h3 className="text-xl font-bold">School</h3>
-            <div className="flex items-end gap-1 mt-2"><span className="text-3xl font-bold font-serif italic">Call for pricing</span></div>
+            <div className="flex items-end gap-1 mt-2"><span className="text-3xl font-bold font-serif">Call for pricing</span></div>
             <p className="text-sm text-muted-foreground pt-2">Every teacher in your building, priced for your school's size and needs.</p>
           </div>
           <Button variant="outline" className="w-full gap-2 font-bold" onClick={() => window.location.href = CONTACT_MAILTO}>
@@ -77,7 +77,7 @@ export function Pricing({ onBack }: PricingProps) {
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Whole district</p>
             <h3 className="text-xl font-bold">District</h3>
-            <div className="flex items-end gap-1 mt-2"><span className="text-3xl font-bold font-serif italic">Call for pricing</span></div>
+            <div className="flex items-end gap-1 mt-2"><span className="text-3xl font-bold font-serif">Call for pricing</span></div>
             <p className="text-sm text-muted-foreground pt-2">Unlimited teachers across all your schools, with district-level rollout support.</p>
           </div>
           <Button variant="outline" className="w-full gap-2 font-bold" onClick={() => window.location.href = CONTACT_MAILTO}>
@@ -92,11 +92,11 @@ export function Pricing({ onBack }: PricingProps) {
       </div>
 
       <div className="max-w-2xl mx-auto space-y-4">
-        <h2 className="text-xl font-bold text-center font-serif italic">Common questions</h2>
+        <h2 className="text-xl font-bold text-center font-serif">Common questions</h2>
         {[
-          { q: 'Is there a free trial?', a: 'Yes — sign up and get 3 free assignment redesigns, no credit card required. After that it\'s $9.99/month for 20 redesigns a month.' },
+          { q: 'Is there a free trial?', a: 'Yes, sign up and get 3 free assignment redesigns, no credit card required. After that it\'s $9.99/month for 20 redesigns a month.' },
           { q: 'How does school and district pricing work?', a: "Every school is different, so we price school and district plans individually. Email socratesiqed@gmail.com and we'll put together a quote for your size and needs." },
-          { q: 'Is student work sent to AI companies?', a: "Assignment text is sent to Anthropic's Claude API for analysis only — it is not stored or used for training. We never collect student PII." },
+          { q: 'Is student work sent to AI companies?', a: "Assignment text is sent to Anthropic's Claude API for analysis only. It is not stored or used for training. We never collect student PII." },
           { q: 'Do you offer discounts for Title I schools?', a: 'Yes. Email socratesiqed@gmail.com and we\'ll work something out.' },
         ].map(({ q, a }) => (
           <div key={q} className="bg-secondary/30 rounded-xl p-4 space-y-1 border border-border">

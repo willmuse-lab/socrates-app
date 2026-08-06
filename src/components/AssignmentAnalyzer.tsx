@@ -160,7 +160,7 @@ export function AssignmentAnalyzer({
   const handleExportDocx = async () => { if (!result) return; try { await exportToDocx(result, text, buildTransformation()); toast.success('DOCX exported!'); } catch { toast.error('Failed to export DOCX.'); } };
   const handleExportGoogleDocs = async () => {
     if (!result) return;
-    const title = `SocratesIQ Analysis — ${text.trim().split('\n')[0].substring(0, 40)}`;
+    const title = `SocratesIQ Analysis: ${text.trim().split('\n')[0].substring(0, 40)}`;
     try {
       toast.info('Creating Google Doc…');
       const res = await exportToGoogleDocs(result, text, title, buildTransformation());
@@ -202,7 +202,7 @@ export function AssignmentAnalyzer({
       const revised = await refineAssignment(current, instruction, subject, gradeLevel);
       setEditedTexts(prev => ({ ...prev, [i]: revised }));
       setRefineInputs(prev => ({ ...prev, [i]: '' }));
-      toast.success('Revised! The updated version is shown — revise again or continue to the lesson plan.');
+      toast.success('Revised! The updated version is shown. Revise again or continue to the lesson plan.');
     } catch (err: any) {
       toast.error(err?.message || 'Revision failed. Please try again.');
     } finally { setRefining(null); }
@@ -265,7 +265,7 @@ export function AssignmentAnalyzer({
                   <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">Transform Yesterday's Assignments into <span className="text-accent">Tomorrow's Learning.</span></h1>
                   <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground pt-1">Wisdom in the Age of Artificial Intelligence</p>
                 </div>
-                <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">Upload the assignments you've refined over years of teaching. SocratesIQ analyzes them, measures AI resilience, and transforms them into standards-aligned, classroom-ready learning experiences — without losing what makes them yours.</p>
+                <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">Upload the assignments you've refined over years of teaching. SocratesIQ analyzes them, measures AI resilience, and transforms them into standards-aligned, classroom-ready learning experiences, without losing what makes them yours.</p>
                 <p className="text-xs font-bold uppercase tracking-widest text-accent">Built by Teachers · Designed for the AI Era</p>
               </div>
             </div>
@@ -311,7 +311,7 @@ export function AssignmentAnalyzer({
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               <Card className="border border-border shadow-sm">
-                <CardHeader><CardTitle className="text-lg font-serif italic">Upload Document</CardTitle><CardDescription>PDF, DOCX, or TXT files.</CardDescription></CardHeader>
+                <CardHeader><CardTitle className="text-lg font-serif">Upload Document</CardTitle><CardDescription>PDF, DOCX, or TXT files.</CardDescription></CardHeader>
                 <CardContent className="space-y-4">
                   <FileUploader onTextExtracted={setText} />
                   {googleConfigured && (
@@ -323,7 +323,7 @@ export function AssignmentAnalyzer({
                 </CardContent>
               </Card>
               <Card className="border border-border shadow-sm flex flex-col">
-                <CardHeader><CardTitle className="text-lg font-serif italic">Paste Text</CardTitle><CardDescription>Directly input your prompt.</CardDescription></CardHeader>
+                <CardHeader><CardTitle className="text-lg font-serif">Paste Text</CardTitle><CardDescription>Directly input your prompt.</CardDescription></CardHeader>
                 <CardContent className="space-y-4 flex-1 flex flex-col">
                   <Textarea placeholder="Paste your assignment here..." className="flex-1 min-h-[150px] resize-none border-border focus-visible:ring-accent" value={text} onChange={(e) => { setText(e.target.value); if (previousResult) setPreviousResult(null); }} />
                   <Button className="w-full h-12 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-md" onClick={handleAnalyze} disabled={isAnalyzing || !text.trim()}>
@@ -463,12 +463,12 @@ export function AssignmentAnalyzer({
                 {result.suggestions.map((suggestion, i) => (
                   <TabsContent key={i} value={suggestion.level} className="mt-6 space-y-6">
                     <div className="space-y-1">
-                      <h3 className="text-2xl font-serif italic text-accent">{suggestion.title}</h3>
+                      <h3 className="text-2xl font-serif text-accent">{suggestion.title}</h3>
                       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
                     </div>
                     <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{editedTexts[i] ?? suggestion.modifiedAssignment}</div>
                     {editedTexts[i] != null && editedTexts[i] !== suggestion.modifiedAssignment && (
-                      <p className="text-[10px] text-muted-foreground italic -mt-4">✏️ Showing your revised version — downloads and the lesson plan will use it.</p>
+                      <p className="text-[10px] text-muted-foreground italic -mt-4">✏️ Showing your revised version. Downloads and the lesson plan will use it.</p>
                     )}
                     {editingIndex === i && (
                       <div className="space-y-2">
@@ -564,7 +564,7 @@ export function AssignmentAnalyzer({
             </div>
             {applied !== null && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent font-medium">
-                <BookOpen className="w-4 h-4 flex-shrink-0" />Version applied — re-analyze to see updated score.
+                <BookOpen className="w-4 h-4 flex-shrink-0" />Version applied. Re-analyze to see updated score.
               </motion.div>
             )}
             <div className="space-y-4">
@@ -615,18 +615,18 @@ export function AssignmentAnalyzer({
       <Dialog open={showScoreInfo} onOpenChange={setShowScoreInfo}>
         <DialogContent className="sm:max-w-[480px] border-border bg-card p-8 max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold italic font-serif">The AI Resilience Score</DialogTitle>
+            <DialogTitle className="text-2xl font-bold font-serif">The AI Resilience Score</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-            <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
-            <p>There's no fixed formula. SocratesIQ weighs your assignment against a proprietary, research-based rubric built on four dimensions — <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
+            <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient: harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
+            <p>There's no fixed formula. SocratesIQ weighs your assignment against a proprietary, research-based rubric built on four dimensions: <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
             <div className="space-y-1.5">
               {[
-                ['0–30', 'Highly vulnerable — one AI prompt could do it', 'text-red-500'],
-                ['31–50', 'Vulnerable — still largely AI-completable', 'text-orange-500'],
-                ['51–70', 'Moderate — some resilient elements, gaps remain', 'text-amber-500'],
-                ['71–85', 'Strong — multiple anchors and a process trail', 'text-lime-600'],
-                ['86–100', 'Exceptional — AI can assist but not replace', 'text-green-600'],
+                ['0–30', 'Highly vulnerable: one AI prompt could do it', 'text-red-500'],
+                ['31–50', 'Vulnerable: still largely AI-completable', 'text-orange-500'],
+                ['51–70', 'Moderate: some resilient elements, gaps remain', 'text-amber-500'],
+                ['71–85', 'Strong: multiple anchors and a process trail', 'text-lime-600'],
+                ['86–100', 'Exceptional: AI can assist but not replace', 'text-green-600'],
               ].map(([range, label, color]) => (
                 <div key={range} className="flex items-start gap-3">
                   <span className={`font-bold w-14 shrink-0 ${color}`}>{range}</span>
@@ -634,7 +634,7 @@ export function AssignmentAnalyzer({
                 </div>
               ))}
             </div>
-            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut — and the Bronze/Silver/Gold redesigns that raise it.</p>
+            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut, and the Bronze/Silver/Gold redesigns that raise it.</p>
           </div>
         </DialogContent>
       </Dialog>
@@ -645,27 +645,27 @@ export function AssignmentAnalyzer({
       <Dialog open={showWall} onOpenChange={setShowWall}>
         <DialogContent className="sm:max-w-[440px] border-border bg-card p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold italic font-serif">
+            <DialogTitle className="text-2xl font-bold font-serif">
               {credits?.plan === 'paid' ? "You've used this month's redesigns" : `You've used your ${credits?.allowance ?? 3} free redesigns`}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>{credits?.plan === 'paid'
-              ? 'Your plan includes 20 assignment redesigns a month. It resets at the start of your next month — everything you already created stays available.'
-              : 'Nice work — you got the full experience. To keep transforming assignments, a paid plan is on the way.'}</p>
+              ? 'Your plan includes 20 assignment redesigns a month. It resets at the start of your next month. Everything you already created stays available.'
+              : 'Nice work! You got the full experience. To keep transforming assignments, a paid plan is on the way.'}</p>
             <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-1">
               <p className="text-lg font-bold text-foreground">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
               <p className="text-xs"><strong className="text-foreground">20 assignment redesigns every month.</strong> Each one includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
             </div>
             {credits?.plan !== 'paid' && (
               <p className="text-xs bg-secondary/40 border border-border rounded-lg p-3">
-                💌 <strong className="text-foreground">Paid plans are launching soon.</strong> We'll email you the moment they're ready — no need to do anything.
+                💌 <strong className="text-foreground">Paid plans are launching soon.</strong> We'll email you the moment they're ready. No need to do anything.
               </p>
             )}
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => setShowWall(false)}>Got it</Button>
               <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={() => { setShowWall(false); toast.success("You're on the list — we'll email you when plans go live."); }}>
+                onClick={() => { setShowWall(false); toast.success("You're on the list. We'll email you when plans go live."); }}>
                 Notify me
               </Button>
             </div>

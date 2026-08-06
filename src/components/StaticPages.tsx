@@ -12,18 +12,18 @@ export function AboutPage({ onBack }: PageProps) {
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-5">
-          <h1 className="text-4xl font-bold font-serif italic leading-tight">Built by educators,<br />for educators.</h1>
-          <p className="text-muted-foreground leading-relaxed">SocratesIQ was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI — which is both impossible and counterproductive — we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
+          <h1 className="text-4xl font-bold font-serif leading-tight">Built by educators,<br />for educators.</h1>
+          <p className="text-muted-foreground leading-relaxed">SocratesIQ was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI (which is both impossible and counterproductive), we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
           <p className="text-muted-foreground leading-relaxed">Our methodology emerged from classroom research, consultation with pedagogical experts, and analysis of international AI-in-education guidance.</p>
         </div>
         <div className="bg-secondary/50 rounded-2xl border border-border p-8 space-y-4">
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Our philosophy</p>
-          <blockquote className="text-2xl font-serif italic text-accent leading-relaxed">"The unexamined assignment is not worth giving."</blockquote>
-          <p className="text-sm text-muted-foreground">— The Socratic Architect</p>
+          <blockquote className="text-2xl font-serif text-accent leading-relaxed">"The unexamined assignment is not worth giving."</blockquote>
+          <p className="text-sm text-muted-foreground">The Socratic Architect</p>
         </div>
       </div>
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold font-serif italic">The research behind SocratesIQ</h2>
+        <h2 className="text-2xl font-bold font-serif">The research behind SocratesIQ</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
         <div className="flex flex-wrap gap-2">
           {[
@@ -39,7 +39,7 @@ export function AboutPage({ onBack }: PageProps) {
       </div>
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
-        <h3 className="text-xl font-bold font-serif italic">Get in touch</h3>
+        <h3 className="text-xl font-bold font-serif">Get in touch</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">Questions about the framework, partnership opportunities, research collaboration, or school pricing.</p>
         <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com'} className="gap-2">
           <Mail className="w-4 h-4" />socratesiqed@gmail.com
@@ -61,8 +61,8 @@ export function ScoringPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-10">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-3">
-        <div className="flex items-center gap-3"><Gauge className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">How scoring works</h1></div>
-        <p className="text-muted-foreground leading-relaxed">Every assignment gets a <strong>resilience score from 0 to 100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side: a low resilience score means high vulnerability.</p>
+        <div className="flex items-center gap-3"><Gauge className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">How scoring works</h1></div>
+        <p className="text-muted-foreground leading-relaxed">Every assignment gets a <strong>resilience score from 0 to 100</strong>. Higher means more resilient: harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side: a low resilience score means high vulnerability.</p>
       </div>
 
       <div className="space-y-4">
@@ -78,7 +78,7 @@ export function ScoringPage({ onBack }: PageProps) {
             <span key={name} className="px-4 py-2 rounded-full bg-secondary/60 border border-border text-sm font-bold text-foreground/80">{name}</span>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground italic">The detailed rubric behind each dimension is part of SocratesIQ's proprietary methodology — your analysis results explain how each one applies to your specific assignment.</p>
+        <p className="text-xs text-muted-foreground italic">The detailed rubric behind each dimension is part of SocratesIQ's proprietary methodology. Your analysis results explain how each one applies to your specific assignment.</p>
       </div>
 
       <div className="space-y-4">
@@ -97,8 +97,8 @@ export function ScoringPage({ onBack }: PageProps) {
       </div>
 
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-6 space-y-2">
-        <h2 className="text-base font-bold">A note on what the score is — and isn't</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">Because the score is an expert AI judgment against a rubric rather than a fixed calculation, it is consistent in the ballpark but the exact number can shift a few points run to run. Treat it as a <strong>diagnostic guide, not a final grade</strong>. The real value is the breakdown of how an assignment could be shortcut — and the Bronze, Silver, and Gold redesigns that show you how to strengthen it.</p>
+        <h2 className="text-base font-bold">A note on what the score is, and isn't</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">Because the score is an expert AI judgment against a rubric rather than a fixed calculation, it is consistent in the ballpark but the exact number can shift a few points run to run. Treat it as a <strong>diagnostic guide, not a final grade</strong>. The real value is the breakdown of how an assignment could be shortcut, and the Bronze, Silver, and Gold redesigns that show you how to strengthen it.</p>
       </div>
 
       <p className="text-xs text-muted-foreground/80">SocratesIQ cites published research to describe its methodology. It is not affiliated with, sponsored by, or endorsed by the researchers or institutions referenced.</p>
@@ -111,12 +111,12 @@ export function PrivacyPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-2">
-        <div className="flex items-center gap-3"><Shield className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Data Privacy & Security</h1></div>
+        <div className="flex items-center gap-3"><Shield className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Data Privacy & Security</h1></div>
         <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
       </div>
       {[
         { title: 'What data we collect', content: 'We collect the minimum necessary: your name and email address, assignment text you submit for analysis, your saved assignments and analysis results, and basic usage metadata.\n\nWe do NOT collect student names, student work, grades, or any personally identifiable student information.' },
-        { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers SocratesIQ.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded — it is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
+        { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers SocratesIQ.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded. It is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
         { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at socratesiqed@gmail.com to request a DPA.' },
         { title: 'Google Drive & Docs', content: 'When you use the Google Drive features, we request the narrowest permission Google offers (per-file access): SocratesIQ can only read files you explicitly pick in the Google file window, and can create new Google Docs when you export.\n\nWe cannot see, list, or search the rest of your Drive. Your Google sign-in token stays in your browser for the session and is never sent to our servers, logged, or stored in our database.' },
         { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email socratesiqed@gmail.com. We will process deletion requests within 14 days.' },
@@ -139,7 +139,7 @@ export function FeedbackPage({ onBack }: PageProps) {
         <div className="flex justify-center gap-1">
           {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
         </div>
-        <h1 className="text-4xl font-bold font-serif italic">Teacher feedback</h1>
+        <h1 className="text-4xl font-bold font-serif">Teacher feedback</h1>
         <p className="text-muted-foreground">What teachers are telling us after using SocratesIQ in their classrooms.</p>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
@@ -147,13 +147,13 @@ export function FeedbackPage({ onBack }: PageProps) {
           <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
             className="bg-card border border-border rounded-2xl p-6 space-y-3 hover:border-accent/30 transition-colors">
             <Quote className="w-5 h-5 text-accent opacity-40" />
-            <p className="text-sm font-serif italic leading-relaxed text-foreground">"{c.quote}"</p>
-            <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">— {c.role}</p>
+            <p className="text-sm font-serif leading-relaxed text-foreground">"{c.quote}"</p>
+            <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{c.role}</p>
           </motion.div>
         ))}
       </div>
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-3">
-        <h3 className="text-xl font-bold font-serif italic">Using SocratesIQ in your classroom?</h3>
+        <h3 className="text-xl font-bold font-serif">Using SocratesIQ in your classroom?</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">We'd love to hear what's working. Send us your experience and it may appear here.</p>
         <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com?subject=My%20Socrates%20feedback'} className="gap-2">
           <Mail className="w-4 h-4" />Share your feedback
@@ -168,7 +168,7 @@ export function TermsPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-2">
-        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Terms of Service</h1></div>
+        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Terms of Service</h1></div>
         <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
       </div>
       {[
@@ -198,47 +198,47 @@ export function TermsPage({ onBack }: PageProps) {
 const HELP_TOPICS = [
   {
     title: 'Getting started: what SocratesIQ does',
-    content: 'SocratesIQ analyzes your assignments for how easily a student could complete them with AI, then helps you redesign them.\n\nThe basic flow: paste or upload an assignment → pick your AI strategy → click Analyze. You get a resilience score (0–100), a breakdown of exactly how AI could shortcut the assignment, and three ready-to-use redesigns (Bronze, Silver, Gold).\n\nSet up your teaching profile when you first sign in (subjects and grade levels) — every analysis is tailored to what you teach.',
+    content: 'SocratesIQ analyzes your assignments for how easily a student could complete them with AI, then helps you redesign them.\n\nThe basic flow: paste or upload an assignment → pick your AI strategy → click Analyze. You get a resilience score (0–100), a breakdown of exactly how AI could shortcut the assignment, and three ready-to-use redesigns (Bronze, Silver, Gold).\n\nSet up your teaching profile when you first sign in (subjects and grade levels), and every analysis is tailored to what you teach.',
   },
   {
     title: 'Adding an assignment (paste, upload, Google Drive, or template)',
-    content: 'Four ways to get an assignment in:\n\n1. PASTE — copy your assignment text into the "Paste Text" box.\n2. UPLOAD — drop a PDF, Word (.docx), or plain-text file into the "Upload Document" card. The text is extracted automatically.\n3. GOOGLE DRIVE — click "Select from Google Drive," sign in to Google if asked, and pick a Google Doc (or a PDF/Word file stored in Drive). SocratesIQ can only read the specific files you pick — never the rest of your Drive.\n4. TEMPLATE — click "Start from a template" to begin from a sample assignment for your subject.\n\nIf a PDF won\'t read (some scanned PDFs are images, not text), try the Word version, or copy-paste the text instead.',
+    content: 'Four ways to get an assignment in:\n\n1. PASTE: copy your assignment text into the "Paste Text" box.\n2. UPLOAD: drop a PDF, Word (.docx), or plain-text file into the "Upload Document" card. The text is extracted automatically.\n3. GOOGLE DRIVE: click "Select from Google Drive," sign in to Google if asked, and pick a Google Doc (or a PDF/Word file stored in Drive). SocratesIQ can only read the specific files you pick, never the rest of your Drive.\n4. TEMPLATE: click "Start from a template" to begin from a sample assignment for your subject.\n\nIf a PDF won\'t read (some scanned PDFs are images, not text), try the Word version, or copy-paste the text instead.',
   },
   {
     title: 'The three AI strategies (AI-Free, AI-Assisted, AI-Integrated)',
-    content: 'Before analyzing, choose the role AI should play in this assignment — you decide. Your choice changes the redesigns you get:\n\nAI-FREE LEARNING — design for human-only creation, reasoning, and demonstration of learning. Redesigns make the assignment AI-resistant (personal evidence, in-class steps, process artifacts).\n\nAI-ASSISTED LEARNING — students use AI for brainstorming, feedback, and research while maintaining ownership. Redesigns build AI in as a helper and grade the student\'s own synthesis and reflection.\n\nAI-INTEGRATED LEARNING — students use AI as a tool they analyze, critique, and improve. Redesigns have students fact-check and strengthen AI\'s work, and document the collaboration.\n\nThere is no wrong choice — pick per assignment. You can set your usual default in Settings.',
+    content: 'Before analyzing, choose the role AI should play in this assignment. You decide. Your choice changes the redesigns you get:\n\nAI-FREE LEARNING: design for human-only creation, reasoning, and demonstration of learning. Redesigns make the assignment AI-resistant (personal evidence, in-class steps, process artifacts).\n\nAI-ASSISTED LEARNING: students use AI for brainstorming, feedback, and research while maintaining ownership. Redesigns build AI in as a helper and grade the student\'s own synthesis and reflection.\n\nAI-INTEGRATED LEARNING: students use AI as a tool they analyze, critique, and improve. Redesigns have students fact-check and strengthen AI\'s work, and document the collaboration.\n\nThere is no wrong choice. Pick per assignment. You can set your usual default in Settings.',
   },
   {
     title: 'Understanding your results',
-    content: 'RESILIENCE SCORE (0–100): how hard it is for a student to complete your ORIGINAL assignment using AI. Higher = harder to shortcut. The score always measures AI-resistance, whatever strategy you chose.\n\nAI FAILURE BREAKDOWN: three specific ways a student could use AI to shortcut the assignment, each with a severity and a fix.\n\nBRONZE / SILVER / GOLD REDESIGNS: three rewritten versions of your assignment, from a light tweak (Bronze) to a substantial restructure (Silver) to a transformational redesign (Gold) — all following your chosen AI strategy. Use "Compare levels" to see them side by side. Each is written to be handed out as-is, but always apply your own professional judgment.\n\nWANT CHANGES? Under each redesign there\'s a box: "Anything you\'d like to change before the lesson plan?" Type a request — like "make it a group project" or "fit it into one class period" — and click Revise. You can also click "Edit inline" to change the text yourself. Your revised version is what gets downloaded and built into the lesson plan.',
+    content: 'RESILIENCE SCORE (0–100): how hard it is for a student to complete your ORIGINAL assignment using AI. Higher = harder to shortcut. The score always measures AI-resistance, whatever strategy you chose.\n\nAI FAILURE BREAKDOWN: three specific ways a student could use AI to shortcut the assignment, each with a severity and a fix.\n\nBRONZE / SILVER / GOLD REDESIGNS: three rewritten versions of your assignment, from a light tweak (Bronze) to a substantial restructure (Silver) to a transformational redesign (Gold), all following your chosen AI strategy. Use "Compare levels" to see them side by side. Each is written to be handed out as-is, but always apply your own professional judgment.\n\nWANT CHANGES? Under each redesign there\'s a box: "Anything you\'d like to change before the lesson plan?" Type a request, like "make it a group project" or "fit it into one class period" and click Revise. You can also click "Edit inline" to change the text yourself. Your revised version is what gets downloaded and built into the lesson plan.',
   },
   {
     title: 'Standards alignment and lesson plans',
-    content: 'You can align results to your state standards and generate a full lesson plan:\n\n1. UPLOAD YOUR STANDARDS once — during onboarding, or anytime in Settings. PDF, Word, or text.\n2. After an analysis, choose a redesign level, select your standards document on the results screen, and run alignment. You\'ll see which standards the assignment addresses, any gaps, and near-misses.\n3. Generate the LESSON PLAN — built on the CCSS-aligned template: learning standards, learning targets, relevance, assessment criteria, activities/tasks with your AI rules built in, resources, access for all, and modifications/accommodations. The Word download matches the official template layout exactly, with a Notes column left blank for you.\n4. Generate STUDENT DIRECTIONS — a student-facing handout with steps, AI rules, and grading expectations.\n\nStandards upload requires being signed in.',
+    content: 'You can align results to your state standards and generate a full lesson plan:\n\n1. UPLOAD YOUR STANDARDS once, during onboarding, or anytime in Settings. PDF, Word, or text.\n2. After an analysis, choose a redesign level, select your standards document on the results screen, and run alignment. You\'ll see which standards the assignment addresses, any gaps, and near-misses.\n3. Generate the LESSON PLAN, built on the CCSS-aligned template: learning standards, learning targets, relevance, assessment criteria, activities/tasks with your AI rules built in, resources, access for all, and modifications/accommodations. The Word download matches the official template layout exactly, with a Notes column left blank for you.\n4. Generate STUDENT DIRECTIONS, a student-facing handout with steps, AI rules, and grading expectations.\n\nStandards upload requires being signed in.',
   },
   {
     title: 'Saving, the Library, and syncing',
-    content: 'Click Save on any analysis to keep it. Your saved assignments live in the Library (top navigation).\n\nWhen you\'re signed in, saved assignments sync to the cloud — you\'ll see a cloud icon and can access them from any device. You can reopen, review, or delete saved assignments from the Library at any time.',
+    content: 'Click Save on any analysis to keep it. Your saved assignments live in the Library (top navigation).\n\nWhen you\'re signed in, saved assignments sync to the cloud. You\'ll see a cloud icon and can access them from any device. You can reopen, review, or delete saved assignments from the Library at any time.',
   },
   {
     title: 'Downloading and sharing results',
-    content: 'THE FULL ANALYSIS REPORT (top of the results screen): download as PDF or Word (DOCX), save straight to your Google Drive as a Google Doc, or click SHARE to copy a summary link for a colleague. The report includes your score, the failure breakdown, and all three redesigns.\n\nONE REDESIGNED ASSIGNMENT: under each Bronze/Silver/Gold version, use the "Download this version" row to get just that assignment as a PDF, Word document, or Google Doc — ready to hand out. If you used "Edit inline," your edits are included.\n\nLESSON PLAN & STUDENT DIRECTIONS: once generated, each has its own PDF / Word / Google Doc buttons next to "Copy all."\n\nGoogle Doc saves open in a new tab and land in your Drive automatically. The first time, Google will ask you to sign in and approve — allow popups for this site.',
+    content: 'THE FULL ANALYSIS REPORT (top of the results screen): download as PDF or Word (DOCX), save straight to your Google Drive as a Google Doc, or click SHARE to copy a summary link for a colleague. The report includes your score, the failure breakdown, and all three redesigns.\n\nONE REDESIGNED ASSIGNMENT: under each Bronze/Silver/Gold version, use the "Download this version" row to get just that assignment as a PDF, Word document, or Google Doc, ready to hand out. If you used "Edit inline," your edits are included.\n\nLESSON PLAN & STUDENT DIRECTIONS: once generated, each has its own PDF / Word / Google Doc buttons next to "Copy all."\n\nGoogle Doc saves open in a new tab and land in your Drive automatically. The first time, Google will ask you to sign in and approve. Allow popups for this site.',
   },
   {
     title: 'Signing in: email and Google',
-    content: 'Two ways to sign in today:\n\nEMAIL + PASSWORD — create an account with any email address.\nGOOGLE — click "Continue with Google" and use your Google account. No separate password needed.\n\nIf you signed up with Google, always use the Google button — your account has no password.',
+    content: 'Two ways to sign in today:\n\nEMAIL + PASSWORD: create an account with any email address.\nGOOGLE: click "Continue with Google" and use your Google account. No separate password needed.\n\nIf you signed up with Google, always use the Google button. Your account has no password.',
   },
   {
     title: 'Forgot your password?',
-    content: 'On the sign-in screen, click "Forgot password?" (under the password box), enter your email, and click Send Reset Link.\n\nCheck your inbox for the reset email and click the link — it brings you back to SocratesIQ to choose a new password. You\'ll be signed in immediately after saving it.\n\nTips:\n• The link expires after about an hour — request a fresh one if needed.\n• No email? Check your spam folder, and wait a minute or two.\n• Signed up with Google? There\'s no password to reset — use "Continue with Google" instead.',
+    content: 'On the sign-in screen, click "Forgot password?" (under the password box), enter your email, and click Send Reset Link.\n\nCheck your inbox for the reset email and click the link. It brings you back to SocratesIQ to choose a new password. You\'ll be signed in immediately after saving it.\n\nTips:\n• The link expires after about an hour. Request a fresh one if needed.\n• No email? Check your spam folder, and wait a minute or two.\n• Signed up with Google? There\'s no password to reset. Use "Continue with Google" instead.',
   },
   {
     title: 'Settings and your teaching profile',
-    content: 'Open Settings (gear icon) to change:\n\n• Your subjects and grade levels (multi-select — analyses are tailored to these)\n• Your standards documents\n• The analysis framework: Triple-A (Anchor, Audit, Agency) or Bloom\'s Taxonomy with a target level\n• Your default AI strategy (Avoid / Augment / Embrace)\n\nChanges apply to your next analysis.',
+    content: 'Open Settings (gear icon) to change:\n\n• Your subjects and grade levels (multi-select; analyses are tailored to these)\n• Your standards documents\n• The analysis framework: Triple-A (Anchor, Audit, Agency) or Bloom\'s Taxonomy with a target level\n• Your default AI strategy (Avoid / Augment / Embrace)\n\nChanges apply to your next analysis.',
   },
   {
     title: 'Troubleshooting common errors',
-    content: '"This step took too long and timed out" — the AI hit a time limit. Just try again; if it keeps happening on one assignment, try slightly shorter text.\n\n"The result came back in an unexpected format" — a rare formatting hiccup in the AI\'s response. Click the same button again; it almost always succeeds on retry.\n\nA PDF uploads but no text appears — the PDF is probably a scanned image. Use the Word version or paste the text.\n\nGoogle sign-in doesn\'t finish — make sure you complete the Google permission screen, and try a regular (non-private) browser window.\n\nStill stuck? Email us — see Contact support below.',
+    content: '"This step took too long and timed out": the AI hit a time limit. Just try again; if it keeps happening on one assignment, try slightly shorter text.\n\n"The result came back in an unexpected format": a rare formatting hiccup in the AI\'s response. Click the same button again; it almost always succeeds on retry.\n\nA PDF uploads but no text appears: the PDF is probably a scanned image. Use the Word version or paste the text.\n\nGoogle sign-in doesn\'t finish: make sure you complete the Google permission screen, and try a regular (non-private) browser window.\n\nStill stuck? Email us. See Contact support below.',
   },
   {
     title: 'Contact support',
@@ -256,7 +256,7 @@ export function HelpPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
       <div className="space-y-2">
-        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif italic">Help & How-To</h1></div>
+        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Help & How-To</h1></div>
         <p className="text-muted-foreground">Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.</p>
       </div>
       <input

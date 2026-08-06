@@ -174,14 +174,14 @@ export function LessonPlanPanel({ assignmentText, standardsDoc, subject, gradeLe
       <div className="flex items-start gap-2 p-3 rounded-xl bg-teal-50 border border-teal-200">
         <Sparkles className="w-3.5 h-3.5 mt-0.5 shrink-0 text-teal-600" />
         <div className="text-[11px] text-teal-800">
-          <span className="font-bold">{AI_STRATEGY_RULES[aiStrategy].label}</span> — this is the AI approach you chose for this assignment, and it shapes the lesson plan and student directions. To change it, pick a different AI strategy at the top and re-analyze.
+          <span className="font-bold">{AI_STRATEGY_RULES[aiStrategy].label}</span>: this is the AI approach you chose for this assignment, and it shapes the lesson plan and student directions. To change it, pick a different AI strategy at the top and re-analyze.
         </div>
       </div>
 
       {!standardsDoc && (
         <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-800">
           <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-          <span>No standards document selected. The lesson plan will use placeholder standards — upload your SCOS above to enable automatic alignment.</span>
+          <span>No standards document selected. The lesson plan will use placeholder standards. Upload your SCOS above to enable automatic alignment.</span>
         </div>
       )}
 

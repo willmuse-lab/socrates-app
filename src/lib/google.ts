@@ -88,7 +88,7 @@ export async function getAccessToken(forceFresh = false): Promise<string> {
       error_callback: (err: any) => {
         reject(new Error(err?.type === 'popup_closed'
           ? 'The Google sign-in window was closed.'
-          : 'The Google sign-in popup was blocked — allow popups for this site and try again.'));
+          : 'The Google sign-in popup was blocked. Allow popups for this site and try again.'));
       },
     });
     client.requestAccessToken();
