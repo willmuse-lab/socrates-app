@@ -1,7 +1,13 @@
-# SOCRATES — Session Handoff Document
+# SocratesIQ 1: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: August 4 2026.
+session. Read this whole file before making changes. Last updated: August 5 2026.
+
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 1.md`
+now, and the number bumps by one on every update (next update renames it to
+`SocratesIQ 2.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
+handoff and continue").
 
 ## Session status (August 4 2026) — UI reskin + EPOCH IN PROGRESS (branches, NOT merged)
 
@@ -22,6 +28,18 @@ OPEN BRANCHES / PRs:
   transparent PNG, replaces the old; used by header, splash, favicon, onboarding,
   loading). Design DIRECTION = the marketing team's Lovable mockup
   https://socrates-spark-redo.lovable.app (editorial navy/paper, photography).
+  ADDED TO PR #10 SINCE (Aug 5): (a) PUBLIC LANDING PAGE — new
+  `src/components/LandingPage.tsx`; logged-out visitors now see a marketing homepage
+  instead of a forced login (App.tsx: splash no longer force-opens login; header is
+  auth-aware with Sign in / Get started; LoginDialog gained `onClose` and is
+  dismissable); login gates ONLY the tool; honest copy + a real before→after score
+  visual, no fabricated stats. Solves the "marketers can't get past sign-in" blocker.
+  (b) OWL-ONLY nav mark — `public/owl.png` (cropped + optimized from Will's upload to
+  70KB) shown beside a "SocratesIQ" Sora wordmark; favicon + streaming loading icon use
+  it; the full stacked lockup `public/logo.png` stays on splash + onboarding.
+  (c) EM-DASH CLEANUP — em dashes read as an AI tell, so ~100 across 17 user-facing
+  files became commas/periods/colons/parens (en-dash ranges like 0-100 and internal
+  split-delimiters left alone).
 - **PR #11 `claude/epoch-redesigns` — EPOCH redesigns (draft, ready to test).**
   Folds the MIT Sloan EPOCH paper (Loaiza & Rigobón 2025) into the redesign engine,
   ADDITIVE: one entry added to `RESEARCH_NOTES`, reinforcing — NOT replacing — the
@@ -63,19 +81,22 @@ DECISIONS MADE (don't relitigate):
   Lovable draft's fake proof, use Sora, use product screenshots not classroom photos,
   brand-kit colors/contrast, extend the design into the app (not just the homepage).
 
-NEXT STEPS (Will's stated plan, session paused here):
-1. **Fix the logo** — get an owl-only / horizontal lockup (ideally a REAL vector SVG)
-   from the designer; the tall stacked lockup renders small in the ~60px nav. Upload via
-   GitHub (`public/`), agent wires it into the header/loading spots.
-2. **Build the PUBLIC LANDING PAGE** — the top open product need: login is currently
-   FORCED before anything (non-dismissable LoginDialog in App.tsx), so marketers /
-   prospects / press / SEO can't see what SocratesIQ is. Build a public marketing
-   homepage (reskin + Sora + brand + HONEST content + product screenshots per the
-   punch-list) with "Get Started/Sign in" opening the login and login gating only the
-   TOOL (analyze/save). Email capture still happens at signup. Lovable mockup = layout
-   reference.
-3. Decide on merging PR #10 (reskin) and PR #11 (EPOCH), then trigger a Netlify deploy
-   (auto-deploy of main does NOT fire — see Deployment facts).
+NEXT STEPS:
+1. DONE (Aug 5): the logo owl-mark in the nav AND the public landing page (both in
+   PR #10, described above). STILL OPEN on the logo: a TRUE vector SVG from a designer
+   (the current owl is an AI-generated raster; a wrapped-bitmap "svg" was rejected).
+2. **Will to REVIEW the PR #10 preview**
+   (deploy-preview-10--brilliant-mandazi-3937f4.netlify.app) and share it with the
+   marketing companies — they can now see the site WITHOUT signing in. Everything
+   downstream keys off his reaction. (Ignore the stale `musesocrates` preview.)
+3. **Polish the inner pages** (Pricing / About / FAQ / Scoring / Help) to match the
+   landing's editorial layout. They already inherit the new colors + Sora, but their
+   layouts are plainer than the homepage (punch-list: extend the look beyond the front
+   page). This is the recommended next BUILD the agent can do solo.
+4. Drop real PRODUCT SCREENSHOTS into the landing when Will has them (imagery decision:
+   product shots + brand graphics, NOT fake classroom photos).
+5. Decide on merging PR #10 (reskin + landing) and PR #11 (EPOCH), then trigger a
+   Netlify deploy (auto-deploy of main does NOT fire — see Deployment facts).
 
 PAUSED / UNFINISHED: a `/content-coach` social post — 5 viral angles were offered
 (AI-detectors-are-a-trap / a real number / teacher origin story / a classroom
