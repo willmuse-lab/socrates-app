@@ -48,6 +48,7 @@ export default function App() {
   const [user, setUser] = useState<{ name: string; email: string; id?: string } | null>(null);
   const [profile, setProfile] = useState<TeacherProfile | null>(null);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [loginMode, setLoginMode] = useState<'login' | 'signup'>('login');
   const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('studio');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -123,6 +124,14 @@ export default function App() {
     if (hydrated) saveSettings({ activeFramework, defaultPreference, bloomsLevel, dimensions });
   }, [activeFramework, defaultPreference, bloomsLevel, dimensions, hydrated]);
 
+  // Open the auth dialog on the right form: "Get started" → Create Account,
+  // "Sign in" → Welcome Back. A first-time visitor should never land on the
+  // returning-user greeting.
+  const openLogin = (mode: 'login' | 'signup' = 'login') => {
+    setLoginMode(mode);
+    setIsLoginOpen(true);
+  };
+
   const handleLogin = (name: string, email: string, id?: string) => {
     const newUser = { name, email, id };
     setUser(newUser); saveUser(newUser); setIsLoginOpen(false);
@@ -147,7 +156,7 @@ export default function App() {
     if (supabaseEnabled) await signOut();
     setUser(null); clearUser(); clearProfile(); setProfile(null);
     setCloudSynced(false); setSavedAssignments(loadAssignments());
-    setIsLoginOpen(true); toast.info('Logged out successfully');
+    openLogin('login'); toast.info('Logged out successfully');
   };
 
   const handleSaveAssignment = useCallback(async (assignment: Omit<SavedAssignment, 'id' | 'date'>) => {
@@ -178,7 +187,7 @@ export default function App() {
       <AnimatePresence>{showOnboarding && user && (
         <Onboarding userName={user.name} userEmail={user.email} userId={user.id || ''} onComplete={handleOnboardingComplete} />
       )}</AnimatePresence>
-      <LoginDialog isOpen={isLoginOpen && !showSplash && !showOnboarding} onLogin={handleLogin} onClose={() => setIsLoginOpen(false)} />
+      <LoginDialog isOpen={isLoginOpen && !showSplash && !showOnboarding} initialMode={loginMode} onLogin={handleLogin} onClose={() => setIsLoginOpen(false)} />
       <ResetPasswordDialog isOpen={showPasswordReset} onDone={() => setShowPasswordReset(false)} />
 
       <header className="h-16 md:h-20 px-4 md:px-10 flex items-center justify-between border-b border-border bg-card sticky top-0 z-40">
@@ -238,8 +247,8 @@ export default function App() {
             />
           ) : (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => setIsLoginOpen(true)}>Sign in</Button>
-              <Button size="sm" onClick={() => setIsLoginOpen(true)}>Get started</Button>
+              <Button variant="ghost" size="sm" onClick={() => openLogin('login')}>Sign in</Button>
+              <Button size="sm" onClick={() => openLogin('signup')}>Get started</Button>
             </div>
           )}
         </div>
@@ -249,7 +258,7 @@ export default function App() {
         <AnimatePresence mode="wait">
           {viewMode === 'studio' && !user && (
             <motion.div key="landing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <LandingPage onGetStarted={() => setIsLoginOpen(true)} onNavigate={(v) => setViewMode(v as ViewMode)} />
+              <LandingPage onGetStarted={() => openLogin('signup')} onNavigate={(v) => setViewMode(v as ViewMode)} />
             </motion.div>
           )}
           {viewMode === 'studio' && user && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,22 +31,31 @@ function MicrosoftIcon() {
   );
 }
 
+type Mode = 'login' | 'signup' | 'forgot';
+
 interface LoginDialogProps {
   isOpen: boolean;
   onLogin: (name: string, email: string, id?: string) => void;
   onClose?: () => void;
+  // Which form to show when the dialog opens. "Get started" opens signup,
+  // "Sign in" opens login — so a brand-new visitor never sees "Welcome Back".
+  initialMode?: Mode;
 }
 
-type Mode = 'login' | 'signup' | 'forgot';
-
-export function LoginDialog({ isOpen, onLogin, onClose }: LoginDialogProps) {
-  const [mode, setMode] = useState<Mode>('login');
+export function LoginDialog({ isOpen, onLogin, onClose, initialMode = 'login' }: LoginDialogProps) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [resetSent, setResetSent] = useState(false);
+
+  // Each time the dialog opens, show the form the trigger asked for and clear
+  // any stale error/reset state from a previous open.
+  useEffect(() => {
+    if (isOpen) { setMode(initialMode); setError(''); setResetSent(false); }
+  }, [isOpen, initialMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
