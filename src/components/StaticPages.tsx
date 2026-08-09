@@ -1,30 +1,71 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Shield, BookOpen, Mail, Gauge, Quote, Star } from 'lucide-react';
+import { Mail, Quote, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TEACHER_COMMENTS } from '@/src/lib/comments';
 
 interface PageProps { onBack: () => void; }
 
+// ---- Shared editorial furniture ------------------------------------------
+// So the inner pages read as part of the same design family as the landing:
+// an eyebrow label above a large Sora heading, a consistent back link, and a
+// shared numbered-section body for the long-form legal/help pages.
+
+function BackLink({ onBack }: PageProps) {
+  return (
+    <button onClick={onBack} className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground hover:text-accent transition-colors">
+      ← Back to Studio
+    </button>
+  );
+}
+
+function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: React.ReactNode; children?: React.ReactNode }) {
+  return (
+    <header className="space-y-4">
+      <p className="eyebrow">{eyebrow}</p>
+      <h1 className="text-3xl md:text-5xl font-semibold leading-[1.1]">{title}</h1>
+      {children && <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">{children}</p>}
+    </header>
+  );
+}
+
+function ProseSections({ sections }: { sections: { title: string; content: string }[] }) {
+  return (
+    <div className="space-y-8">
+      {sections.map(({ title, content }) => (
+        <section key={title} className="space-y-3 pb-8 border-b border-border last:border-0">
+          <h2 className="font-serif text-xl font-semibold">{title}</h2>
+          <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{content}</div>
+        </section>
+      ))}
+    </div>
+  );
+}
+
 export function AboutPage({ onBack }: PageProps) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto p-6 md:p-10 space-y-12">
-      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto p-6 md:p-10 space-y-14">
+      <BackLink onBack={onBack} />
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-5">
-          <h1 className="text-4xl font-bold font-serif leading-tight">Built by educators,<br />for educators.</h1>
+          <p className="eyebrow">About SocratesIQ</p>
+          <h1 className="text-4xl md:text-5xl font-semibold leading-[1.05]">Built by educators,<br />for educators.</h1>
           <p className="text-muted-foreground leading-relaxed">SocratesIQ was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI (which is both impossible and counterproductive), we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
           <p className="text-muted-foreground leading-relaxed">Our methodology emerged from classroom research, consultation with pedagogical experts, and analysis of international AI-in-education guidance.</p>
         </div>
-        <div className="bg-secondary/50 rounded-2xl border border-border p-8 space-y-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Our philosophy</p>
-          <blockquote className="text-2xl font-serif text-accent leading-relaxed">"The unexamined assignment is not worth giving."</blockquote>
-          <p className="text-sm text-muted-foreground">The Socratic Architect</p>
+        {/* Dark editorial accent, echoing the landing's ink sections. */}
+        <div className="ink-card section-ink p-8 space-y-4">
+          <p className="text-[0.72rem] font-bold uppercase tracking-[0.2em] on-ink-muted">Our philosophy</p>
+          <blockquote className="text-2xl font-serif on-ink-accent leading-relaxed">"The unexamined assignment is not worth giving."</blockquote>
+          <p className="text-sm on-ink-muted">The Socratic Architect</p>
         </div>
       </div>
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold font-serif">The research behind SocratesIQ</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
+        <div className="space-y-2">
+          <p className="eyebrow">The research base</p>
+          <h2 className="text-2xl md:text-3xl font-semibold">The research behind SocratesIQ</h2>
+        </div>
+        <p className="text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
         <div className="flex flex-wrap gap-2">
           {[
             'UNESCO (2023)', 'Bearman & Luckin (2024)', 'Mollick & Mollick (2023)', 'Lodge et al. (2023)',
@@ -37,9 +78,9 @@ export function AboutPage({ onBack }: PageProps) {
         <p className="text-xs text-muted-foreground italic">How these sources are combined into SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
         <p className="text-xs text-muted-foreground/80 border-t border-border pt-4">SocratesIQ cites this research to describe its methodology. It is not affiliated with, sponsored by, or endorsed by these researchers or institutions.</p>
       </div>
-      <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-4">
+      <div className="rounded-2xl border border-accent/20 bg-accent/5 p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
-        <h3 className="text-xl font-bold font-serif">Get in touch</h3>
+        <h3 className="text-xl font-semibold font-serif">Get in touch</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">Questions about the framework, partnership opportunities, research collaboration, or school pricing.</p>
         <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com'} className="gap-2">
           <Mail className="w-4 h-4" />socratesiqed@gmail.com
@@ -58,20 +99,19 @@ export function ScoringPage({ onBack }: PageProps) {
     { range: '86–100', label: 'Exceptional', desc: 'AI can assist, but cannot replace the student.', color: 'text-green-600' },
   ];
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-10">
-      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
-      <div className="space-y-3">
-        <div className="flex items-center gap-3"><Gauge className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">How scoring works</h1></div>
-        <p className="text-muted-foreground leading-relaxed">Every assignment gets a <strong>resilience score from 0 to 100</strong>. Higher means more resilient: harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side: a low resilience score means high vulnerability.</p>
-      </div>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-12">
+      <BackLink onBack={onBack} />
+      <PageHeader eyebrow="How scoring works" title="The AI Resilience Score">
+        Every assignment gets a resilience score from 0 to 100. Higher means more resilient: harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.
+      </PageHeader>
 
       <div className="space-y-4">
-        <h2 className="text-lg font-bold">What produces the score</h2>
+        <h2 className="font-serif text-xl font-semibold">What produces the score</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. SocratesIQ sends your assignment to its AI together with a research-based rubric and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-lg font-bold">The four dimensions it looks for</h2>
+        <h2 className="font-serif text-xl font-semibold">The four dimensions it looks for</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four research-based dimensions, each scored individually with an explanation in your results. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
         <div className="flex flex-wrap gap-2">
           {['Anchor', 'Proprietary', 'Audit', 'Agency'].map(name => (
@@ -82,7 +122,7 @@ export function ScoringPage({ onBack }: PageProps) {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-lg font-bold">The score bands</h2>
+        <h2 className="font-serif text-xl font-semibold">The score bands</h2>
         <div className="space-y-2">
           {bands.map(({ range, label, desc, color }) => (
             <div key={range} className="flex items-start gap-4 p-4 border border-border rounded-xl bg-card">
@@ -96,8 +136,8 @@ export function ScoringPage({ onBack }: PageProps) {
         </div>
       </div>
 
-      <div className="bg-accent/5 border border-accent/20 rounded-2xl p-6 space-y-2">
-        <h2 className="text-base font-bold">A note on what the score is, and isn't</h2>
+      <div className="rounded-2xl border border-accent/20 bg-accent/5 p-6 space-y-2">
+        <h2 className="font-serif text-lg font-semibold">A note on what the score is, and isn't</h2>
         <p className="text-sm text-muted-foreground leading-relaxed">Because the score is an expert AI judgment against a rubric rather than a fixed calculation, it is consistent in the ballpark but the exact number can shift a few points run to run. Treat it as a <strong>diagnostic guide, not a final grade</strong>. The real value is the breakdown of how an assignment could be shortcut, and the Quick Fix, Rebuild, and Reinvent redesigns that show you how to strengthen it.</p>
       </div>
 
@@ -108,39 +148,34 @@ export function ScoringPage({ onBack }: PageProps) {
 
 export function PrivacyPage({ onBack }: PageProps) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
-      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
-      <div className="space-y-2">
-        <div className="flex items-center gap-3"><Shield className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Data Privacy & Security</h1></div>
-        <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
-      </div>
-      {[
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-12">
+      <BackLink onBack={onBack} />
+      <PageHeader eyebrow="Privacy & security" title="Data privacy and security">
+        Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+      </PageHeader>
+      <ProseSections sections={[
         { title: 'What data we collect', content: 'We collect the minimum necessary: your name and email address, assignment text you submit for analysis, your saved assignments and analysis results, and basic usage metadata.\n\nWe do NOT collect student names, student work, grades, or any personally identifiable student information.' },
         { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers SocratesIQ.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded. It is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
         { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at socratesiqed@gmail.com to request a DPA.' },
         { title: 'Google Drive & Docs', content: 'When you use the Google Drive features, we request the narrowest permission Google offers (per-file access): SocratesIQ can only read files you explicitly pick in the Google file window, and can create new Google Docs when you export.\n\nWe cannot see, list, or search the rest of your Drive. Your Google sign-in token stays in your browser for the session and is never sent to our servers, logged, or stored in our database.' },
         { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email socratesiqed@gmail.com. We will process deletion requests within 14 days.' },
         { title: 'Contact', content: 'Data privacy questions: socratesiqed@gmail.com\nWe aim to respond within 2 business days.' },
-      ].map(({ title, content }) => (
-        <div key={title} className="space-y-3 pb-6 border-b border-border last:border-0">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{content}</div>
-        </div>
-      ))}
+      ]} />
     </motion.div>
   );
 }
 
 export function FeedbackPage({ onBack }: PageProps) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto p-6 md:p-10 space-y-10">
-      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
-      <div className="text-center space-y-3">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto p-6 md:p-10 space-y-12">
+      <BackLink onBack={onBack} />
+      <div className="text-center space-y-4">
         <div className="flex justify-center gap-1">
           {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
         </div>
-        <h1 className="text-4xl font-bold font-serif">Teacher feedback</h1>
-        <p className="text-muted-foreground">What teachers are telling us after using SocratesIQ in their classrooms.</p>
+        <p className="eyebrow">Teacher feedback</p>
+        <h1 className="text-4xl md:text-5xl font-semibold">What teachers are telling us</h1>
+        <p className="text-muted-foreground text-lg max-w-xl mx-auto">Real reactions after using SocratesIQ to redesign assignments in their own classrooms.</p>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
         {TEACHER_COMMENTS.map((c, i) => (
@@ -152,8 +187,8 @@ export function FeedbackPage({ onBack }: PageProps) {
           </motion.div>
         ))}
       </div>
-      <div className="bg-accent/5 border border-accent/20 rounded-2xl p-8 text-center space-y-3">
-        <h3 className="text-xl font-bold font-serif">Using SocratesIQ in your classroom?</h3>
+      <div className="rounded-2xl border border-accent/20 bg-accent/5 p-8 text-center space-y-3">
+        <h3 className="text-xl font-semibold font-serif">Using SocratesIQ in your classroom?</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">We'd love to hear what's working. Send us your experience and it may appear here.</p>
         <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com?subject=My%20Socrates%20feedback'} className="gap-2">
           <Mail className="w-4 h-4" />Share your feedback
@@ -165,13 +200,12 @@ export function FeedbackPage({ onBack }: PageProps) {
 
 export function TermsPage({ onBack }: PageProps) {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
-      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
-      <div className="space-y-2">
-        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Terms of Service</h1></div>
-        <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
-      </div>
-      {[
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-12">
+      <BackLink onBack={onBack} />
+      <PageHeader eyebrow="Terms of service" title="Terms of service">
+        Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+      </PageHeader>
+      <ProseSections sections={[
         { title: '1. Agreement to these terms', content: 'These Terms of Service ("Terms") govern your access to and use of SocratesIQ ("the Service"), operated by SocratesIQ ("we," "us"). By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.' },
         { title: '2. What SocratesIQ does', content: 'SocratesIQ helps educators analyze and redesign their own teaching assignments to be more resilient to AI completion. The Service uses artificial intelligence to generate scores, suggestions, and redesigned assignment text. These outputs are educational guidance, not professional, legal, or accreditation advice.' },
         { title: '3. Eligibility and accounts', content: 'The Service is intended for educators and school staff aged 18 or older. You are responsible for the accuracy of your account information and for keeping your login credentials secure. You are responsible for all activity that occurs under your account.' },
@@ -185,12 +219,7 @@ export function TermsPage({ onBack }: PageProps) {
         { title: '11. Termination', content: 'You may stop using the Service at any time. We may suspend or terminate access if you violate these Terms or use the Service in a way that could harm us or other users. Upon termination, your right to use the Service ends; sections that by their nature should survive (such as intellectual property, disclaimers, and limitation of liability) will continue to apply.' },
         { title: '12. Changes to these terms', content: 'We may update these Terms from time to time. When we make material changes, we will update the date above and, where appropriate, notify you. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.' },
         { title: '13. Contact', content: 'Questions about these Terms: socratesiqed@gmail.com' },
-      ].map(({ title, content }) => (
-        <div key={title} className="space-y-3 pb-6 border-b border-border last:border-0">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{content}</div>
-        </div>
-      ))}
+      ]} />
     </motion.div>
   );
 }
@@ -218,7 +247,7 @@ const HELP_TOPICS = [
   },
   {
     title: 'Saving, the Library, and syncing',
-    content: 'Click Save on any analysis to keep it. Your saved assignments live in the Library (top navigation).\n\nWhen you\'re signed in, saved assignments sync to the cloud. You\'ll see a cloud icon and can access them from any device. You can reopen, review, or delete saved assignments from the Library at any time.',
+    content: 'Click Save on any analysis to keep it. Your saved assignments live in the Library (top navigation).\n\nAs you work, SocratesIQ also autosaves your current draft to this browser, so you can pick up where you left off if you navigate away. When you\'re signed in, saved assignments sync to your account, so you can reach them from any device. You can reopen, review, or delete saved assignments from the Library at any time.',
   },
   {
     title: 'Downloading and sharing results',
@@ -253,27 +282,28 @@ export function HelpPage({ onBack }: PageProps) {
     ? HELP_TOPICS.filter(t => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
     : HELP_TOPICS;
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-8">
-      <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Back to Studio</button>
-      <div className="space-y-2">
-        <div className="flex items-center gap-3"><BookOpen className="w-6 h-6 text-accent" /><h1 className="text-3xl font-bold font-serif">Help & How-To</h1></div>
-        <p className="text-muted-foreground">Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.</p>
-      </div>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-10">
+      <BackLink onBack={onBack} />
+      <PageHeader eyebrow="Help center" title="Help and how-to">
+        Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.
+      </PageHeader>
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search help topics…"
-        className="w-full h-10 px-4 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
+        className="w-full h-11 px-4 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
       />
       {topics.length === 0 && (
         <p className="text-sm text-muted-foreground">No topics match "{query}". Try another word, or email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.</p>
       )}
-      {topics.map(({ title, content }) => (
-        <div key={title} className="space-y-3 pb-6 border-b border-border last:border-0">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{content}</div>
-        </div>
-      ))}
+      <div className="space-y-8">
+        {topics.map(({ title, content }) => (
+          <section key={title} className="space-y-3 pb-8 border-b border-border last:border-0">
+            <h2 className="font-serif text-xl font-semibold">{title}</h2>
+            <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{content}</div>
+          </section>
+        ))}
+      </div>
     </motion.div>
   );
 }
