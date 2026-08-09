@@ -33,6 +33,18 @@ const STRATEGY_LABELS: Record<AIPreference, string> = {
   embrace: 'AI-Integrated Learning',
 };
 
+// Display names for the three redesign levels (renamed Aug 6 2026 from the
+// Bronze/Silver/Gold medals, which read as a ranking — Gold is not "best,"
+// it's the biggest change). The internal level values 'Bronze'/'Silver'/'Gold'
+// are UNCHANGED everywhere (API contract, saved library items, share links);
+// only the visible label changes, same pattern as the AI-strategy rename.
+type TierLevel = 'Bronze' | 'Silver' | 'Gold';
+const TIER_LABELS: Record<TierLevel, string> = {
+  Bronze: 'Quick Fix',
+  Silver: 'Rebuild',
+  Gold: 'Reinvent',
+};
+
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
   bloomsLevel = 'Analyze', subject = '', gradeLevel = '', teacherName = '', schoolName = '', onSave, onReset, initialText = '', userId = ''
@@ -81,6 +93,65 @@ export function AssignmentAnalyzer({
     setCredits(await getCredits());
   }, [gated]);
   React.useEffect(() => { refreshCredits(); }, [refreshCredits]);
+
+  // ---- Draft autosave ------------------------------------------------------
+  // Teachers were losing work when they navigated away mid-redesign: inline
+  // edits and revisions live in React memory only. We quietly persist the
+  // working draft to THIS browser and restore it on return, so you pick up
+  // where you left off. "Save to Library" stays the deliberate keep-forever
+  // action (a full snapshot); this is just crash/navigation insurance.
+  const DRAFT_KEY = 'siq_draft_v1';
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
+  const hydratedRef = React.useRef(false);
+  const clearDraft = React.useCallback(() => {
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    setDraftSavedAt(null);
+  }, []);
+
+  // Restore a saved draft once on mount (unless the parent handed us initialText,
+  // e.g. opening a library item — that takes precedence over the draft).
+  React.useEffect(() => {
+    if (initialText) { hydratedRef.current = true; return; }
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d && (d.text?.trim() || d.result)) {
+          if (typeof d.text === 'string') setText(d.text);
+          if (d.result) { setResult(d.result); lastChargedRef.current = (d.text || '').trim().slice(0, 120); }
+          if (d.editedTexts) setEditedTexts(d.editedTexts);
+          if (d.activeLevel) setActiveLevel(d.activeLevel);
+          if (d.aiPreference) setAiPreference(d.aiPreference);
+          if (d.previousResult) setPreviousResult(d.previousResult);
+          if (d.lessonPlan) setLessonPlan(d.lessonPlan);
+          if (d.studentDirections) setStudentDirections(d.studentDirections);
+          if (d.savedAt) setDraftSavedAt(d.savedAt);
+          toast.info('Restored your last draft.', { duration: 4000 });
+        }
+      }
+    } catch {}
+    hydratedRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced save whenever the working draft changes. Skips until hydration is
+  // done (so the empty initial state never overwrites a real saved draft) and
+  // when there is nothing worth keeping.
+  React.useEffect(() => {
+    if (!hydratedRef.current) return;
+    if (!text.trim() && !result) return;
+    const id = setTimeout(() => {
+      try {
+        const savedAt = Date.now();
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
+          text, result, editedTexts, activeLevel, aiPreference, previousResult,
+          lessonPlan, studentDirections, savedAt,
+        }));
+        setDraftSavedAt(savedAt);
+      } catch {}
+    }, 800);
+    return () => clearTimeout(id);
+  }, [text, result, editedTexts, activeLevel, aiPreference, previousResult, lessonPlan, studentDirections]);
 
   const getChangeSummary = (original: string, modified: string): string[] => {
     const origSentences = original.match(/[^.!?]+[.!?]+/g) || original.split('\n').filter(Boolean);
@@ -160,7 +231,7 @@ export function AssignmentAnalyzer({
   const handleExportDocx = async () => { if (!result) return; try { await exportToDocx(result, text, buildTransformation()); toast.success('DOCX exported!'); } catch { toast.error('Failed to export DOCX.'); } };
   const handleExportGoogleDocs = async () => {
     if (!result) return;
-    const title = `SocratesIQ Analysis — ${text.trim().split('\n')[0].substring(0, 40)}`;
+    const title = `SocratesIQ Analysis: ${text.trim().split('\n')[0].substring(0, 40)}`;
     try {
       toast.info('Creating Google Doc…');
       const res = await exportToGoogleDocs(result, text, title, buildTransformation());
@@ -176,7 +247,7 @@ export function AssignmentAnalyzer({
     if (!result) return;
     const suggestion = result.suggestions[i];
     const body = editedTexts[i] ?? suggestion.modifiedAssignment;
-    const title = suggestion.title || `${suggestion.level} Redesign`;
+    const title = suggestion.title || `${TIER_LABELS[suggestion.level as TierLevel]} Redesign`;
     try {
       if (format === 'pdf') { downloadSimplePDF(title, redesignToBlocks(body)); toast.success('PDF downloaded!'); }
       else if (format === 'docx') { await downloadSimpleDocx(title, redesignToBlocks(body)); toast.success('Word document downloaded!'); }
@@ -202,13 +273,13 @@ export function AssignmentAnalyzer({
       const revised = await refineAssignment(current, instruction, subject, gradeLevel);
       setEditedTexts(prev => ({ ...prev, [i]: revised }));
       setRefineInputs(prev => ({ ...prev, [i]: '' }));
-      toast.success('Revised! The updated version is shown — revise again or continue to the lesson plan.');
+      toast.success('Revised! The updated version is shown. Revise again or continue to the lesson plan.');
     } catch (err: any) {
       toast.error(err?.message || 'Revision failed. Please try again.');
     } finally { setRefining(null); }
   };
 
-  const handleStrengthen = () => { setActiveLevel('Gold'); suggestionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast.info('Showing Socratic Transformation (Gold Level)'); };
+  const handleStrengthen = () => { setActiveLevel('Gold'); suggestionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast.info(`Showing the ${TIER_LABELS.Gold} redesign`); };
   const handleSaveToLibrary = () => {
     if (!result || !onSave) return;
     const firstLine = text.trim().split('\n')[0];
@@ -221,7 +292,7 @@ export function AssignmentAnalyzer({
     });
     toast.success('Assignment saved to your library!');
   };
-  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; onReset?.(); };
+  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; clearDraft(); onReset?.(); };
 
   // Which dimensions improved between the original and the redesigned analysis.
   const improvedDimensions = (): string[] => {
@@ -265,7 +336,7 @@ export function AssignmentAnalyzer({
                   <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">Transform Yesterday's Assignments into <span className="text-accent">Tomorrow's Learning.</span></h1>
                   <p className="text-sm font-semibold uppercase tracking-widest text-muted-foreground pt-1">Wisdom in the Age of Artificial Intelligence</p>
                 </div>
-                <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">Upload the assignments you've refined over years of teaching. SocratesIQ analyzes them, measures AI resilience, and transforms them into standards-aligned, classroom-ready learning experiences — without losing what makes them yours.</p>
+                <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">Upload the assignments you've refined over years of teaching. SocratesIQ analyzes them, measures AI resilience, and transforms them into standards-aligned, classroom-ready learning experiences, without losing what makes them yours.</p>
                 <p className="text-xs font-bold uppercase tracking-widest text-accent">Built by Teachers · Designed for the AI Era</p>
               </div>
             </div>
@@ -311,7 +382,7 @@ export function AssignmentAnalyzer({
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               <Card className="border border-border shadow-sm">
-                <CardHeader><CardTitle className="text-lg font-serif italic">Upload Document</CardTitle><CardDescription>PDF, DOCX, or TXT files.</CardDescription></CardHeader>
+                <CardHeader><CardTitle className="text-lg font-serif">Upload Document</CardTitle><CardDescription>PDF, DOCX, or TXT files.</CardDescription></CardHeader>
                 <CardContent className="space-y-4">
                   <FileUploader onTextExtracted={setText} />
                   {googleConfigured && (
@@ -323,7 +394,7 @@ export function AssignmentAnalyzer({
                 </CardContent>
               </Card>
               <Card className="border border-border shadow-sm flex flex-col">
-                <CardHeader><CardTitle className="text-lg font-serif italic">Paste Text</CardTitle><CardDescription>Directly input your prompt.</CardDescription></CardHeader>
+                <CardHeader><CardTitle className="text-lg font-serif">Paste Text</CardTitle><CardDescription>Directly input your prompt.</CardDescription></CardHeader>
                 <CardContent className="space-y-4 flex-1 flex flex-col">
                   <Textarea placeholder="Paste your assignment here..." className="flex-1 min-h-[150px] resize-none border-border focus-visible:ring-accent" value={text} onChange={(e) => { setText(e.target.value); if (previousResult) setPreviousResult(null); }} />
                   <Button className="w-full h-12 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 rounded-md" onClick={handleAnalyze} disabled={isAnalyzing || !text.trim()}>
@@ -430,10 +501,9 @@ export function AssignmentAnalyzer({
                       const changes = getChangeSummary(text, sug.modifiedAssignment);
                       const colors = ['border-orange-200 bg-orange-50', 'border-slate-200 bg-slate-50', 'border-amber-200 bg-amber-50'];
                       const badges = ['bg-orange-100 text-orange-700', 'bg-slate-100 text-slate-600', 'bg-amber-100 text-amber-700'];
-                      const medals = ['🥉', '🥈', '🥇'];
                       return (
                         <div key={i} className={`p-4 rounded-xl border-2 ${colors[i]} space-y-3`}>
-                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${badges[i]}`}>{medals[i]} {sug.level}</div>
+                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${badges[i]}`}>{TIER_LABELS[sug.level as TierLevel]}</div>
                           <p className="text-xs font-bold">{sug.title}</p>
                           <p className="text-[11px] text-muted-foreground leading-relaxed italic">{sug.description}</p>
                           {sug.strengthens && <p className="text-[10px] font-bold uppercase tracking-wider text-accent">Strengthens: {sug.strengthens}</p>}
@@ -457,20 +527,20 @@ export function AssignmentAnalyzer({
               )}
               <Tabs value={activeLevel} onValueChange={(v) => setActiveLevel(v as any)} className="w-full">
                 <TabsList className="grid w-full grid-cols-3 h-10 bg-secondary rounded-md p-1">
-                  <TabsTrigger value="Bronze" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">🥉 Bronze</TabsTrigger>
-                  <TabsTrigger value="Silver" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">🥈 Silver</TabsTrigger>
-                  <TabsTrigger value="Gold" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">🥇 Gold</TabsTrigger>
+                  <TabsTrigger value="Bronze" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">{TIER_LABELS.Bronze}</TabsTrigger>
+                  <TabsTrigger value="Silver" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">{TIER_LABELS.Silver}</TabsTrigger>
+                  <TabsTrigger value="Gold" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">{TIER_LABELS.Gold}</TabsTrigger>
                 </TabsList>
                 {result.suggestions.map((suggestion, i) => (
                   <TabsContent key={i} value={suggestion.level} className="mt-6 space-y-6">
                     <div className="space-y-1">
-                      <h3 className="text-2xl font-serif italic text-accent">{suggestion.title}</h3>
+                      <h3 className="text-2xl font-serif text-accent">{suggestion.title}</h3>
                       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
                       {suggestion.strengthens && <p className="text-[11px] font-bold uppercase tracking-wider text-accent mt-1">Strengthens: {suggestion.strengthens}</p>}
                     </div>
                     <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{editedTexts[i] ?? suggestion.modifiedAssignment}</div>
                     {editedTexts[i] != null && editedTexts[i] !== suggestion.modifiedAssignment && (
-                      <p className="text-[10px] text-muted-foreground italic -mt-4">✏️ Showing your revised version — downloads and the lesson plan will use it.</p>
+                      <p className="text-[10px] text-muted-foreground italic -mt-4">✏️ Showing your revised version. Downloads and the lesson plan will use it.</p>
                     )}
                     {editingIndex === i && (
                       <div className="space-y-2">
@@ -550,6 +620,12 @@ export function AssignmentAnalyzer({
               <Button variant="outline" className="flex-1 h-10 text-xs font-bold uppercase tracking-widest border-border hover:bg-secondary gap-2" onClick={handleNewAssignment}><RotateCcw className="w-3.5 h-3.5" />New Assignment</Button>
               <Button className="flex-1 h-10 text-xs font-bold uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 gap-2" onClick={handleSaveToLibrary}><Save className="w-3.5 h-3.5" />Save to Library</Button>
             </div>
+            {draftSavedAt && (
+              <p className="flex items-center justify-center gap-1.5 text-center text-[10px] text-muted-foreground -mt-2">
+                <Check className="w-3 h-3 text-success" />
+                Draft autosaved to this browser. Use Save to Library to keep it for good.
+              </p>
+            )}
           </div>
           <aside className="bg-card border-b md:border-b-0 md:border-l border-border p-6 md:p-10 flex flex-col gap-8 overflow-y-auto order-1 md:order-2">
             <div className="text-center space-y-3">
@@ -566,7 +642,7 @@ export function AssignmentAnalyzer({
             </div>
             {applied !== null && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent font-medium">
-                <BookOpen className="w-4 h-4 flex-shrink-0" />Version applied — re-analyze to see updated score.
+                <BookOpen className="w-4 h-4 flex-shrink-0" />Version applied. Re-analyze to see updated score.
               </motion.div>
             )}
             <div className="space-y-4">
@@ -617,18 +693,18 @@ export function AssignmentAnalyzer({
       <Dialog open={showScoreInfo} onOpenChange={setShowScoreInfo}>
         <DialogContent className="sm:max-w-[480px] border-border bg-card p-8 max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold italic font-serif">The AI Resilience Score</DialogTitle>
+            <DialogTitle className="text-2xl font-bold font-serif">The AI Resilience Score</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
-            <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient — harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
-            <p>There's no fixed formula. SocratesIQ weighs your assignment against a proprietary, research-based rubric built on four dimensions — <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
+            <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient: harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
+            <p>There's no fixed formula. SocratesIQ weighs your assignment against a proprietary, research-based rubric built on four dimensions: <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
             <div className="space-y-1.5">
               {[
-                ['0–30', 'Highly vulnerable — one AI prompt could do it', 'text-red-500'],
-                ['31–50', 'Vulnerable — still largely AI-completable', 'text-orange-500'],
-                ['51–70', 'Moderate — some resilient elements, gaps remain', 'text-amber-500'],
-                ['71–85', 'Strong — multiple anchors and a process trail', 'text-lime-600'],
-                ['86–100', 'Exceptional — AI can assist but not replace', 'text-green-600'],
+                ['0–30', 'Highly vulnerable: one AI prompt could do it', 'text-red-500'],
+                ['31–50', 'Vulnerable: still largely AI-completable', 'text-orange-500'],
+                ['51–70', 'Moderate: some resilient elements, gaps remain', 'text-amber-500'],
+                ['71–85', 'Strong: multiple anchors and a process trail', 'text-lime-600'],
+                ['86–100', 'Exceptional: AI can assist but not replace', 'text-green-600'],
               ].map(([range, label, color]) => (
                 <div key={range} className="flex items-start gap-3">
                   <span className={`font-bold w-14 shrink-0 ${color}`}>{range}</span>
@@ -636,7 +712,7 @@ export function AssignmentAnalyzer({
                 </div>
               ))}
             </div>
-            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut — and the Bronze/Silver/Gold redesigns that raise it.</p>
+            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut, and the Bronze/Silver/Gold redesigns that raise it.</p>
           </div>
         </DialogContent>
       </Dialog>
@@ -647,27 +723,27 @@ export function AssignmentAnalyzer({
       <Dialog open={showWall} onOpenChange={setShowWall}>
         <DialogContent className="sm:max-w-[440px] border-border bg-card p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold italic font-serif">
+            <DialogTitle className="text-2xl font-bold font-serif">
               {credits?.plan === 'paid' ? "You've used this month's redesigns" : `You've used your ${credits?.allowance ?? 3} free redesigns`}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>{credits?.plan === 'paid'
-              ? 'Your plan includes 20 assignment redesigns a month. It resets at the start of your next month — everything you already created stays available.'
-              : 'Nice work — you got the full experience. To keep transforming assignments, a paid plan is on the way.'}</p>
+              ? 'Your plan includes 20 assignment redesigns a month. It resets at the start of your next month. Everything you already created stays available.'
+              : 'Nice work! You got the full experience. To keep transforming assignments, a paid plan is on the way.'}</p>
             <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-1">
               <p className="text-lg font-bold text-foreground">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
               <p className="text-xs"><strong className="text-foreground">20 assignment redesigns every month.</strong> Each one includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
             </div>
             {credits?.plan !== 'paid' && (
               <p className="text-xs bg-secondary/40 border border-border rounded-lg p-3">
-                💌 <strong className="text-foreground">Paid plans are launching soon.</strong> We'll email you the moment they're ready — no need to do anything.
+                💌 <strong className="text-foreground">Paid plans are launching soon.</strong> We'll email you the moment they're ready. No need to do anything.
               </p>
             )}
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => setShowWall(false)}>Got it</Button>
               <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={() => { setShowWall(false); toast.success("You're on the list — we'll email you when plans go live."); }}>
+                onClick={() => { setShowWall(false); toast.success("You're on the list. We'll email you when plans go live."); }}>
                 Notify me
               </Button>
             </div>

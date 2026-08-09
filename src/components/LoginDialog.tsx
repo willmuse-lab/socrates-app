@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,21 +31,31 @@ function MicrosoftIcon() {
   );
 }
 
+type Mode = 'login' | 'signup' | 'forgot';
+
 interface LoginDialogProps {
   isOpen: boolean;
   onLogin: (name: string, email: string, id?: string) => void;
+  onClose?: () => void;
+  // Which form to show when the dialog opens. "Get started" opens signup,
+  // "Sign in" opens login — so a brand-new visitor never sees "Welcome Back".
+  initialMode?: Mode;
 }
 
-type Mode = 'login' | 'signup' | 'forgot';
-
-export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
-  const [mode, setMode] = useState<Mode>('login');
+export function LoginDialog({ isOpen, onLogin, onClose, initialMode = 'login' }: LoginDialogProps) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [resetSent, setResetSent] = useState(false);
+
+  // Each time the dialog opens, show the form the trigger asked for and clear
+  // any stale error/reset state from a previous open.
+  useEffect(() => {
+    if (isOpen) { setMode(initialMode); setError(''); setResetSent(false); }
+  }, [isOpen, initialMode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,14 +122,14 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
   const isDemo = !supabaseEnabled;
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose?.(); }}>
       <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden border-border bg-card shadow-2xl">
         <div className="relative h-32 bg-primary flex items-center justify-center overflow-hidden">
           <div className="relative flex flex-col items-center gap-2">
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg">
               <GraduationCap className="w-7 h-7 text-primary" />
             </div>
-            <span className="text-white font-serif italic text-xl font-bold tracking-tight">SocratesIQ</span>
+            <span className="text-white font-serif text-xl font-bold tracking-tight">SocratesIQ</span>
           </div>
         </div>
         <div className="p-8 space-y-6">
@@ -194,7 +204,7 @@ export function LoginDialog({ isOpen, onLogin }: LoginDialogProps) {
             )}
             {mode === 'forgot' && resetSent && (
               <div className="text-xs text-green-700 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                Check your email — if an account exists for that address, a reset link is on its way. It expires in about an hour. (Signed up with Google? Use the 'Continue with Google' button instead.)
+                Check your email. If an account exists for that address, a reset link is on its way. It expires in about an hour. (Signed up with Google? Use the 'Continue with Google' button instead.)
               </div>
             )}
             <AnimatePresence>

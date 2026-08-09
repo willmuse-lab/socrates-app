@@ -11,7 +11,7 @@ interface DifferentiationPanelProps {
 
 const VARIANTS = [
   { key: 'iep' as const, label: 'IEP / 504', emoji: '🤝', color: 'border-purple-200 bg-purple-50', activeColor: 'border-purple-400 bg-purple-100', badge: 'bg-purple-100 text-purple-700', desc: 'Scaffolded version with sentence starters, simplified language, and step-by-step structure.' },
-  { key: 'ell' as const, label: 'ELL Support', emoji: '🌍', color: 'border-blue-200 bg-blue-50', activeColor: 'border-blue-400 bg-blue-100', badge: 'bg-blue-100 text-blue-700', desc: 'Adapted for English Language Learners — key terms defined, reduced idioms, added context.' },
+  { key: 'ell' as const, label: 'ELL Support', emoji: '🌍', color: 'border-blue-200 bg-blue-50', activeColor: 'border-blue-400 bg-blue-100', badge: 'bg-blue-100 text-blue-700', desc: 'Adapted for English Language Learners: key terms defined, reduced idioms, added context.' },
   { key: 'gifted' as const, label: 'Gifted / Advanced', emoji: '🚀', color: 'border-amber-200 bg-amber-50', activeColor: 'border-amber-400 bg-amber-100', badge: 'bg-amber-100 text-amber-700', desc: 'Extended version with deeper complexity, additional challenge, and higher-order thinking.' },
 ];
 
@@ -30,7 +30,7 @@ export function DifferentiationPanel({ versions, level }: DifferentiationPanelPr
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <Users className="w-4 h-4 text-muted-foreground" />
-        <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Differentiated versions — {level}</p>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Differentiated versions: {level}</p>
       </div>
       <div className="grid grid-cols-3 gap-2">
         {VARIANTS.map(v => (

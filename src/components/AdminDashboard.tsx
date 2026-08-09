@@ -53,7 +53,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
       <Card className="w-full max-w-sm p-8 space-y-6">
         <div className="text-center space-y-2">
           <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mx-auto"><ShieldCheck className="w-6 h-6 text-accent" /></div>
-          <h2 className="text-xl font-bold font-serif italic">Admin Dashboard</h2>
+          <h2 className="text-xl font-bold font-serif">Admin Dashboard</h2>
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <input type="password" placeholder="Admin password" value={pw}
@@ -73,7 +73,7 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
         <div>
           <div className="flex items-center gap-3">
             <TrendingUp className="w-6 h-6 text-accent" />
-            <h1 className="text-3xl font-bold font-serif italic">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold font-serif">Admin Dashboard</h1>
             {!supabaseEnabled && <Badge variant="outline" className="text-amber-600 border-amber-300 text-[10px]">Demo data</Badge>}
           </div>
           <p className="text-muted-foreground text-sm mt-1">School-wide usage and engagement overview.</p>

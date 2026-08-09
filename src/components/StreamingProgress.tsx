@@ -47,7 +47,7 @@ export function StreamingProgress({ percent, isVisible }: StreamingProgressProps
           <div className="relative">
             <div className="absolute inset-0 rounded-full bg-accent/20 animate-ping" />
             <div className="relative w-16 h-16 rounded-full border-2 border-accent/30 flex items-center justify-center bg-card">
-              <img src="/logo.png" alt="SocratesIQ" className="w-10 h-10 object-contain" />
+              <img src="/owl.png" alt="SocratesIQ" className="w-10 h-10 object-contain" />
             </div>
           </div>
 
@@ -59,8 +59,8 @@ export function StreamingProgress({ percent, isVisible }: StreamingProgressProps
                 transition={{ duration: 0.45 }}
                 className="text-center space-y-3">
                 <Quote className="w-5 h-5 text-accent opacity-40 mx-auto" />
-                <p className="text-lg md:text-xl font-serif italic leading-relaxed text-foreground">"{comment.quote}"</p>
-                <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">— {comment.role}</p>
+                <p className="text-lg md:text-xl font-serif leading-relaxed text-foreground">"{comment.quote}"</p>
+                <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">{comment.role}</p>
               </motion.div>
             </AnimatePresence>
           </div>
