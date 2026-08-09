@@ -82,8 +82,8 @@ export function AboutPage({ onBack }: PageProps) {
         <Mail className="w-8 h-8 text-accent mx-auto" />
         <h3 className="text-xl font-semibold font-serif">Get in touch</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">Questions about the framework, partnership opportunities, research collaboration, or school pricing.</p>
-        <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com'} className="gap-2">
-          <Mail className="w-4 h-4" />socratesiqed@gmail.com
+        <Button onClick={() => window.location.href = 'mailto:hello@socratesiq.com'} className="gap-2">
+          <Mail className="w-4 h-4" />hello@socratesiq.com
         </Button>
       </div>
     </motion.div>
@@ -156,10 +156,10 @@ export function PrivacyPage({ onBack }: PageProps) {
       <ProseSections sections={[
         { title: 'What data we collect', content: 'We collect the minimum necessary: your name and email address, assignment text you submit for analysis, your saved assignments and analysis results, and basic usage metadata.\n\nWe do NOT collect student names, student work, grades, or any personally identifiable student information.' },
         { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers SocratesIQ.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded. It is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
-        { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at socratesiqed@gmail.com to request a DPA.' },
+        { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at hello@socratesiq.com to request a DPA.' },
         { title: 'Google Drive & Docs', content: 'When you use the Google Drive features, we request the narrowest permission Google offers (per-file access): SocratesIQ can only read files you explicitly pick in the Google file window, and can create new Google Docs when you export.\n\nWe cannot see, list, or search the rest of your Drive. Your Google sign-in token stays in your browser for the session and is never sent to our servers, logged, or stored in our database.' },
-        { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email socratesiqed@gmail.com. We will process deletion requests within 14 days.' },
-        { title: 'Contact', content: 'Data privacy questions: socratesiqed@gmail.com\nWe aim to respond within 2 business days.' },
+        { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email hello@socratesiq.com. We will process deletion requests within 14 days.' },
+        { title: 'Contact', content: 'Data privacy questions: hello@socratesiq.com\nWe aim to respond within 2 business days.' },
       ]} />
     </motion.div>
   );
@@ -190,7 +190,7 @@ export function FeedbackPage({ onBack }: PageProps) {
       <div className="rounded-2xl border border-accent/20 bg-accent/5 p-8 text-center space-y-3">
         <h3 className="text-xl font-semibold font-serif">Using SocratesIQ in your classroom?</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">We'd love to hear what's working. Send us your experience and it may appear here.</p>
-        <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com?subject=My%20Socrates%20feedback'} className="gap-2">
+        <Button onClick={() => window.location.href = 'mailto:hello@socratesiq.com?subject=My%20Socrates%20feedback'} className="gap-2">
           <Mail className="w-4 h-4" />Share your feedback
         </Button>
       </div>
@@ -218,7 +218,7 @@ export function TermsPage({ onBack }: PageProps) {
         { title: '10. Limitation of liability', content: 'To the maximum extent permitted by law, we are not liable for any indirect, incidental, or consequential damages arising from your use of the Service. Our total liability for any claim relating to the Service will not exceed the amount you paid us in the 12 months before the claim.' },
         { title: '11. Termination', content: 'You may stop using the Service at any time. We may suspend or terminate access if you violate these Terms or use the Service in a way that could harm us or other users. Upon termination, your right to use the Service ends; sections that by their nature should survive (such as intellectual property, disclaimers, and limitation of liability) will continue to apply.' },
         { title: '12. Changes to these terms', content: 'We may update these Terms from time to time. When we make material changes, we will update the date above and, where appropriate, notify you. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.' },
-        { title: '13. Contact', content: 'Questions about these Terms: socratesiqed@gmail.com' },
+        { title: '13. Contact', content: 'Questions about these Terms: hello@socratesiq.com' },
       ]} />
     </motion.div>
   );
@@ -271,7 +271,7 @@ const HELP_TOPICS = [
   },
   {
     title: 'Contact support',
-    content: 'We\'re a small team of educators and we read everything.\n\nEmail: socratesiqed@gmail.com\nWe aim to respond within 2 business days.\n\nWhen reporting a problem, it helps to include: what you clicked, what you expected, what happened instead, and roughly what time it happened.',
+    content: 'We\'re a small team of educators and we read everything.\n\nEmail: support@socratesiq.com\nWe aim to respond within 2 business days.\n\nWhen reporting a problem, it helps to include: what you clicked, what you expected, what happened instead, and roughly what time it happened.',
   },
 ];
 
@@ -285,7 +285,7 @@ export function HelpPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-10">
       <BackLink onBack={onBack} />
       <PageHeader eyebrow="Help center" title="Help and how-to">
-        Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.
+        Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:support@socratesiq.com" className="text-accent font-semibold hover:underline">support@socratesiq.com</a>.
       </PageHeader>
       <input
         value={query}
@@ -294,7 +294,7 @@ export function HelpPage({ onBack }: PageProps) {
         className="w-full h-11 px-4 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
       />
       {topics.length === 0 && (
-        <p className="text-sm text-muted-foreground">No topics match "{query}". Try another word, or email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.</p>
+        <p className="text-sm text-muted-foreground">No topics match "{query}". Try another word, or email <a href="mailto:support@socratesiq.com" className="text-accent font-semibold hover:underline">support@socratesiq.com</a>.</p>
       )}
       <div className="space-y-8">
         {topics.map(({ title, content }) => (
