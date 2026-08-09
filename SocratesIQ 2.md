@@ -1,7 +1,176 @@
-# SOCRATES — Session Handoff Document
+# SocratesIQ 2: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: July 25 2026.
+session. Read this whole file before making changes. Last updated: August 6 2026.
+
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 2.md`
+now, and the number bumps by one on every update (next update renames it to
+`SocratesIQ 3.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
+handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versioned
+file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
+`SocratesIQ N.md` wins.
+
+## Session status (August 6 2026) — "Welcome Back" greeting fix (on PR #10)
+
+Small, self-contained fix added to the reskin branch (PR #10
+`claude/handoff-continuation-w2g10j`). PROBLEM Will reported: a brand-new or
+incognito visitor sometimes saw "Welcome Back" — the auth dialog always opened
+in login mode, so clicking "Get started" greeted a first-timer like a returning
+user. FIX (2 files, wiring only, no functionality change):
+- `LoginDialog.tsx` — new optional `initialMode?: 'login' | 'signup' | 'forgot'`
+  prop (default 'login'); the internal `mode` seeds from it, and a `useEffect`
+  re-applies `initialMode` (and clears stale error/reset state) every time the
+  dialog opens. So "Welcome Back" now appears ONLY on the actual sign-in form.
+- `App.tsx` — new `loginMode` state + an `openLogin(mode)` helper. Header
+  "Get started" and the landing-page CTA → `openLogin('signup')` (Create Account);
+  header "Sign in" and post-logout → `openLogin('login')` (Welcome Back);
+  `<LoginDialog>` gets `initialMode={loginMode}`.
+Verified: `npx tsc --noEmit` clean + `npx vite build` passes. Committed + pushed
+to PR #10 (will show on the deploy-preview-10 build). Confirm in a fresh
+incognito window: header "Get started" should read "Create Account"; only
+signing in shows "Welcome Back".
+
+ALSO SHIPPED Aug 6 on PR #10 (Will's decisions, four changes + inner-page polish):
+- **Redesign tiers renamed Bronze/Silver/Gold -> Quick Fix / Rebuild / Reinvent.**
+  The medals read as a ranking (Gold = "best"), but the tiers are levels of CHANGE,
+  not quality. DISPLAY-ONLY rename: the internal level values stay 'Bronze'/'Silver'/
+  'Gold' everywhere (API contract in analyze.ts, saved library `status`, share links)
+  so nothing breaks; only labels changed, via `TIER_LABELS` (AssignmentAnalyzer),
+  `STATUS_LABELS` (LibraryView, SavedReportView), and updated plain-copy in Pricing,
+  Onboarding, LandingPage, StaticPages. Same pattern as the AI-strategy rename. Medals
+  (emoji) were removed from the tabs, compare view, Onboarding demo, and Library badges.
+- **Student time is now WOVEN INTO each redesign** (Will: "no [separate badge] but
+  include that in the redesign for each tier"). analyze.ts redesign prompt now tells the
+  model to STATE the expected completion time inside the assignment text, scaled by
+  level (Quick Fix ~10-20 min, Rebuild ~one class period, Reinvent up to two). No new
+  UI field; it reads as part of the handout.
+- **Draft autosave in the analyzer** (AssignmentAnalyzer.tsx). Inline edits/revisions
+  lived only in React memory and were lost on navigation. A debounced localStorage draft
+  (`siq_draft_v1`) now saves text/result/editedTexts/activeLevel/aiPreference/lessonPlan/
+  directions and restores on mount (skipped when `initialText` is passed, e.g. opening a
+  library item). Small "Draft autosaved" note under the New/Save buttons; cleared on New
+  Assignment. "Save to Library" is still the deliberate keep-forever snapshot. Local-only
+  for now (a cloud draft table is a possible future enhancement).
+- **Cloud/Local sync pill HIDDEN** in the header (App.tsx) at Will's request (it read as
+  clutter in the top-right corner). Commented out, not deleted; `cloudSynced` state and
+  the `Cloud`/`HardDrive` imports were removed since they were now unused. Sync still runs.
+- **Inner pages polished to the landing's editorial layout** (StaticPages.tsx +
+  Pricing.tsx): shared `BackLink`/`PageHeader`/`ProseSections` helpers, `.eyebrow` labels
+  over large Sora `font-semibold` headings, a dark `.ink-card` philosophy accent on About,
+  eyebrow'd section intros. Copy preserved (legal text verbatim); the Library/sync Help
+  topic was updated to mention autosave and drop the now-hidden cloud badge.
+All four builds/type-checks pass (vite + tsc + esbuild on analyze.ts). Three commits on
+PR #10.
+
+BRANCH/HANDOFF HOUSEKEEPING done this session: the versioned handoff
+(`SocratesIQ 1.md`, which lived only on PR #12 `claude/handoff-update-aug4`) was
+brought onto the reskin branch as `SocratesIQ 2.md`, and the stale top-level
+`HANDOFF.md` was removed here so there is ONE canonical handoff. NOTE: because
+PR #12's whole job was the `HANDOFF.md → SocratesIQ 1.md` rename, PR #10 now
+supersedes it — when PR #10 merges, PR #12 can be closed without merging (or
+will merge cleanly as a no-op). Don't merge both expecting two separate handoff
+files.
+
+## Session status (August 4 2026) — UI reskin + EPOCH IN PROGRESS (branches, NOT merged)
+
+Nothing from this session is live or on `main` yet — it is all on branches / draft
+PRs. Will's live site is UNCHANGED. Two workstreams plus decisions:
+
+OPEN BRANCHES / PRs:
+- **PR #10 `claude/handoff-continuation-w2g10j` — UI RESKIN (ON HOLD; do NOT merge
+  without Will's explicit OK).** Why: a hired marketing team said the old UI "looks
+  too AI" (cream bg + four pastel corner-glow radial gradients + coral accent +
+  Georgia-italic headlines = a generic AI-default look). On the branch: warm-paper +
+  deep-navy + slate-blue editorial palette (`src/index.css` tokens), corner-glows
+  removed, ALL headings flipped italic→upright (38 spots), navy pill buttons, `.eyebrow`
+  labels + `.section-ink` dark bands, a dark "Built by a teacher" section on the
+  landing. THEN per the brand kit the font was switched Fraunces→**Sora** (whole UI is
+  Sora; `--font-serif` token repurposed to Sora so headings render in it; fonts load
+  via <link> in index.html). Also here: the **new owl brand logo** (`public/logo.png`,
+  transparent PNG, replaces the old; used by header, splash, favicon, onboarding,
+  loading). Design DIRECTION = the marketing team's Lovable mockup
+  https://socrates-spark-redo.lovable.app (editorial navy/paper, photography).
+  ADDED TO PR #10 SINCE (Aug 5): (a) PUBLIC LANDING PAGE — new
+  `src/components/LandingPage.tsx`; logged-out visitors now see a marketing homepage
+  instead of a forced login (App.tsx: splash no longer force-opens login; header is
+  auth-aware with Sign in / Get started; LoginDialog gained `onClose` and is
+  dismissable); login gates ONLY the tool; honest copy + a real before→after score
+  visual, no fabricated stats. Solves the "marketers can't get past sign-in" blocker.
+  (b) OWL-ONLY nav mark — `public/owl.png` (cropped + optimized from Will's upload to
+  70KB) shown beside a "SocratesIQ" Sora wordmark; favicon + streaming loading icon use
+  it; the full stacked lockup `public/logo.png` stays on splash + onboarding.
+  (c) EM-DASH CLEANUP — em dashes read as an AI tell, so ~100 across 17 user-facing
+  files became commas/periods/colons/parens (en-dash ranges like 0-100 and internal
+  split-delimiters left alone).
+  (d) WELCOME-BACK FIX (Aug 6) — the auth dialog now opens on the right form so a
+  first-time/incognito visitor never sees "Welcome Back" (see the Aug 6 status block
+  at the top for details).
+  (e) MORE Aug 6 (see the Aug 6 status block): redesign tiers renamed Bronze/Silver/Gold
+  -> Quick Fix / Rebuild / Reinvent (display only), student time woven into each redesign,
+  draft autosave in the analyzer, cloud sync pill hidden, and the inner pages (About/
+  Scoring/Pricing/Help/Privacy/Terms/Feedback) polished to the landing's editorial layout.
+- **PR #11 `claude/epoch-redesigns` — EPOCH redesigns (draft, ready to test).**
+  Folds the MIT Sloan EPOCH paper (Loaiza & Rigobón 2025) into the redesign engine,
+  ADDITIVE: one entry added to `RESEARCH_NOTES`, reinforcing — NOT replacing — the
+  existing strategies. Every redesign must now build a human capability AI can't
+  replicate; a short "Strengthens: …" tag renders on each Bronze/Silver/Gold card
+  (new optional `strengthens` field on the suggestion type in gemini.ts + analyze.ts
+  prompt bullet + OUTPUT FORMAT). About page gets ONE citation chip
+  (`Loaiza & Rigobón, MIT (2025)`) in the sources list. WILL'S RULES: MIT/EPOCH
+  appears ONLY in the research base + About citation, NEVER in redesign output (prompt:
+  "never name any framework, study, or acronym"); redesigns ONLY (0–100 score +
+  failure breakdown unchanged); always on; learning-and-thinking voice. Kept on a
+  SEPARATE branch from the reskin so it can ship independently. Builds pass (vite +
+  esbuild).
+
+ENVIRONMENT NOTE: the agent cannot reach lovable.app, socratesiq.com, or the netlify
+site (org network policy returns 403 CONNECT). Will must paste screenshots / publish
+for the agent to see anything external. Pasted IMAGES are visible to the agent but do
+NOT land on its filesystem — binary assets (logos, photos) must come in via GitHub
+upload; SVG/text can be pasted.
+
+DECISIONS MADE (don't relitigate):
+- **Font = Sora** (brand kit), NOT the Lovable serif. Brand kit: Sora typeface; palette
+  navy #0F1B2E / slate #33455E / blue #00A8E8 / green #2EBB57 / grey #E6EBF1; owl =
+  "Design 1 – Abstract" (navy→teal). Kit also has horizontal / owl-only / reversed
+  lockups.
+- **The app's OWN copy is CLEAN** — audited: no fabricated stats/testimonials
+  (testimonials already anonymized; pricing "Save %" is computed). The fake proof
+  ("87%→0%", "300+ institutions", "Dr. Sarah Jenkins") is ONLY in the Lovable draft
+  (marketing's to fix). NUANCE: "87%→0%" traces to REAL data in `RESEARCH_NOTES` (the
+  BUV / Furze et al. 2024 pilot) but Lovable misworded it (misconduct CASES → zero, not
+  "87% of students"); "300+ institutions" & "Dr. Sarah Jenkins" are AI-invented.
+- **Imagery:** no real classroom photos (no schools/pilots yet). Plan: PRODUCT
+  SCREENSHOTS + brand graphics + honest "materials" shots Will can take; licensed stock
+  only as honest mood, never captioned as real users; NO AI-generated people.
+- **Logo format:** the new logo is an AI-generated RASTER (PNG). Will's "Owllogo.svg"
+  upload was a WRAPPED BITMAP (a PNG embedded in an SVG, ~470KB, zero vector paths) —
+  removed it. A true vector needs a designer to redraw the owl; the PNG is fine for web.
+- A marketing **punch-list** was delivered to Will (scratchpad file) covering: strip the
+  Lovable draft's fake proof, use Sora, use product screenshots not classroom photos,
+  brand-kit colors/contrast, extend the design into the app (not just the homepage).
+
+NEXT STEPS:
+1. DONE (Aug 5): the logo owl-mark in the nav AND the public landing page (both in
+   PR #10, described above). STILL OPEN on the logo: a TRUE vector SVG from a designer
+   (the current owl is an AI-generated raster; a wrapped-bitmap "svg" was rejected).
+2. **Will to REVIEW the PR #10 preview**
+   (deploy-preview-10--brilliant-mandazi-3937f4.netlify.app) and share it with the
+   marketing companies — they can now see the site WITHOUT signing in. Everything
+   downstream keys off his reaction. (Ignore the stale `musesocrates` preview.)
+3. **Polish the inner pages** (Pricing / About / FAQ / Scoring / Help) to match the
+   landing's editorial layout. They already inherit the new colors + Sora, but their
+   layouts are plainer than the homepage (punch-list: extend the look beyond the front
+   page). This is the recommended next BUILD the agent can do solo.
+4. Drop real PRODUCT SCREENSHOTS into the landing when Will has them (imagery decision:
+   product shots + brand graphics, NOT fake classroom photos).
+5. Decide on merging PR #10 (reskin + landing) and PR #11 (EPOCH), then trigger a
+   Netlify deploy (auto-deploy of main does NOT fire — see Deployment facts).
+
+PAUSED / UNFINISHED: a `/content-coach` social post — 5 viral angles were offered
+(AI-detectors-are-a-trap / a real number / teacher origin story / a classroom
+transformation / "stop telling students not to use AI"); Will never picked one.
 
 ## Session status (July 22–25 2026) — all LIVE on main
 

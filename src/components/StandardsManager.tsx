@@ -62,7 +62,7 @@ export function StandardsManager({ userId, onSelect, selectedId }: StandardsMana
     try {
       const text = await extractPDF(file);
       if (!text || text.length < 200) {
-        toast.error('Could not extract readable text — this PDF may be a scanned image. Try a text-based version of your standards document.');
+        toast.error('Could not extract readable text. This PDF may be a scanned image. Try a text-based version of your standards document.');
         return;
       }
       setExtractedText(text); setExtractedFilename(file.name);
@@ -173,7 +173,7 @@ export function StandardsManager({ userId, onSelect, selectedId }: StandardsMana
           </div>
         ) : extractedText ? (
           <div className="flex items-center justify-center gap-2 text-xs text-teal-700 font-medium">
-            <CheckCircle2 className="w-4 h-4" /> {extractedFilename} ready — fill in details below
+            <CheckCircle2 className="w-4 h-4" /> {extractedFilename} ready. Fill in details below
           </div>
         ) : (
           <div className="flex flex-col items-center gap-1 text-muted-foreground">
@@ -191,7 +191,7 @@ export function StandardsManager({ userId, onSelect, selectedId }: StandardsMana
             <div className="grid grid-cols-2 gap-2">
               <div className="col-span-2">
                 <Label className="text-[10px] uppercase tracking-wider">Title</Label>
-                <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="NC SCOS — 7th Grade ELA" className="h-9 text-xs" />
+                <Input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="NC SCOS: 7th Grade ELA" className="h-9 text-xs" />
               </div>
               <div>
                 <Label className="text-[10px] uppercase tracking-wider">State</Label>

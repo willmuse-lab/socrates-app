@@ -61,7 +61,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
               className="bg-card border border-border rounded-2xl p-8 space-y-6 text-center">
               <div className="w-20 h-20 mx-auto"><img src="/logo.png" alt="SocratesIQ" className="w-full h-full object-contain" /></div>
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold font-serif italic">Welcome, {userName.split(' ')[0]}.</h1>
+                <h1 className="text-3xl font-bold font-serif">Welcome, {userName.split(' ')[0]}.</h1>
                 <p className="text-muted-foreground leading-relaxed">SocratesIQ helps you design assignments that <strong>AI cannot shortcut</strong>. This takes 90 seconds to set up.</p>
               </div>
               <div className="grid grid-cols-3 gap-4 text-left">
@@ -79,7 +79,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
           {step === 1 && (
             <motion.div key="profile" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6 max-h-[85vh] overflow-y-auto">
-              <div><h2 className="text-2xl font-bold font-serif italic">Tell us about your teaching</h2>
+              <div><h2 className="text-2xl font-bold font-serif">Tell us about your teaching</h2>
                 <p className="text-sm text-muted-foreground">SocratesIQ tailors every suggestion to your subject and students.</p></div>
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -122,7 +122,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
                 {userId && supabaseEnabled && (
                   <div className="space-y-2 pt-2 border-t border-border">
                     <StandardsManager userId={userId} onSelect={() => {}} />
-                    <p className="text-[10px] text-muted-foreground italic">Optional — used to align your assignments and lesson plans to your standards. You can add or change this anytime in Settings.</p>
+                    <p className="text-[10px] text-muted-foreground italic">Optional: used to align your assignments and lesson plans to your standards. You can add or change this anytime in Settings.</p>
                   </div>
                 )}
               </div>
@@ -135,11 +135,11 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
           {step === 2 && (
             <motion.div key="framework" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6">
-              <div><h2 className="text-2xl font-bold font-serif italic">The Triple-A Framework</h2>
+              <div><h2 className="text-2xl font-bold font-serif">The Triple-A Framework</h2>
                 <p className="text-sm text-muted-foreground">The three principles behind every SocratesIQ suggestion.</p></div>
               <div className="space-y-3">
                 {[
-                  { color: 'bg-accent', label: 'Anchor', icon: '⚓', desc: "Ground assignments in local, personal, or current context that AI cannot access — your classroom, this week's news, your students' own community." },
+                  { color: 'bg-accent', label: 'Anchor', icon: '⚓', desc: "Ground assignments in local, personal, or current context that AI cannot access: your classroom, this week's news, your students' own community." },
                   { color: 'bg-green-600', label: 'Audit', icon: '🔍', desc: 'Assess the process, not just the product. Require draft histories, revision memos, or what I tried and why it failed reflections.' },
                   { color: 'bg-amber-600', label: 'Agency', icon: '🎯', desc: "Make the student's own voice, experience, and stakes central. Personal perspective is the one thing AI genuinely cannot replicate." },
                 ].map((item, i) => (
@@ -159,17 +159,16 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
           {step === 3 && (
             <motion.div key="demo" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
               className="bg-card border border-border rounded-2xl p-8 space-y-6">
-              <div><h2 className="text-2xl font-bold font-serif italic">See it in action</h2>
+              <div><h2 className="text-2xl font-bold font-serif">See it in action</h2>
                 <p className="text-sm text-muted-foreground">How a typical {subjects[0] || 'assignment'} improves at each level.</p></div>
               <div className="space-y-3">
                 {[
-                  { medal: '🥉', level: 'Bronze', color: 'border-orange-200 bg-orange-50', badge: 'bg-orange-100 text-orange-700', label: 'Quick fix — 5 minutes', after: 'Write a 500-word essay referencing a news article from this week and one change you\'ve personally observed in your local environment.' },
-                  { medal: '🥈', level: 'Silver', color: 'border-slate-200 bg-slate-50', badge: 'bg-slate-100 text-slate-700', label: 'Deeper redesign — 15 minutes', after: 'Submit your essay AND a 200-word process note: what you tried first, why you changed direction, and one thing you\'d do differently.' },
-                  { medal: '🥇', level: 'Gold', color: 'border-amber-200 bg-amber-50', badge: 'bg-amber-100 text-amber-700', label: 'Full transformation', after: 'Interview a family member about climate change they\'ve witnessed. Your essay must centre their voice and connect it to your own.' },
+                  { level: 'Quick Fix', color: 'border-orange-200 bg-orange-50', badge: 'bg-orange-100 text-orange-700', label: 'About 15 minutes in class', after: 'In this 15-minute task, write a 500-word essay referencing a news article from this week and one change you\'ve personally observed in your local environment.' },
+                  { level: 'Rebuild', color: 'border-slate-200 bg-slate-50', badge: 'bg-slate-100 text-slate-700', label: 'About one class period', after: 'Over one class period, submit your essay AND a 200-word process note: what you tried first, why you changed direction, and one thing you\'d do differently.' },
+                  { level: 'Reinvent', color: 'border-amber-200 bg-amber-50', badge: 'bg-amber-100 text-amber-700', label: 'Up to two class periods', after: 'Across two class periods, interview a family member about climate change they\'ve witnessed. Your essay must centre their voice and connect it to your own.' },
                 ].map(item => (
                   <div key={item.level} className={`p-4 border rounded-xl ${item.color} space-y-2`}>
                     <div className="flex items-center gap-2">
-                      <span>{item.medal}</span>
                       <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${item.badge}`}>{item.level}</span>
                       <span className="text-[10px] text-muted-foreground ml-auto">{item.label}</span>
                     </div>
@@ -191,7 +190,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
                 <CheckCircle2 className="w-8 h-8 text-green-600" />
               </motion.div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold font-serif italic">You're all set!</h2>
+                <h2 className="text-2xl font-bold font-serif">You're all set!</h2>
                 <p className="text-muted-foreground text-sm leading-relaxed">SocratesIQ will now tailor every analysis to <strong>{subjects.join(', ')}</strong> at the <strong>{gradeLevels.join(', ')}</strong> level{gradeLevels.length > 1 ? 's' : ''}.</p>
               </div>
               <div className="bg-secondary/40 rounded-xl p-4 text-left space-y-2">
@@ -204,7 +203,7 @@ export function Onboarding({ userName, userEmail, userId = '', onComplete }: Onb
                 Open the Studio <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <button onClick={handleComplete} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                Skip for now — I'll set this up later in Settings
+                Skip for now. I'll set this up later in Settings
               </button>
             </motion.div>
           )}

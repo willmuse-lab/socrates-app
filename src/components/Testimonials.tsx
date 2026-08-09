@@ -11,7 +11,7 @@ const TESTIMONIALS = [
     role: 'Pilot program teacher',
     color: 'bg-accent',
     quote: "SocratesIQ is a tool that helps teachers reduce students' ability to use AI to do the work for them. It also suggests ways to incorporate class time and discussion into assessments, which encouraged my students to engage with each other more.",
-    highlight: 'Students caught AI giving incorrect information — and it became a major teaching moment about critical thinking.',
+    highlight: 'Students caught AI giving incorrect information, and it became a major teaching moment about critical thinking.',
     feature: 'Quick-start examples',
     result: 'Students used multiple AI sources to compare information, turning AI limitations into learning opportunities.',
   },
@@ -19,14 +19,14 @@ const TESTIMONIALS = [
     role: 'High school teacher',
     color: 'bg-accent',
     quote: "One surprising result was how often students caught AI giving incorrect information, which gave me the opportunity to applaud students for how much more they knew about the material than AI did. That was really eye-opening for students who said they usually just trust what AI says.",
-    highlight: "Students in lower-level classes thrived — it wasn't HARD, it just forced them to THINK.",
+    highlight: "Students in lower-level classes thrived. It wasn't HARD, it just forced them to THINK.",
     feature: 'Level redesigns',
     result: 'One assignment became a multi-source AI critique project. Major success especially for lower-level classes.',
   },
   {
     role: 'Pilot program teacher',
     color: 'bg-purple-600',
-    quote: 'A program with the ability to evaluate your premade lessons for AI vulnerabilities and then patch those holes with your choice of AI usage. I do not use AI as the "bad guy" any longer — it is now a tool we use to facilitate learning.',
+    quote: 'A program with the ability to evaluate your premade lessons for AI vulnerabilities and then patch those holes with your choice of AI usage. I do not use AI as the "bad guy" any longer. It is now a tool we use to facilitate learning.',
     highlight: 'Students are not afraid of using AI as long as they journal the assignment along the way.',
     feature: 'Quick-start examples',
     result: 'More productive outcomes, with students journaling their AI use as they work.',
@@ -63,7 +63,7 @@ export function Testimonials({ compact = false }: TestimonialProps) {
           <div className="flex justify-center gap-1">
             {[1,2,3,4,5].map(i => <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />)}
           </div>
-          <h2 className="text-3xl font-bold font-serif italic">What teachers are saying</h2>
+          <h2 className="text-3xl font-bold font-serif">What teachers are saying</h2>
           <p className="text-muted-foreground">Real feedback from real classrooms.</p>
         </div>
         <div className="relative">
