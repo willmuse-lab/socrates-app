@@ -31,6 +31,38 @@ to PR #10 (will show on the deploy-preview-10 build). Confirm in a fresh
 incognito window: header "Get started" should read "Create Account"; only
 signing in shows "Welcome Back".
 
+ALSO SHIPPED Aug 6 on PR #10 (Will's decisions, four changes + inner-page polish):
+- **Redesign tiers renamed Bronze/Silver/Gold -> Quick Fix / Rebuild / Reinvent.**
+  The medals read as a ranking (Gold = "best"), but the tiers are levels of CHANGE,
+  not quality. DISPLAY-ONLY rename: the internal level values stay 'Bronze'/'Silver'/
+  'Gold' everywhere (API contract in analyze.ts, saved library `status`, share links)
+  so nothing breaks; only labels changed, via `TIER_LABELS` (AssignmentAnalyzer),
+  `STATUS_LABELS` (LibraryView, SavedReportView), and updated plain-copy in Pricing,
+  Onboarding, LandingPage, StaticPages. Same pattern as the AI-strategy rename. Medals
+  (emoji) were removed from the tabs, compare view, Onboarding demo, and Library badges.
+- **Student time is now WOVEN INTO each redesign** (Will: "no [separate badge] but
+  include that in the redesign for each tier"). analyze.ts redesign prompt now tells the
+  model to STATE the expected completion time inside the assignment text, scaled by
+  level (Quick Fix ~10-20 min, Rebuild ~one class period, Reinvent up to two). No new
+  UI field; it reads as part of the handout.
+- **Draft autosave in the analyzer** (AssignmentAnalyzer.tsx). Inline edits/revisions
+  lived only in React memory and were lost on navigation. A debounced localStorage draft
+  (`siq_draft_v1`) now saves text/result/editedTexts/activeLevel/aiPreference/lessonPlan/
+  directions and restores on mount (skipped when `initialText` is passed, e.g. opening a
+  library item). Small "Draft autosaved" note under the New/Save buttons; cleared on New
+  Assignment. "Save to Library" is still the deliberate keep-forever snapshot. Local-only
+  for now (a cloud draft table is a possible future enhancement).
+- **Cloud/Local sync pill HIDDEN** in the header (App.tsx) at Will's request (it read as
+  clutter in the top-right corner). Commented out, not deleted; `cloudSynced` state and
+  the `Cloud`/`HardDrive` imports were removed since they were now unused. Sync still runs.
+- **Inner pages polished to the landing's editorial layout** (StaticPages.tsx +
+  Pricing.tsx): shared `BackLink`/`PageHeader`/`ProseSections` helpers, `.eyebrow` labels
+  over large Sora `font-semibold` headings, a dark `.ink-card` philosophy accent on About,
+  eyebrow'd section intros. Copy preserved (legal text verbatim); the Library/sync Help
+  topic was updated to mention autosave and drop the now-hidden cloud badge.
+All four builds/type-checks pass (vite + tsc + esbuild on analyze.ts). Three commits on
+PR #10.
+
 BRANCH/HANDOFF HOUSEKEEPING done this session: the versioned handoff
 (`SocratesIQ 1.md`, which lived only on PR #12 `claude/handoff-update-aug4`) was
 brought onto the reskin branch as `SocratesIQ 2.md`, and the stale top-level
@@ -74,6 +106,10 @@ OPEN BRANCHES / PRs:
   (d) WELCOME-BACK FIX (Aug 6) — the auth dialog now opens on the right form so a
   first-time/incognito visitor never sees "Welcome Back" (see the Aug 6 status block
   at the top for details).
+  (e) MORE Aug 6 (see the Aug 6 status block): redesign tiers renamed Bronze/Silver/Gold
+  -> Quick Fix / Rebuild / Reinvent (display only), student time woven into each redesign,
+  draft autosave in the analyzer, cloud sync pill hidden, and the inner pages (About/
+  Scoring/Pricing/Help/Privacy/Terms/Feedback) polished to the landing's editorial layout.
 - **PR #11 `claude/epoch-redesigns` — EPOCH redesigns (draft, ready to test).**
   Folds the MIT Sloan EPOCH paper (Loaiza & Rigobón 2025) into the redesign engine,
   ADDITIVE: one entry added to `RESEARCH_NOTES`, reinforcing — NOT replacing — the
