@@ -33,6 +33,18 @@ const STRATEGY_LABELS: Record<AIPreference, string> = {
   embrace: 'AI-Integrated Learning',
 };
 
+// Display names for the three redesign levels (renamed Aug 6 2026 from the
+// Bronze/Silver/Gold medals, which read as a ranking — Gold is not "best,"
+// it's the biggest change). The internal level values 'Bronze'/'Silver'/'Gold'
+// are UNCHANGED everywhere (API contract, saved library items, share links);
+// only the visible label changes, same pattern as the AI-strategy rename.
+type TierLevel = 'Bronze' | 'Silver' | 'Gold';
+const TIER_LABELS: Record<TierLevel, string> = {
+  Bronze: 'Quick Fix',
+  Silver: 'Rebuild',
+  Gold: 'Reinvent',
+};
+
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
   bloomsLevel = 'Analyze', subject = '', gradeLevel = '', teacherName = '', schoolName = '', onSave, onReset, initialText = '', userId = ''
@@ -81,6 +93,65 @@ export function AssignmentAnalyzer({
     setCredits(await getCredits());
   }, [gated]);
   React.useEffect(() => { refreshCredits(); }, [refreshCredits]);
+
+  // ---- Draft autosave ------------------------------------------------------
+  // Teachers were losing work when they navigated away mid-redesign: inline
+  // edits and revisions live in React memory only. We quietly persist the
+  // working draft to THIS browser and restore it on return, so you pick up
+  // where you left off. "Save to Library" stays the deliberate keep-forever
+  // action (a full snapshot); this is just crash/navigation insurance.
+  const DRAFT_KEY = 'siq_draft_v1';
+  const [draftSavedAt, setDraftSavedAt] = useState<number | null>(null);
+  const hydratedRef = React.useRef(false);
+  const clearDraft = React.useCallback(() => {
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
+    setDraftSavedAt(null);
+  }, []);
+
+  // Restore a saved draft once on mount (unless the parent handed us initialText,
+  // e.g. opening a library item — that takes precedence over the draft).
+  React.useEffect(() => {
+    if (initialText) { hydratedRef.current = true; return; }
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d && (d.text?.trim() || d.result)) {
+          if (typeof d.text === 'string') setText(d.text);
+          if (d.result) { setResult(d.result); lastChargedRef.current = (d.text || '').trim().slice(0, 120); }
+          if (d.editedTexts) setEditedTexts(d.editedTexts);
+          if (d.activeLevel) setActiveLevel(d.activeLevel);
+          if (d.aiPreference) setAiPreference(d.aiPreference);
+          if (d.previousResult) setPreviousResult(d.previousResult);
+          if (d.lessonPlan) setLessonPlan(d.lessonPlan);
+          if (d.studentDirections) setStudentDirections(d.studentDirections);
+          if (d.savedAt) setDraftSavedAt(d.savedAt);
+          toast.info('Restored your last draft.', { duration: 4000 });
+        }
+      }
+    } catch {}
+    hydratedRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced save whenever the working draft changes. Skips until hydration is
+  // done (so the empty initial state never overwrites a real saved draft) and
+  // when there is nothing worth keeping.
+  React.useEffect(() => {
+    if (!hydratedRef.current) return;
+    if (!text.trim() && !result) return;
+    const id = setTimeout(() => {
+      try {
+        const savedAt = Date.now();
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({
+          text, result, editedTexts, activeLevel, aiPreference, previousResult,
+          lessonPlan, studentDirections, savedAt,
+        }));
+        setDraftSavedAt(savedAt);
+      } catch {}
+    }, 800);
+    return () => clearTimeout(id);
+  }, [text, result, editedTexts, activeLevel, aiPreference, previousResult, lessonPlan, studentDirections]);
 
   const getChangeSummary = (original: string, modified: string): string[] => {
     const origSentences = original.match(/[^.!?]+[.!?]+/g) || original.split('\n').filter(Boolean);
@@ -176,7 +247,7 @@ export function AssignmentAnalyzer({
     if (!result) return;
     const suggestion = result.suggestions[i];
     const body = editedTexts[i] ?? suggestion.modifiedAssignment;
-    const title = suggestion.title || `${suggestion.level} Redesign`;
+    const title = suggestion.title || `${TIER_LABELS[suggestion.level as TierLevel]} Redesign`;
     try {
       if (format === 'pdf') { downloadSimplePDF(title, redesignToBlocks(body)); toast.success('PDF downloaded!'); }
       else if (format === 'docx') { await downloadSimpleDocx(title, redesignToBlocks(body)); toast.success('Word document downloaded!'); }
@@ -208,7 +279,7 @@ export function AssignmentAnalyzer({
     } finally { setRefining(null); }
   };
 
-  const handleStrengthen = () => { setActiveLevel('Gold'); suggestionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast.info('Showing Socratic Transformation (Gold Level)'); };
+  const handleStrengthen = () => { setActiveLevel('Gold'); suggestionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast.info(`Showing the ${TIER_LABELS.Gold} redesign`); };
   const handleSaveToLibrary = () => {
     if (!result || !onSave) return;
     const firstLine = text.trim().split('\n')[0];
@@ -221,7 +292,7 @@ export function AssignmentAnalyzer({
     });
     toast.success('Assignment saved to your library!');
   };
-  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; onReset?.(); };
+  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; clearDraft(); onReset?.(); };
 
   // Which dimensions improved between the original and the redesigned analysis.
   const improvedDimensions = (): string[] => {
@@ -430,10 +501,9 @@ export function AssignmentAnalyzer({
                       const changes = getChangeSummary(text, sug.modifiedAssignment);
                       const colors = ['border-orange-200 bg-orange-50', 'border-slate-200 bg-slate-50', 'border-amber-200 bg-amber-50'];
                       const badges = ['bg-orange-100 text-orange-700', 'bg-slate-100 text-slate-600', 'bg-amber-100 text-amber-700'];
-                      const medals = ['🥉', '🥈', '🥇'];
                       return (
                         <div key={i} className={`p-4 rounded-xl border-2 ${colors[i]} space-y-3`}>
-                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${badges[i]}`}>{medals[i]} {sug.level}</div>
+                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${badges[i]}`}>{TIER_LABELS[sug.level as TierLevel]}</div>
                           <p className="text-xs font-bold">{sug.title}</p>
                           <p className="text-[11px] text-muted-foreground leading-relaxed italic">{sug.description}</p>
                           {changes.length > 0 && (
@@ -456,9 +526,9 @@ export function AssignmentAnalyzer({
               )}
               <Tabs value={activeLevel} onValueChange={(v) => setActiveLevel(v as any)} className="w-full">
                 <TabsList className="grid w-full grid-cols-3 h-10 bg-secondary rounded-md p-1">
-                  <TabsTrigger value="Bronze" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">🥉 Bronze</TabsTrigger>
-                  <TabsTrigger value="Silver" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">🥈 Silver</TabsTrigger>
-                  <TabsTrigger value="Gold" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">🥇 Gold</TabsTrigger>
+                  <TabsTrigger value="Bronze" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">{TIER_LABELS.Bronze}</TabsTrigger>
+                  <TabsTrigger value="Silver" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">{TIER_LABELS.Silver}</TabsTrigger>
+                  <TabsTrigger value="Gold" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">{TIER_LABELS.Gold}</TabsTrigger>
                 </TabsList>
                 {result.suggestions.map((suggestion, i) => (
                   <TabsContent key={i} value={suggestion.level} className="mt-6 space-y-6">
@@ -548,6 +618,12 @@ export function AssignmentAnalyzer({
               <Button variant="outline" className="flex-1 h-10 text-xs font-bold uppercase tracking-widest border-border hover:bg-secondary gap-2" onClick={handleNewAssignment}><RotateCcw className="w-3.5 h-3.5" />New Assignment</Button>
               <Button className="flex-1 h-10 text-xs font-bold uppercase tracking-widest bg-primary text-primary-foreground hover:bg-primary/90 gap-2" onClick={handleSaveToLibrary}><Save className="w-3.5 h-3.5" />Save to Library</Button>
             </div>
+            {draftSavedAt && (
+              <p className="flex items-center justify-center gap-1.5 text-center text-[10px] text-muted-foreground -mt-2">
+                <Check className="w-3 h-3 text-success" />
+                Draft autosaved to this browser. Use Save to Library to keep it for good.
+              </p>
+            )}
           </div>
           <aside className="bg-card border-b md:border-b-0 md:border-l border-border p-6 md:p-10 flex flex-col gap-8 overflow-y-auto order-1 md:order-2">
             <div className="text-center space-y-3">

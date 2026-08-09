@@ -23,6 +23,14 @@ const STATUS_COLORS: Record<string, string> = {
   Bronze: 'bg-orange-100 text-orange-700 border-orange-200',
 };
 
+// Display labels for the redesign levels (renamed Aug 6 2026). Stored status
+// values stay 'Bronze'/'Silver'/'Gold' so older saved items keep working.
+const STATUS_LABELS: Record<string, string> = {
+  Bronze: 'Quick Fix',
+  Silver: 'Rebuild',
+  Gold: 'Reinvent',
+};
+
 const SCORE_COLOR = (score: number) => score >= 70 ? 'text-[#708D81]' : score >= 40 ? 'text-[#D4A373]' : 'text-red-400';
 
 export function LibraryView({ onBack, assignments, onOpen, onDelete }: LibraryViewProps) {
@@ -74,7 +82,7 @@ export function LibraryView({ onBack, assignments, onOpen, onDelete }: LibraryVi
           <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
           {(['All', 'Bronze', 'Silver', 'Gold'] as FilterStatus[]).map(s => (
             <button key={s} onClick={() => setFilter(s)}
-              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded transition-all ${filter === s ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>{s}</button>
+              className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded transition-all ${filter === s ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>{s === 'All' ? 'All' : STATUS_LABELS[s]}</button>
           ))}
         </div>
         <div className="flex items-center gap-2 bg-secondary/50 rounded-lg px-3 py-1.5">
@@ -102,7 +110,7 @@ export function LibraryView({ onBack, assignments, onOpen, onDelete }: LibraryVi
                 <Card className="p-6 border border-border bg-card hover:border-accent/40 hover:shadow-md transition-all group flex flex-col relative overflow-hidden cursor-pointer" onClick={() => onOpen(item)}>
                   <div className="flex justify-between items-start mb-4">
                     <Badge className={`rounded-full px-3 py-0.5 text-[10px] uppercase font-bold tracking-widest border ${STATUS_COLORS[item.status]}`}>
-                      {item.status === 'Gold' ? '🥇' : item.status === 'Silver' ? '🥈' : '🥉'} {item.status}
+                      {STATUS_LABELS[item.status] ?? item.status}
                     </Badge>
                     <div className="flex items-center gap-2">
                       <span className={`flex items-center gap-1 text-xs font-bold ${SCORE_COLOR(item.resilience)}`}><ShieldCheck className="w-3.5 h-3.5" />{item.resilience}</span>

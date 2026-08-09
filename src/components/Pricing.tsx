@@ -45,7 +45,7 @@ export function Pricing({ onBack }: PricingProps) {
           </div>
           <Button className="w-full gap-2 font-bold bg-accent hover:bg-accent/90">Get started <ArrowRight className="w-4 h-4" /></Button>
           <div className="space-y-2.5">
-            {['20 assignment redesigns a month','Bronze, Silver & Gold redesigns','Lesson plans & student directions','Personal assignment library','PDF, Word & Google Doc export'].map(f => (
+            {['20 assignment redesigns a month','Quick Fix, Rebuild & Reinvent redesigns','Lesson plans & student directions','Personal assignment library','PDF, Word & Google Doc export'].map(f => (
               <div key={f} className="flex items-start gap-2.5 text-xs"><Check className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />{f}</div>
             ))}
             {['School admin dashboard','Teacher management','LMS integration'].map(f => (

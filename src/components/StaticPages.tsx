@@ -98,7 +98,7 @@ export function ScoringPage({ onBack }: PageProps) {
 
       <div className="bg-accent/5 border border-accent/20 rounded-2xl p-6 space-y-2">
         <h2 className="text-base font-bold">A note on what the score is, and isn't</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">Because the score is an expert AI judgment against a rubric rather than a fixed calculation, it is consistent in the ballpark but the exact number can shift a few points run to run. Treat it as a <strong>diagnostic guide, not a final grade</strong>. The real value is the breakdown of how an assignment could be shortcut, and the Bronze, Silver, and Gold redesigns that show you how to strengthen it.</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">Because the score is an expert AI judgment against a rubric rather than a fixed calculation, it is consistent in the ballpark but the exact number can shift a few points run to run. Treat it as a <strong>diagnostic guide, not a final grade</strong>. The real value is the breakdown of how an assignment could be shortcut, and the Quick Fix, Rebuild, and Reinvent redesigns that show you how to strengthen it.</p>
       </div>
 
       <p className="text-xs text-muted-foreground/80">SocratesIQ cites published research to describe its methodology. It is not affiliated with, sponsored by, or endorsed by the researchers or institutions referenced.</p>
@@ -198,7 +198,7 @@ export function TermsPage({ onBack }: PageProps) {
 const HELP_TOPICS = [
   {
     title: 'Getting started: what SocratesIQ does',
-    content: 'SocratesIQ analyzes your assignments for how easily a student could complete them with AI, then helps you redesign them.\n\nThe basic flow: paste or upload an assignment → pick your AI strategy → click Analyze. You get a resilience score (0–100), a breakdown of exactly how AI could shortcut the assignment, and three ready-to-use redesigns (Bronze, Silver, Gold).\n\nSet up your teaching profile when you first sign in (subjects and grade levels), and every analysis is tailored to what you teach.',
+    content: 'SocratesIQ analyzes your assignments for how easily a student could complete them with AI, then helps you redesign them.\n\nThe basic flow: paste or upload an assignment → pick your AI strategy → click Analyze. You get a resilience score (0–100), a breakdown of exactly how AI could shortcut the assignment, and three ready-to-use redesigns (Quick Fix, Rebuild, Reinvent).\n\nSet up your teaching profile when you first sign in (subjects and grade levels), and every analysis is tailored to what you teach.',
   },
   {
     title: 'Adding an assignment (paste, upload, Google Drive, or template)',
@@ -210,7 +210,7 @@ const HELP_TOPICS = [
   },
   {
     title: 'Understanding your results',
-    content: 'RESILIENCE SCORE (0–100): how hard it is for a student to complete your ORIGINAL assignment using AI. Higher = harder to shortcut. The score always measures AI-resistance, whatever strategy you chose.\n\nAI FAILURE BREAKDOWN: three specific ways a student could use AI to shortcut the assignment, each with a severity and a fix.\n\nBRONZE / SILVER / GOLD REDESIGNS: three rewritten versions of your assignment, from a light tweak (Bronze) to a substantial restructure (Silver) to a transformational redesign (Gold), all following your chosen AI strategy. Use "Compare levels" to see them side by side. Each is written to be handed out as-is, but always apply your own professional judgment.\n\nWANT CHANGES? Under each redesign there\'s a box: "Anything you\'d like to change before the lesson plan?" Type a request, like "make it a group project" or "fit it into one class period" and click Revise. You can also click "Edit inline" to change the text yourself. Your revised version is what gets downloaded and built into the lesson plan.',
+    content: 'RESILIENCE SCORE (0–100): how hard it is for a student to complete your ORIGINAL assignment using AI. Higher = harder to shortcut. The score always measures AI-resistance, whatever strategy you chose.\n\nAI FAILURE BREAKDOWN: three specific ways a student could use AI to shortcut the assignment, each with a severity and a fix.\n\nQUICK FIX / REBUILD / REINVENT REDESIGNS: three rewritten versions of your assignment, from a light tweak (Quick Fix) to a substantial restructure (Rebuild) to a transformational redesign (Reinvent), all following your chosen AI strategy. Each states about how long it takes a student, right in the assignment. Use "Compare levels" to see them side by side. Each is written to be handed out as-is, but always apply your own professional judgment.\n\nWANT CHANGES? Under each redesign there\'s a box: "Anything you\'d like to change before the lesson plan?" Type a request, like "make it a group project" or "fit it into one class period" and click Revise. You can also click "Edit inline" to change the text yourself. Your revised version is what gets downloaded and built into the lesson plan.',
   },
   {
     title: 'Standards alignment and lesson plans',
@@ -222,7 +222,7 @@ const HELP_TOPICS = [
   },
   {
     title: 'Downloading and sharing results',
-    content: 'THE FULL ANALYSIS REPORT (top of the results screen): download as PDF or Word (DOCX), save straight to your Google Drive as a Google Doc, or click SHARE to copy a summary link for a colleague. The report includes your score, the failure breakdown, and all three redesigns.\n\nONE REDESIGNED ASSIGNMENT: under each Bronze/Silver/Gold version, use the "Download this version" row to get just that assignment as a PDF, Word document, or Google Doc, ready to hand out. If you used "Edit inline," your edits are included.\n\nLESSON PLAN & STUDENT DIRECTIONS: once generated, each has its own PDF / Word / Google Doc buttons next to "Copy all."\n\nGoogle Doc saves open in a new tab and land in your Drive automatically. The first time, Google will ask you to sign in and approve. Allow popups for this site.',
+    content: 'THE FULL ANALYSIS REPORT (top of the results screen): download as PDF or Word (DOCX), save straight to your Google Drive as a Google Doc, or click SHARE to copy a summary link for a colleague. The report includes your score, the failure breakdown, and all three redesigns.\n\nONE REDESIGNED ASSIGNMENT: under each Quick Fix / Rebuild / Reinvent version, use the "Download this version" row to get just that assignment as a PDF, Word document, or Google Doc, ready to hand out. If you used "Edit inline," your edits are included.\n\nLESSON PLAN & STUDENT DIRECTIONS: once generated, each has its own PDF / Word / Google Doc buttons next to "Copy all."\n\nGoogle Doc saves open in a new tab and land in your Drive automatically. The first time, Google will ask you to sign in and approve. Allow popups for this site.',
   },
   {
     title: 'Signing in: email and Google',

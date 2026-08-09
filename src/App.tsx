@@ -21,7 +21,7 @@ import { loadAssignments, saveAssignments, loadSettings, saveSettings, loadUser,
 import { supabaseEnabled, onAuthStateChange, fetchAssignmentsFromCloud, saveAssignmentToCloud, deleteAssignmentFromCloud, signOut, getCredits, Credits, fetchProfileFromCloud, saveProfileToCloud } from '@/src/lib/supabase';
 import { loadProfile, saveProfile, clearProfile, TeacherProfile } from '@/src/lib/profile';
 import { StandardsManager } from './components/StandardsManager';
-import { Settings, ShieldCheck, Zap, Plus, Trash2, Cloud, HardDrive } from 'lucide-react';
+import { Settings, ShieldCheck, Zap, Plus, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
@@ -227,13 +227,10 @@ export default function App() {
               </span>
             );
           })()}
-          {user && (
-            <span title={cloudSynced ? 'Cloud synced' : 'Local only'}
-              className={`hidden md:flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${cloudSynced ? 'bg-green-50 text-green-600 border-green-200' : 'bg-secondary text-muted-foreground border-border'}`}>
-              {cloudSynced ? <Cloud className="w-3 h-3" /> : <HardDrive className="w-3 h-3" />}
-              {cloudSynced ? 'Cloud' : 'Local'}
-            </span>
-          )}
+          {/* Cloud/Local sync pill hidden (Will, Aug 6 2026) — it read as clutter
+              in the top-right corner and the sync state is not something teachers
+              need to act on. Sync still happens; only the badge is hidden. Restore
+              this block to bring it back. (cloudSynced state is still maintained.) */}
           {user ? (
             <UserMenu user={user}
               onLogout={handleLogout}

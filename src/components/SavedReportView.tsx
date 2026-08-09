@@ -10,6 +10,10 @@ import { googleConfigured } from '@/src/lib/google';
 import { logClientUsage } from '@/src/lib/supabase';
 import { SavedAssignment } from '../App';
 
+// Display labels for the redesign levels (renamed Aug 6 2026). Saved items still
+// store 'Bronze'/'Silver'/'Gold' as status, so older reports keep working.
+const STATUS_LABELS: Record<string, string> = { Bronze: 'Quick Fix', Silver: 'Rebuild', Gold: 'Reinvent' };
+
 // Read-only view of a saved library assignment: its redesign report plus the
 // lesson plan and student directions that were generated for it. No AI re-run —
 // everything is read from the saved snapshot. If the lesson plan/directions were
@@ -54,7 +58,7 @@ export function SavedReportView({ assignment, onBack, onRedesignAgain, userId = 
         <h1 className="text-2xl md:text-3xl font-bold font-serif">{assignment.title}</h1>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <span>Saved {assignment.date}</span>
-          {assignment.status && <span className="px-2 py-0.5 rounded-full bg-secondary font-bold uppercase tracking-widest text-[10px]">{assignment.status} redesign</span>}
+          {assignment.status && <span className="px-2 py-0.5 rounded-full bg-secondary font-bold uppercase tracking-widest text-[10px]">{STATUS_LABELS[assignment.status] ?? assignment.status} redesign</span>}
           {assignment.subject && <span>{assignment.subject}</span>}
           {assignment.gradeLevel && <span>{assignment.gradeLevel}</span>}
           <span>AI Resilience Score: <strong className={scoreColor(assignment.resilience)}>{assignment.resilience}</strong>/100</span>

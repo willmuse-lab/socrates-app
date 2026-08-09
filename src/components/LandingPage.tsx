@@ -90,7 +90,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
           <div className="grid sm:grid-cols-3 gap-6">
             {[
               { num: '1', title: 'Analyze', body: 'Paste or upload an assignment you already use. Get a 0–100 AI Resilience Score and exactly where AI can replace student thinking.' },
-              { num: '2', title: 'Transform', body: 'Choose a redesign (Bronze, Silver, or Gold) tuned to your AI strategy. Each one is rewritten and ready to hand out.' },
+              { num: '2', title: 'Transform', body: 'Choose a redesign (Quick Fix, Rebuild, or Reinvent) tuned to your AI strategy. Each one is rewritten and ready to hand out.' },
               { num: '3', title: 'Teach', body: 'Generate a full lesson plan and student directions, aligned to your standards. Download as PDF, Word, or Google Doc.' },
             ].map(s => (
               <div key={s.num} className="ink-card p-7 space-y-4">
