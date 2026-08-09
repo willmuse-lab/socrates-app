@@ -139,6 +139,12 @@ feedback from BOTH a peer and an AI, then a reflection reconciling the two; the
 student's judgement is the assessed artifact.
 [Kharbach, 2026] Let AI handle research logistics and differentiation while students
 do interpretation, evaluation, and argument; tailor to the subject.
+[Loaiza & Rigobón, 2025 — MIT Sloan, "EPOCH"] The human capabilities that complement
+rather than compete with AI — empathy, presence and connection, opinion/judgment and
+ethics, creativity, and hope/vision — are where AI is weakest and where human work is
+growing. Redesigns should deliberately build these capabilities (independent judgment,
+original voice, creative synthesis, human connection, reasoning from local/limited
+information), reinforcing — not replacing — the strategies above.
 
 Kharbach (2026), "Critical Thinking Activities for the Age of AI" (educatorstechnology.com):
   13 classroom-tested activities that make the AI INTERACTION ITSELF the site of

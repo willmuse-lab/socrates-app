@@ -27,6 +27,7 @@ export interface AnalysisResult {
     level: "Bronze" | "Silver" | "Gold";
     title: string;
     description: string;
+    strengthens?: string;
     modifiedAssignment: string;
     differentiatedVersions?: DifferentiatedVersions;
   }[];
