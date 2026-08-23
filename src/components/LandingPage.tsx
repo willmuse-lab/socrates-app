@@ -108,8 +108,8 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-start">
           <div className="space-y-5">
             <p className="eyebrow">Why it works</p>
-            <h2 className="text-3xl md:text-4xl font-semibold">Built on research, not guesswork</h2>
-            <p className="text-muted-foreground leading-relaxed">Every score and redesign is grounded in published work on AI and assessment. The idea is simple: detection is a losing game. Redesign the task instead, so the cost of using AI exceeds the cost of doing the work honestly.</p>
+            <h2 className="text-3xl md:text-4xl font-semibold">Informed by research, not guesswork</h2>
+            <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by published work on AI and assessment. The idea is simple: detection is a losing game. Redesign the task instead, so the cost of using AI exceeds the cost of doing the work honestly.</p>
             <p className="text-muted-foreground leading-relaxed">In a published university pilot (Furze et al., 2024), redesigning assignments this way (with no bans and no detection software) brought AI-related misconduct cases down to zero.</p>
             <button onClick={() => onNavigate('scoring')} className="text-sm font-bold uppercase tracking-wider text-accent hover:underline">How the score works →</button>
           </div>

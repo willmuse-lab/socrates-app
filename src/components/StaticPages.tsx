@@ -63,9 +63,9 @@ export function AboutPage({ onBack }: PageProps) {
       <div className="space-y-6">
         <div className="space-y-2">
           <p className="eyebrow">The research base</p>
-          <h2 className="text-2xl md:text-3xl font-semibold">The research behind SocratesIQ</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold">The research that informs SocratesIQ</h2>
         </div>
-        <p className="text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
+        <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
         <div className="flex flex-wrap gap-2">
           {[
             'UNESCO (2023)', 'Bearman & Luckin (2024)', 'Mollick & Mollick (2023)', 'Lodge et al. (2023)',
@@ -107,12 +107,12 @@ export function ScoringPage({ onBack }: PageProps) {
 
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-semibold">What produces the score</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. SocratesIQ sends your assignment to its AI together with a research-based rubric and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. SocratesIQ sends your assignment to its AI together with a rubric informed by research on AI and assessment and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
       </div>
 
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-semibold">The four dimensions it looks for</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four research-based dimensions, each scored individually with an explanation in your results. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four dimensions, informed by research on AI and assessment, each scored individually with an explanation in your results. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
         <div className="flex flex-wrap gap-2">
           {['Anchor', 'Proprietary', 'Audit', 'Agency'].map(name => (
             <span key={name} className="px-4 py-2 rounded-full bg-secondary/60 border border-border text-sm font-bold text-foreground/80">{name}</span>
