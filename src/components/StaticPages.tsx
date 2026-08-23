@@ -65,18 +65,8 @@ export function AboutPage({ onBack }: PageProps) {
           <p className="eyebrow">The research base</p>
           <h2 className="text-2xl md:text-3xl font-semibold">The research that informs SocratesIQ</h2>
         </div>
-        <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            'UNESCO (2023)', 'Bearman & Luckin (2024)', 'Mollick & Mollick (2023)', 'Lodge et al. (2023)',
-            'Dawson (2021)', 'TEQSA (2024)', 'Eaton (2023)', 'Perkins, Furze, Roe & MacVaugh (2024)',
-            'Awadallah Alkouk & Khlaif (2024)', 'Sperber et al. (2025)',
-          ].map(name => (
-            <span key={name} className="px-3 py-1.5 rounded-full bg-secondary/60 border border-border text-xs font-medium text-foreground/80">{name}</span>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground italic">How these sources are combined into SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
-        <p className="text-xs text-muted-foreground/80 border-t border-border pt-4">SocratesIQ cites this research to describe its methodology. It is not affiliated with, sponsored by, or endorsed by these researchers or institutions.</p>
+        <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by peer-reviewed research and international guidance on AI and assessment. How that research is reflected in SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
+        <p className="text-xs text-muted-foreground/80 border-t border-border pt-4">SocratesIQ describes its methodology as informed by research on AI and assessment. It is not affiliated with, sponsored by, or endorsed by any of the researchers or institutions whose work informs it.</p>
       </div>
       <div className="rounded-2xl border border-accent/20 bg-accent/5 p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
