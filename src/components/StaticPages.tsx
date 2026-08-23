@@ -51,7 +51,7 @@ export function AboutPage({ onBack }: PageProps) {
           <p className="eyebrow">About SocratesIQ</p>
           <h1 className="text-4xl md:text-5xl font-semibold leading-[1.05]">Built by educators,<br />for educators.</h1>
           <p className="text-muted-foreground leading-relaxed">SocratesIQ was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI (which is both impossible and counterproductive), we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
-          <p className="text-muted-foreground leading-relaxed">Our methodology emerged from classroom research, consultation with pedagogical experts, and analysis of international AI-in-education guidance.</p>
+          <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by classroom experience, consultation with pedagogical experts, and international AI-in-education guidance.</p>
         </div>
         {/* Dark editorial accent, echoing the landing's ink sections. */}
         <div className="ink-card section-ink p-8 space-y-4">

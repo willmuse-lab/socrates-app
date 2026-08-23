@@ -32,7 +32,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
                 See how it works
               </a>
             </div>
-            <p className="text-xs on-ink-muted">Your first 3 redesigns are free. No credit card.</p>
+            <p className="text-xs on-ink-muted">Your first 2 redesigns are free. No credit card.</p>
           </div>
           {/* Product peek — a real before→after score */}
           <div className="ink-card p-6 md:p-8 space-y-5">
@@ -144,7 +144,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <p className="eyebrow">Pricing</p>
           <h2 className="text-3xl md:text-4xl font-semibold">Start free. Upgrade when it earns its keep.</h2>
-          <p className="text-muted-foreground text-lg">Your first <strong>3 assignment redesigns are free</strong>. No credit card. After that, an individual teacher plan is <strong>$9.99/month</strong> (or $99.99/year) for 20 redesigns a month, with every follow-up free.</p>
+          <p className="text-muted-foreground text-lg">Your first <strong>2 assignment redesigns are free</strong>. No credit card. After that, an individual teacher plan is <strong>$9.99/month</strong> (or $99.99/year) for 15 redesigns a month, with every follow-up free.</p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button onClick={onGetStarted} size="lg" className="gap-2">Get started free <ArrowRight className="w-4 h-4" /></Button>
             <Button onClick={() => onNavigate('pricing')} variant="outline" size="lg">See full pricing</Button>
@@ -182,7 +182,7 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
           <h2 className="text-4xl md:text-5xl font-semibold">Let's redesign your first assignment</h2>
           <p className="text-muted-foreground text-lg">Take the free trial. Bring one assignment. See what happens. No credit card, no commitment.</p>
           <Button onClick={onGetStarted} size="lg" className="gap-2">Get started free <ArrowRight className="w-4 h-4" /></Button>
-          <p className="text-xs text-muted-foreground">Your first 3 redesigns are on us.</p>
+          <p className="text-xs text-muted-foreground">Your first 2 redesigns are on us.</p>
         </div>
       </section>
 
