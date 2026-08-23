@@ -1,15 +1,80 @@
-# SocratesIQ 2: Session Handoff Document
+# SocratesIQ 3: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: August 6 2026.
+session. Read this whole file before making changes. Last updated: August 23 2026.
 
-**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 2.md`
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 3.md`
 now, and the number bumps by one on every update (next update renames it to
-`SocratesIQ 3.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ 4.md`, and so on). To continue in a new session, read the HIGHEST-numbered
 `SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
 handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versioned
 file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
 `SocratesIQ N.md` wins.
+
+## Session status (August 23 2026) — LAUNCHED (brand refresh LIVE) + Google rebuilt on the business account
+
+The whole brand refresh is now MERGED to `main` and DEPLOYED LIVE on socratesiq.com
+(Will triggered the Netlify deploy). This session also rebuilt the entire Google
+integration from scratch after the old Google account was suspended. Live now:
+editorial reskin (navy + warm paper, Sora, owl logo), the public landing page, the
+fixed splash (new logo lockup, old owl fly-in video removed), Quick Fix / Rebuild /
+Reinvent tiers, student-time woven into redesigns, analyzer draft autosave, the
+Welcome Back first-visitor fix, em-dash cleanup, the editorial inner pages, the new
+contact emails, and Google sign-in + Drive on a fresh, durable Google account.
+
+PR STATE: #10 (brand refresh), #13 (splash video removal), #14 (contact emails) all
+MERGED to main and live. #12 (old handoff rename) CLOSED as redundant. **#11
+`claude/epoch-redesigns` (EPOCH) is still OPEN** — it was rebased on top of main and
+is on its Deploy Preview for Will to test; NOT merged. See its own PR-#11 block below.
+
+### ⚠️ GOOGLE ACCOUNT REBUILD (Aug 23 2026) — READ THIS, it supersedes older Google notes
+The old **SocratesIQEd@gmail.com** account was **SUSPENDED by Google for "suspicious
+activity" and is GONE.** It owned the Google Cloud project behind Google sign-in and
+Drive, so both broke site-wide ("Error 401: disabled_client" on the login button).
+Everything was rebuilt on Will's new business account. CURRENT, CORRECT setup:
+- **Official Google account is now `will@socratesiq.com`** — a Google WORKSPACE account
+  on the socratesiq.com domain (Will is the super admin / Organization Administrator).
+  Google Cloud **organization = socratesiq.com** (org ID `951116669540`). Do NOT use any
+  personal Gmail or the dead SocratesIQEd account for anything again.
+- New Google Cloud **project "SocratesIQ"** (project ID `socratesiq-505023`, project
+  **NUMBER `462738908920`**). Created UNDER the socratesiq.com org (not "No organization"
+  — a Workspace account can only create projects inside its org, which was the initial
+  wall; Will already has Project Creator via the domain binding + Org Admin).
+- New OAuth **client "SocratesIQ Web"** (Web application). **Client ID
+  `462738908920-nu01...apps.googleusercontent.com`.** Authorized JS origins:
+  https://socratesiq.com + https://brilliant-mandazi-3937f4.netlify.app. Authorized
+  redirect URI: https://llvtiuhtjpprtwlvnauu.supabase.co/auth/v1/callback (the Supabase
+  callback). Client SECRET is NOT recorded here (it lives in Supabase only).
+- New restricted **API key** for the **Google Picker API** (value NOT recorded here; it
+  lives in Netlify `VITE_GOOGLE_API_KEY`). Drive API + Picker API enabled in the project.
+- **Consent screen:** Audience = EXTERNAL, **Published (In production)**. App is
+  UNVERIFIED — teachers see a one-time "Google hasn't verified this app" screen and click
+  through (Advanced → continue). Formal verification (Verification Center) is DEFERRED;
+  fine for now with the non-sensitive login + drive.file scopes.
+- **Supabase** (project `llvtiuhtjpprtwlvnauu`) → Authentication → Providers → Google:
+  Client ID + Secret REPLACED with the new ones. This is what actually turned login back
+  on (login runs through Supabase server-side — no redeploy needed for the login half).
+  Site URL / redirect allow-list were already correct and unchanged.
+- **Netlify** (brilliant-mandazi-3937f4) env vars UPDATED to the new values, all
+  contexts, NOT marked secret: `VITE_GOOGLE_CLIENT_ID`, `VITE_GOOGLE_API_KEY`,
+  `VITE_GOOGLE_APP_ID` = `462738908920`. These bake at build time → the Drive half needed
+  the redeploy (which also shipped the whole reskin). TESTED LIVE: Google login works,
+  "Save to Google Doc" works.
+- GOTCHA that ate time: the browser kept defaulting to Will's PERSONAL Google account. If
+  any Google screen offers a personal email, you're on the wrong account — switch to
+  will@socratesiq.com (a private window signed in ONLY as will@socratesiq.com avoids the
+  mixing entirely).
+- STILL OPEN on Google (low priority): formal app verification to drop the "unverified"
+  warning; add deploy-preview origins to the OAuth client if login must be tested on a
+  preview URL (only socratesiq.com + the main netlify domain are authorized today).
+
+### Contact emails changed (Aug 23 2026)
+The dead SocratesIQEd@gmail.com was ALSO the site's contact address, so every "contact
+us" link was broken. Now (PR #14, live): **support@socratesiq.com** on the Help page
+(troubleshooting), **hello@socratesiq.com** everywhere else (About, Pricing, Privacy,
+Terms, Feedback). Both are aliases that forward to will@socratesiq.com; info@ is a third
+alias that exists but is not shown on the site. Replace any remaining socratesiqed@gmail.com
+references (they are DEAD).
 
 ## Session status (August 6 2026) — "Welcome Back" greeting fix (on PR #10)
 
@@ -535,11 +600,20 @@ EMPTY (no uploaded papers) so research size is not the bottleneck.
   @socratesiq.com is a later task). Google-only users have no password; the
   sent-confirmation copy points them back to the Google button.
 
-## ⭐ OFFICIAL GOOGLE ACCOUNT (decided July 12 2026)
+## ⭐ OFFICIAL GOOGLE ACCOUNT
 
-**SocratesIQEd@gmail.com is THE official Google account for everything**
+> **SUPERSEDED Aug 23 2026 — DO NOT USE SocratesIQEd@gmail.com.** That account was
+> SUSPENDED by Google and is gone; the Cloud project + OAuth client described in this
+> section are DEAD. The official Google account is now **will@socratesiq.com** (Workspace
+> on the socratesiq.com domain), with a fresh project/OAuth client/API key. See the
+> "GOOGLE ACCOUNT REBUILD (Aug 23 2026)" block near the top of this file for the current,
+> correct setup. The text below is kept only as history of the July 12 migration.
+
+### (Historical, July 12 2026) — the now-dead SocratesIQEd setup
+
+**SocratesIQEd@gmail.com WAS the official Google account for everything**
 (Google Cloud, Drive integration, and eventually all Google login OAuth).
-Will's explicit decision. The OLD account `socratesaiedu@gmail.com` — which
+Will's explicit decision at the time. The OLD account `socratesaiedu@gmail.com` — which
 owns the original "Socrates" Cloud project and the "Socrates Web" OAuth
 client that Google login currently runs through — is DEPRECATED; do not add
 anything new there. CAUTION: the two addresses look nearly identical
