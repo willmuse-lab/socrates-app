@@ -51,7 +51,7 @@ export function AboutPage({ onBack }: PageProps) {
           <p className="eyebrow">About SocratesIQ</p>
           <h1 className="text-4xl md:text-5xl font-semibold leading-[1.05]">Built by educators,<br />for educators.</h1>
           <p className="text-muted-foreground leading-relaxed">SocratesIQ was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI (which is both impossible and counterproductive), we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
-          <p className="text-muted-foreground leading-relaxed">Our methodology emerged from classroom research, consultation with pedagogical experts, and analysis of international AI-in-education guidance.</p>
+          <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by classroom experience, consultation with pedagogical experts, and international AI-in-education guidance.</p>
         </div>
         {/* Dark editorial accent, echoing the landing's ink sections. */}
         <div className="ink-card section-ink p-8 space-y-4">
@@ -63,20 +63,10 @@ export function AboutPage({ onBack }: PageProps) {
       <div className="space-y-6">
         <div className="space-y-2">
           <p className="eyebrow">The research base</p>
-          <h2 className="text-2xl md:text-3xl font-semibold">The research behind SocratesIQ</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold">The research that informs SocratesIQ</h2>
         </div>
-        <p className="text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            'UNESCO (2023)', 'Bearman & Luckin (2024)', 'Mollick & Mollick (2023)', 'Lodge et al. (2023)',
-            'Dawson (2021)', 'TEQSA (2024)', 'Eaton (2023)', 'Perkins, Furze, Roe & MacVaugh (2024)',
-            'Awadallah Alkouk & Khlaif (2024)', 'Sperber et al. (2025)',
-          ].map(name => (
-            <span key={name} className="px-3 py-1.5 rounded-full bg-secondary/60 border border-border text-xs font-medium text-foreground/80">{name}</span>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground italic">How these sources are combined into SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
-        <p className="text-xs text-muted-foreground/80 border-t border-border pt-4">SocratesIQ cites this research to describe its methodology. It is not affiliated with, sponsored by, or endorsed by these researchers or institutions.</p>
+        <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by peer-reviewed research and international guidance on AI and assessment. How that research is reflected in SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
+        <p className="text-xs text-muted-foreground/80 border-t border-border pt-4">SocratesIQ describes its methodology as informed by research on AI and assessment. It is not affiliated with, sponsored by, or endorsed by any of the researchers or institutions whose work informs it.</p>
       </div>
       <div className="rounded-2xl border border-accent/20 bg-accent/5 p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
@@ -107,12 +97,12 @@ export function ScoringPage({ onBack }: PageProps) {
 
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-semibold">What produces the score</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. SocratesIQ sends your assignment to its AI together with a research-based rubric and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. SocratesIQ sends your assignment to its AI together with a rubric informed by research on AI and assessment and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
       </div>
 
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-semibold">The four dimensions it looks for</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four research-based dimensions, each scored individually with an explanation in your results. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four dimensions, informed by research on AI and assessment, each scored individually with an explanation in your results. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
         <div className="flex flex-wrap gap-2">
           {['Anchor', 'Proprietary', 'Audit', 'Agency'].map(name => (
             <span key={name} className="px-4 py-2 rounded-full bg-secondary/60 border border-border text-sm font-bold text-foreground/80">{name}</span>

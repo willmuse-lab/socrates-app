@@ -1,7 +1,7 @@
 -- ============================================================================
 --  user_credits — per-teacher monthly assignment allowance (added July 20 2026).
---  Model: TRIAL = 3 assignments (lifetime, no reset) → then a wall until they
---  upgrade. PAID = 20 assignments per month, resets monthly, NO rollover.
+--  Model: TRIAL = 2 assignments (lifetime, no reset) → then a wall until they
+--  upgrade. PAID = 15 assignments per month, resets monthly, NO rollover.
 --  UNLIMITED = comp/staff/beta accounts that never wall (Will grants by hand).
 --  "1 assignment" = analyzing one new assignment; every follow-up for that same
 --  assignment (re-analysis, revisions, lesson plan, directions, downloads) is
@@ -33,7 +33,7 @@ create policy "user_credits self read"
 -- teacher never hits the wall (the app also special-cases it to show "Unlimited").
 create or replace function public.credit_allowance(p text)
 returns int language sql immutable set search_path = '' as $$
-  select case p when 'paid' then 20 when 'unlimited' then 1000000 else 3 end;
+  select case p when 'paid' then 15 when 'unlimited' then 1000000 else 2 end;
 $$;
 
 -- Read-only: current balance, creating the row on first call and applying a
