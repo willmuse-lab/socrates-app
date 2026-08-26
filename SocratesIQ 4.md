@@ -1,15 +1,71 @@
-# SocratesIQ 3: Session Handoff Document
+# SocratesIQ 4: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: August 23 2026.
+session. Read this whole file before making changes. Last updated: August 26 2026.
 
-**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 3.md`
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 4.md`
 now, and the number bumps by one on every update (next update renames it to
-`SocratesIQ 4.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ 5.md`, and so on). To continue in a new session, read the HIGHEST-numbered
 `SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
 handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versioned
 file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
 `SocratesIQ N.md` wins.
+
+## Session status (August 26 2026) — post-launch copy tweaks + marketing rundown + Claude-account note
+
+Since the Aug 23 launch: a batch of post-launch copy tweaks is MERGED to `main`
+(needs a deploy to go live), a marketing rundown was produced for Will's team, and
+Will is about to move his Claude login to the business email.
+
+### Copy tweaks (PR #16, on main — NEEDS a Netlify deploy to reach the live site)
+- **Research wording softened to "informed by"** everywhere (landing, About, Scoring,
+  and the in-app score-info dialog). Was "grounded in / built on / research-based."
+  Reason: a rights/usage consultation, avoid implying research backs/endorses the product.
+- **Named research citations REMOVED from the About page** (the 10-source chip list:
+  UNESCO, Bearman & Luckin, Mollick, TEQSA, Sperber, etc.). The About "research base"
+  section now speaks only generally, with a generalized non-endorsement note. Per the
+  consultation, naming specific researchers/institutions could invite claims.
+  ⚠️ The **landing-page Furze et al. (2024) pilot reference is intentionally KEPT** —
+  Will frames it as what the redesign APPROACH can achieve (cited to the study), not
+  what SocratesIQ itself did. Do not remove it without asking.
+- **Assignment allowance lowered to 15/month (paid) and 2 free (trial)** — was 20/3.
+  Paid dollar amounts UNCHANGED ($9.99/mo, $99.99/yr). Updated in the copy
+  (Pricing/landing/analyzer plan card) AND in `credit_allowance()` in
+  `supabase/migration-credits.sql`. **Will already RAN the SQL in Supabase**, so the
+  live DB limit is 15/2 now. ⚠️ MISMATCH until deploy: the live site's on-screen copy
+  still says 20/3 until PR #16 is deployed — trigger a Netlify deploy to sync them.
+
+### Marketing rundown (deliverable, not code)
+A one-page SocratesIQ product + brand rundown for Will's AI social/marketing team.
+Published as an Artifact: https://claude.ai/code/artifact/77d8e4c6-1947-4b91-8ef1-314fe6ba4851
+(private to Will's Claude account; share via the page's Share menu). Also delivered as a
+Sora-embedded 6-page PDF. Covers: what it is, the problem, audience, how it works,
+features, differentiators, pricing (2 free / $9.99 = 15/mo), post angles, and do/don't
+guardrails (no invented stats, no naming specific studies, no em dashes, no AI-generated
+fake people). NOTE for Will's team: they do NOT need special access — the public landing
+page + the free trial let them see the product directly at socratesiq.com.
+
+### ⚠️ Claude account email change (in progress, continuity risk)
+Will is losing access to the email he currently uses to log into Claude and wants it on
+the business account. **Anthropic does NOT support changing a Claude account's email in
+place** (confirmed via support.claude.com). Plan: create a NEW Claude account on
+**will@socratesiq.com**, save/export anything needed from the old account, cancel its
+billing, optionally delete it. CONTINUITY RISK: a future session may run under a DIFFERENT
+Claude account than the one that did this work; the **rundown artifact (link above) is
+published under the CURRENT account** and will NOT move automatically (re-publish it from
+the new account if wanted). The code is safe in GitHub regardless of the account switch.
+
+### PR state (Aug 26)
+#10 / #13 / #14 / #15 / #16 all MERGED to main. #12 CLOSED. **#11 `claude/epoch-redesigns`
+(EPOCH) still OPEN** — rebased on main, on its Deploy Preview, NOT yet tested/signed-off
+or merged (see the PR-#11 block below).
+
+### Open / next
+1. **Deploy `main` to Netlify** (Deploys → Trigger deploy → Deploy site) to push the
+   informed-by wording, the removed citations, and the 15/2 copy live (and sync the copy
+   with the DB limit already changed).
+2. Will to test **EPOCH (#11)** on its preview, then decide whether to merge.
+3. Google **app verification** (drop the "unverified app" warning) is deferred — later task.
 
 ## Session status (August 23 2026) — LAUNCHED (brand refresh LIVE) + Google rebuilt on the business account
 
