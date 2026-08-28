@@ -62,6 +62,28 @@ Deployment facts below; auto-deploy of `main` does NOT fire.
    w-10→w-16) per Will's request — the ping/pulse animation itself is unchanged, he
    likes it, just wanted the icon bigger and actually centered.
 
+### Brand assets Will shared this session (Aug 28) — decision + open question
+Will pasted 9 logo images (individual owl+wordmark lockups, plus a brand-kit
+comparison sheet showing "Design 1 – Abstract Owl" vs "Design 2 – Geometric Owl")
+and uploaded a PDF titled "SocratesIQ Brand Kit Folder." **Decision: going with
+Design 1 (Abstract Owl) — do NOT use Design 2 (Geometric Owl) anywhere.** This
+matches what's already live (`public/owl.png`/`public/logo.png`), so no code
+change was needed. Notes for next time:
+- The pasted images never reached this session's filesystem (pasted images are
+  visible but don't land on disk here — only files uploaded with a real path do).
+  They still looked like the same style of AI-generated raster art already in the
+  app (soft edges, not crisp vector), so they do NOT resolve the long-open "need a
+  true vector SVG from a designer" item. If Will wants them actually used as
+  assets, they need to come in via a real file upload or a GitHub URL, not a paste.
+- The PDF turned out to be a 10-page WRITTEN brand-strategy guide (voice, tagline,
+  marketing collateral list, icon/illustration rules, a Canva Pro setup
+  walkthrough) — no embedded logo art at all.
+- **OPEN QUESTION, unanswered:** that PDF's color palette is close but NOT
+  identical to what's coded live — Navy `#1D3557` (PDF) vs `#0F1B2E` (code), Teal
+  `#00A8C8` (PDF) vs `#00A8E8` (code), Light Gray `#EEF2F5` (PDF) vs `#E6EBF1`
+  (code); Emerald `#2EBB57` matches. Do NOT change the live palette to match the
+  PDF without asking Will which is authoritative first.
+
 ### If you see issues and need to revert
 The pre-merge state of `main` was commit `b753647` (tip before this PR). To back out
 the WHOLE merge: `git revert -m 1 3d39dbd` (keeps history, adds a revert commit) or, if
