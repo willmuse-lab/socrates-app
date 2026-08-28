@@ -506,6 +506,7 @@ export function AssignmentAnalyzer({
                           <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${badges[i]}`}>{TIER_LABELS[sug.level as TierLevel]}</div>
                           <p className="text-xs font-bold">{sug.title}</p>
                           <p className="text-[11px] text-muted-foreground leading-relaxed italic">{sug.description}</p>
+                          {sug.strengthens && <p className="text-[10px] font-bold uppercase tracking-wider text-accent">Strengthens: {sug.strengthens}</p>}
                           {changes.length > 0 && (
                             <div className="space-y-1.5 pt-1 border-t border-black/10">
                               <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Key additions:</p>
@@ -535,6 +536,7 @@ export function AssignmentAnalyzer({
                     <div className="space-y-1">
                       <h3 className="text-2xl font-serif text-accent">{suggestion.title}</h3>
                       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
+                      {suggestion.strengthens && <p className="text-[11px] font-bold uppercase tracking-wider text-accent mt-1">Strengthens: {suggestion.strengthens}</p>}
                     </div>
                     <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{editedTexts[i] ?? suggestion.modifiedAssignment}</div>
                     {editedTexts[i] != null && editedTexts[i] !== suggestion.modifiedAssignment && (
@@ -603,7 +605,7 @@ export function AssignmentAnalyzer({
                 <Card className="p-6 md:p-8 border border-border shadow-sm bg-card rounded-xl space-y-6">
                   <div className="space-y-1">
                     <h2 className="text-2xl font-bold">Standards & Lesson Plan</h2>
-                    <p className="text-sm text-muted-foreground">Align the <strong>{activeLevel}</strong> redesign to your standards, then generate a complete lesson plan and student directions.</p>
+                    <p className="text-sm text-muted-foreground">Align the <strong>{TIER_LABELS[activeLevel]}</strong> redesign to your standards, then generate a complete lesson plan and student directions.</p>
                   </div>
                   {userId ? (
                     <StandardsManager userId={userId} onSelect={setStandardsDoc} selectedId={standardsDoc?.id} />
@@ -710,7 +712,7 @@ export function AssignmentAnalyzer({
                 </div>
               ))}
             </div>
-            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut, and the Bronze/Silver/Gold redesigns that raise it.</p>
+            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut, and the {TIER_LABELS.Bronze}/{TIER_LABELS.Silver}/{TIER_LABELS.Gold} redesigns that raise it.</p>
           </div>
         </DialogContent>
       </Dialog>
