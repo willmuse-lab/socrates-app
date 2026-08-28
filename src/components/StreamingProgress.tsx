@@ -46,8 +46,8 @@ export function StreamingProgress({ percent, isVisible }: StreamingProgressProps
           className="flex flex-col items-center justify-center py-16 px-8 space-y-10 max-w-xl mx-auto">
           <div className="relative">
             <div className="absolute inset-0 rounded-full bg-accent/20 animate-ping" />
-            <div className="relative w-16 h-16 rounded-full border-2 border-accent/30 flex items-center justify-center bg-card">
-              <img src="/owl.png" alt="SocratesIQ" className="w-10 h-10 object-contain" />
+            <div className="relative w-24 h-24 rounded-full border-2 border-accent/30 flex items-center justify-center bg-card">
+              <img src="/owl.png" alt="SocratesIQ" className="w-16 h-16 object-contain" />
             </div>
           </div>
 
