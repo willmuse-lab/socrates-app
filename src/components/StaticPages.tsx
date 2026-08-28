@@ -51,7 +51,7 @@ export function AboutPage({ onBack }: PageProps) {
           <p className="eyebrow">About SocratesIQ</p>
           <h1 className="text-4xl md:text-5xl font-semibold leading-[1.05]">Built by educators,<br />for educators.</h1>
           <p className="text-muted-foreground leading-relaxed">SocratesIQ was created out of a simple frustration: AI tools were making it easier for students to avoid the hard work of learning. Rather than banning AI (which is both impossible and counterproductive), we set out to help teachers design assignments where AI <em>cannot replace</em> genuine student thinking.</p>
-          <p className="text-muted-foreground leading-relaxed">Our methodology emerged from classroom research, consultation with pedagogical experts, and analysis of international AI-in-education guidance.</p>
+          <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by classroom experience, consultation with pedagogical experts, and international AI-in-education guidance.</p>
         </div>
         {/* Dark editorial accent, echoing the landing's ink sections. */}
         <div className="ink-card section-ink p-8 space-y-4">
@@ -63,27 +63,17 @@ export function AboutPage({ onBack }: PageProps) {
       <div className="space-y-6">
         <div className="space-y-2">
           <p className="eyebrow">The research base</p>
-          <h2 className="text-2xl md:text-3xl font-semibold">The research behind SocratesIQ</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold">The research that informs SocratesIQ</h2>
         </div>
-        <p className="text-muted-foreground leading-relaxed">Every analysis is grounded in peer-reviewed research and international guidance on AI and assessment, including work from these sources:</p>
-        <div className="flex flex-wrap gap-2">
-          {[
-            'UNESCO (2023)', 'Bearman & Luckin (2024)', 'Mollick & Mollick (2023)', 'Lodge et al. (2023)',
-            'Dawson (2021)', 'TEQSA (2024)', 'Eaton (2023)', 'Perkins, Furze, Roe & MacVaugh (2024)',
-            'Awadallah Alkouk & Khlaif (2024)', 'Sperber et al. (2025)', 'Loaiza & Rigobón, MIT (2025)',
-          ].map(name => (
-            <span key={name} className="px-3 py-1.5 rounded-full bg-secondary/60 border border-border text-xs font-medium text-foreground/80">{name}</span>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground italic">How these sources are combined into SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
-        <p className="text-xs text-muted-foreground/80 border-t border-border pt-4">SocratesIQ cites this research to describe its methodology. It is not affiliated with, sponsored by, or endorsed by these researchers or institutions.</p>
+        <p className="text-muted-foreground leading-relaxed">SocratesIQ's methodology is informed by peer-reviewed research and international guidance on AI and assessment. How that research is reflected in SocratesIQ's scoring rubric and redesign engine is part of our proprietary methodology.</p>
+        <p className="text-xs text-muted-foreground/80 border-t border-border pt-4">SocratesIQ describes its methodology as informed by research on AI and assessment. It is not affiliated with, sponsored by, or endorsed by any of the researchers or institutions whose work informs it.</p>
       </div>
       <div className="rounded-2xl border border-accent/20 bg-accent/5 p-8 text-center space-y-4">
         <Mail className="w-8 h-8 text-accent mx-auto" />
         <h3 className="text-xl font-semibold font-serif">Get in touch</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">Questions about the framework, partnership opportunities, research collaboration, or school pricing.</p>
-        <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com'} className="gap-2">
-          <Mail className="w-4 h-4" />socratesiqed@gmail.com
+        <Button onClick={() => window.location.href = 'mailto:hello@socratesiq.com'} className="gap-2">
+          <Mail className="w-4 h-4" />hello@socratesiq.com
         </Button>
       </div>
     </motion.div>
@@ -107,12 +97,12 @@ export function ScoringPage({ onBack }: PageProps) {
 
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-semibold">What produces the score</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. SocratesIQ sends your assignment to its AI together with a research-based rubric and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">There is no fixed formula crunching numbers. SocratesIQ sends your assignment to its AI together with a rubric informed by research on AI and assessment and asks a single expert question: <em>how hard would it be for a student to complete this with AI doing the work?</em> The AI weighs the assignment against the rubric below and returns a score, a breakdown of how it could be shortcut, and ready-to-use redesigns that raise it.</p>
       </div>
 
       <div className="space-y-4">
         <h2 className="font-serif text-xl font-semibold">The four dimensions it looks for</h2>
-        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four research-based dimensions, each scored individually with an explanation in your results. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
+        <p className="text-sm text-muted-foreground leading-relaxed">The score is built from four dimensions, informed by research on AI and assessment, each scored individually with an explanation in your results. (If you switch to the Bloom's framework in Settings, it scores against cognitive levels instead.)</p>
         <div className="flex flex-wrap gap-2">
           {['Anchor', 'Proprietary', 'Audit', 'Agency'].map(name => (
             <span key={name} className="px-4 py-2 rounded-full bg-secondary/60 border border-border text-sm font-bold text-foreground/80">{name}</span>
@@ -156,10 +146,10 @@ export function PrivacyPage({ onBack }: PageProps) {
       <ProseSections sections={[
         { title: 'What data we collect', content: 'We collect the minimum necessary: your name and email address, assignment text you submit for analysis, your saved assignments and analysis results, and basic usage metadata.\n\nWe do NOT collect student names, student work, grades, or any personally identifiable student information.' },
         { title: 'How assignment text is processed', content: "When you submit an assignment for analysis, the text is sent to Anthropic's Claude API. This is the AI that powers SocratesIQ.\n\nAnthropic's API processes your text to generate the analysis and then the text is discarded. It is not stored by Anthropic for training purposes under our API agreement. Your assignment text is never sold or shared with third parties." },
-        { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at socratesiqed@gmail.com to request a DPA.' },
+        { title: 'FERPA compliance', content: 'SocratesIQ is designed for teacher use, not student use. Teachers should not submit student-identifying information as part of assignment text.\n\nDistrict plan subscribers receive a Data Processing Agreement (DPA) that satisfies FERPA requirements. Contact us at hello@socratesiq.com to request a DPA.' },
         { title: 'Google Drive & Docs', content: 'When you use the Google Drive features, we request the narrowest permission Google offers (per-file access): SocratesIQ can only read files you explicitly pick in the Google file window, and can create new Google Docs when you export.\n\nWe cannot see, list, or search the rest of your Drive. Your Google sign-in token stays in your browser for the session and is never sent to our servers, logged, or stored in our database.' },
-        { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email socratesiqed@gmail.com. We will process deletion requests within 14 days.' },
-        { title: 'Contact', content: 'Data privacy questions: socratesiqed@gmail.com\nWe aim to respond within 2 business days.' },
+        { title: 'Data retention & deletion', content: 'You can delete your saved assignments at any time from the Library.\n\nTo delete your account and all associated data, email hello@socratesiq.com. We will process deletion requests within 14 days.' },
+        { title: 'Contact', content: 'Data privacy questions: hello@socratesiq.com\nWe aim to respond within 2 business days.' },
       ]} />
     </motion.div>
   );
@@ -190,7 +180,7 @@ export function FeedbackPage({ onBack }: PageProps) {
       <div className="rounded-2xl border border-accent/20 bg-accent/5 p-8 text-center space-y-3">
         <h3 className="text-xl font-semibold font-serif">Using SocratesIQ in your classroom?</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">We'd love to hear what's working. Send us your experience and it may appear here.</p>
-        <Button onClick={() => window.location.href = 'mailto:socratesiqed@gmail.com?subject=My%20Socrates%20feedback'} className="gap-2">
+        <Button onClick={() => window.location.href = 'mailto:hello@socratesiq.com?subject=My%20Socrates%20feedback'} className="gap-2">
           <Mail className="w-4 h-4" />Share your feedback
         </Button>
       </div>
@@ -218,7 +208,7 @@ export function TermsPage({ onBack }: PageProps) {
         { title: '10. Limitation of liability', content: 'To the maximum extent permitted by law, we are not liable for any indirect, incidental, or consequential damages arising from your use of the Service. Our total liability for any claim relating to the Service will not exceed the amount you paid us in the 12 months before the claim.' },
         { title: '11. Termination', content: 'You may stop using the Service at any time. We may suspend or terminate access if you violate these Terms or use the Service in a way that could harm us or other users. Upon termination, your right to use the Service ends; sections that by their nature should survive (such as intellectual property, disclaimers, and limitation of liability) will continue to apply.' },
         { title: '12. Changes to these terms', content: 'We may update these Terms from time to time. When we make material changes, we will update the date above and, where appropriate, notify you. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.' },
-        { title: '13. Contact', content: 'Questions about these Terms: socratesiqed@gmail.com' },
+        { title: '13. Contact', content: 'Questions about these Terms: hello@socratesiq.com' },
       ]} />
     </motion.div>
   );
@@ -271,7 +261,7 @@ const HELP_TOPICS = [
   },
   {
     title: 'Contact support',
-    content: 'We\'re a small team of educators and we read everything.\n\nEmail: socratesiqed@gmail.com\nWe aim to respond within 2 business days.\n\nWhen reporting a problem, it helps to include: what you clicked, what you expected, what happened instead, and roughly what time it happened.',
+    content: 'We\'re a small team of educators and we read everything.\n\nEmail: support@socratesiq.com\nWe aim to respond within 2 business days.\n\nWhen reporting a problem, it helps to include: what you clicked, what you expected, what happened instead, and roughly what time it happened.',
   },
 ];
 
@@ -285,7 +275,7 @@ export function HelpPage({ onBack }: PageProps) {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-10">
       <BackLink onBack={onBack} />
       <PageHeader eyebrow="Help center" title="Help and how-to">
-        Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.
+        Quick answers to how SocratesIQ works. Can't find it? Email <a href="mailto:support@socratesiq.com" className="text-accent font-semibold hover:underline">support@socratesiq.com</a>.
       </PageHeader>
       <input
         value={query}
@@ -294,7 +284,7 @@ export function HelpPage({ onBack }: PageProps) {
         className="w-full h-11 px-4 rounded-lg border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/40"
       />
       {topics.length === 0 && (
-        <p className="text-sm text-muted-foreground">No topics match "{query}". Try another word, or email <a href="mailto:socratesiqed@gmail.com" className="text-accent font-semibold hover:underline">socratesiqed@gmail.com</a>.</p>
+        <p className="text-sm text-muted-foreground">No topics match "{query}". Try another word, or email <a href="mailto:support@socratesiq.com" className="text-accent font-semibold hover:underline">support@socratesiq.com</a>.</p>
       )}
       <div className="space-y-8">
         {topics.map(({ title, content }) => (

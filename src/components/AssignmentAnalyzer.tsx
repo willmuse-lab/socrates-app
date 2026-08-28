@@ -697,7 +697,7 @@ export function AssignmentAnalyzer({
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>Every assignment gets a <strong className="text-foreground">resilience score from 0–100</strong>. Higher means more resilient: harder for a student to complete with AI doing the thinking. "Vulnerability" is simply the flip side.</p>
-            <p>There's no fixed formula. SocratesIQ weighs your assignment against a proprietary, research-based rubric built on four dimensions: <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
+            <p>There's no fixed formula. SocratesIQ weighs your assignment against a proprietary rubric, informed by research on AI and assessment, built on four dimensions: <strong className="text-foreground">Anchor, Proprietary, Audit, and Agency</strong>. Your results explain how each one applies to your specific assignment.</p>
             <div className="space-y-1.5">
               {[
                 ['0–30', 'Highly vulnerable: one AI prompt could do it', 'text-red-500'],
@@ -729,11 +729,11 @@ export function AssignmentAnalyzer({
           </DialogHeader>
           <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
             <p>{credits?.plan === 'paid'
-              ? 'Your plan includes 20 assignment redesigns a month. It resets at the start of your next month. Everything you already created stays available.'
+              ? 'Your plan includes 15 assignment redesigns a month. It resets at the start of your next month. Everything you already created stays available.'
               : 'Nice work! You got the full experience. To keep transforming assignments, a paid plan is on the way.'}</p>
             <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 space-y-1">
               <p className="text-lg font-bold text-foreground">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-              <p className="text-xs"><strong className="text-foreground">20 assignment redesigns every month.</strong> Each one includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
+              <p className="text-xs"><strong className="text-foreground">15 assignment redesigns every month.</strong> Each one includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
             </div>
             {credits?.plan !== 'paid' && (
               <p className="text-xs bg-secondary/40 border border-border rounded-lg p-3">

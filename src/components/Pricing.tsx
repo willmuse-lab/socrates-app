@@ -5,7 +5,7 @@ import { Check, X, ArrowRight, Zap, Mail } from 'lucide-react';
 
 interface PricingProps { onBack: () => void; }
 
-const CONTACT_MAILTO = 'mailto:socratesiqed@gmail.com?subject=SocratesIQ%20school%20%2F%20district%20pricing';
+const CONTACT_MAILTO = 'mailto:hello@socratesiq.com?subject=SocratesIQ%20school%20%2F%20district%20pricing';
 
 export function Pricing({ onBack }: PricingProps) {
   const [billing, setBilling] = useState<'annual' | 'monthly'>('annual');
@@ -43,12 +43,12 @@ export function Pricing({ onBack }: PricingProps) {
             <h3 className="font-serif text-xl font-semibold">Teacher</h3>
             <div className="flex items-end gap-1 mt-2"><span className="text-4xl font-bold">${teacherPerMonth}</span><span className="text-muted-foreground text-sm mb-1">/month</span></div>
             {billing === 'annual' && <p className="text-xs text-green-600 font-medium">Billed as ${teacherAnnual}/year</p>}
-            <p className="text-sm font-semibold text-foreground pt-1">20 assignment redesigns every month.</p>
+            <p className="text-sm font-semibold text-foreground pt-1">15 assignment redesigns every month.</p>
             <p className="text-xs text-muted-foreground">Each includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
           </div>
           <Button className="w-full gap-2 font-bold bg-accent hover:bg-accent/90">Get started <ArrowRight className="w-4 h-4" /></Button>
           <div className="space-y-2.5">
-            {['20 assignment redesigns a month','Quick Fix, Rebuild & Reinvent redesigns','Lesson plans & student directions','Personal assignment library','PDF, Word & Google Doc export'].map(f => (
+            {['15 assignment redesigns a month','Quick Fix, Rebuild & Reinvent redesigns','Lesson plans & student directions','Personal assignment library','PDF, Word & Google Doc export'].map(f => (
               <div key={f} className="flex items-start gap-2.5 text-xs"><Check className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />{f}</div>
             ))}
             {['School admin dashboard','Teacher management','LMS integration'].map(f => (
@@ -100,10 +100,10 @@ export function Pricing({ onBack }: PricingProps) {
           <h2 className="text-2xl md:text-3xl font-semibold">Common questions</h2>
         </div>
         {[
-          { q: 'Is there a free trial?', a: 'Yes, sign up and get 3 free assignment redesigns, no credit card required. After that it\'s $9.99/month for 20 redesigns a month.' },
-          { q: 'How does school and district pricing work?', a: "Every school is different, so we price school and district plans individually. Email socratesiqed@gmail.com and we'll put together a quote for your size and needs." },
+          { q: 'Is there a free trial?', a: 'Yes, sign up and get 2 free assignment redesigns, no credit card required. After that it\'s $9.99/month for 15 redesigns a month.' },
+          { q: 'How does school and district pricing work?', a: "Every school is different, so we price school and district plans individually. Email hello@socratesiq.com and we'll put together a quote for your size and needs." },
           { q: 'Is student work sent to AI companies?', a: "Assignment text is sent to Anthropic's Claude API for analysis only. It is not stored or used for training. We never collect student PII." },
-          { q: 'Do you offer discounts for Title I schools?', a: 'Yes. Email socratesiqed@gmail.com and we\'ll work something out.' },
+          { q: 'Do you offer discounts for Title I schools?', a: 'Yes. Email hello@socratesiq.com and we\'ll work something out.' },
         ].map(({ q, a }) => (
           <div key={q} className="bg-secondary/30 rounded-xl p-4 space-y-1 border border-border">
             <p className="text-sm font-bold">{q}</p>

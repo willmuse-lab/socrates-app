@@ -16,7 +16,7 @@ export function getAnonId(): string {
 }
 
 // ---- Assignment credits (monthly allowance) --------------------------------
-// Trial = 3 lifetime, Paid = 20/month (no rollover). The real allowance/reset
+// Trial = 2 lifetime, Paid = 15/month (no rollover). The real allowance/reset
 // logic lives in Postgres (migration-credits.sql) so it can't be tampered with;
 // these just call the RPCs. See "1 assignment = 1 credit" rule in the analyzer.
 export interface Credits {
