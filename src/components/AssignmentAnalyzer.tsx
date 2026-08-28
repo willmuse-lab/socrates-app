@@ -605,7 +605,7 @@ export function AssignmentAnalyzer({
                 <Card className="p-6 md:p-8 border border-border shadow-sm bg-card rounded-xl space-y-6">
                   <div className="space-y-1">
                     <h2 className="text-2xl font-bold">Standards & Lesson Plan</h2>
-                    <p className="text-sm text-muted-foreground">Align the <strong>{activeLevel}</strong> redesign to your standards, then generate a complete lesson plan and student directions.</p>
+                    <p className="text-sm text-muted-foreground">Align the <strong>{TIER_LABELS[activeLevel]}</strong> redesign to your standards, then generate a complete lesson plan and student directions.</p>
                   </div>
                   {userId ? (
                     <StandardsManager userId={userId} onSelect={setStandardsDoc} selectedId={standardsDoc?.id} />
@@ -712,7 +712,7 @@ export function AssignmentAnalyzer({
                 </div>
               ))}
             </div>
-            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut, and the Bronze/Silver/Gold redesigns that raise it.</p>
+            <p className="text-xs bg-accent/5 border border-accent/20 rounded-lg p-3"><strong className="text-foreground">It's a diagnostic guide, not a final grade.</strong> The exact number can shift a few points run to run. The real value is the breakdown of how it could be shortcut, and the {TIER_LABELS.Bronze}/{TIER_LABELS.Silver}/{TIER_LABELS.Gold} redesigns that raise it.</p>
           </div>
         </DialogContent>
       </Dialog>
