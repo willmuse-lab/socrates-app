@@ -691,14 +691,6 @@ export function AssignmentAnalyzer({
                       : dimensions.map((dim, i) => <p key={i}><strong className="text-foreground">{dim.name}:</strong> {dim.description}</p>)}
                   </AccordionContent>
                 </AccordionItem>
-                <AccordionItem value="aias" className="border-border">
-                  <AccordionTrigger className="text-[11px] font-bold uppercase py-2 hover:no-underline">AI Assessment Scale</AccordionTrigger>
-                  <AccordionContent className="text-[11px] text-muted-foreground space-y-2">
-                    {[['L1','No AI assistance.'],['L2','AI for planning only.'],['L3','AI for editing (with appendix).'],['L4','AI for completion (with critique).'],['L5','Full human-AI co-design.']].map(([k,v]) => (
-                      <p key={k}><strong className="text-foreground">{k}:</strong> {v}</p>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
               </Accordion>
             </div>
             <Button className="w-full h-12 text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 mt-auto" onClick={handleStrengthen}>Strengthen Assignment</Button>

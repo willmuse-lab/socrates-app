@@ -237,7 +237,10 @@ never default to the same two or three moves:
 
 export const SCORING_GUIDANCE = `
 SCORING — every score MUST be justified against named framework criteria
-(Triple-A pillars, Ai-RACE components, AIAS levels), not generic impressions:
+(Triple-A pillars, Ai-RACE components), not generic impressions. Ground your
+own reasoning in the AIAS levels above if useful, but do NOT cite "AIAS" or
+an AIAS level by name in a score explanation -- there is no on-screen
+reference for that term, so it would read as unexplained jargon to a teacher:
   0-30  Completable by AI with a single prompt. No Anchor, no Audit, no Agency;
         fails Ai-RACE Relevance and Engagement entirely.
   31-50 Some friction but largely AI-completable. At most one weak Triple-A element.
