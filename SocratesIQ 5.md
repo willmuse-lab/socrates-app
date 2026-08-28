@@ -78,11 +78,12 @@ change was needed. Notes for next time:
 - The PDF turned out to be a 10-page WRITTEN brand-strategy guide (voice, tagline,
   marketing collateral list, icon/illustration rules, a Canva Pro setup
   walkthrough) — no embedded logo art at all.
-- **OPEN QUESTION, unanswered:** that PDF's color palette is close but NOT
-  identical to what's coded live — Navy `#1D3557` (PDF) vs `#0F1B2E` (code), Teal
-  `#00A8C8` (PDF) vs `#00A8E8` (code), Light Gray `#EEF2F5` (PDF) vs `#E6EBF1`
-  (code); Emerald `#2EBB57` matches. Do NOT change the live palette to match the
-  PDF without asking Will which is authoritative first.
+- **Color palette: LEAVE AS-IS for now (Will's decision, Aug 28).** That PDF's
+  palette is close but NOT identical to what's coded live — Navy `#1D3557` (PDF)
+  vs `#0F1B2E` (code), Teal `#00A8C8` (PDF) vs `#00A8E8` (code), Light Gray
+  `#EEF2F5` (PDF) vs `#E6EBF1` (code); Emerald `#2EBB57` matches. Will may change
+  the palette later and will explicitly say "pull these colors" when ready — do
+  NOT change the live palette on your own initiative before then.
 
 ### If you see issues and need to revert
 The pre-merge state of `main` was commit `b753647` (tip before this PR). To back out
