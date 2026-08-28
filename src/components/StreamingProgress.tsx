@@ -22,17 +22,28 @@ export function StreamingProgress({ percent, isVisible }: StreamingProgressProps
   }, [isVisible]);
 
   // The two analysis steps only bump `percent` at real checkpoints, which left
-  // the bar frozen for long stretches. Trickle upward continuously (ease-out
-  // toward a 95% ceiling) so it always climbs, while a real checkpoint snaps it
-  // forward and acts as a floor. It reaches 100% only on true completion.
+  // the bar frozen for long stretches. Trickle upward continuously so it always
+  // climbs, while a real checkpoint snaps it forward and acts as a floor. It
+  // reaches 100% only on true completion.
+  //
+  // The trickle is paced by ELAPSED TIME (not tick count) against a ~14s time
+  // constant calibrated to a typical successful analysis. A per-tick fraction
+  // (the old approach) decays almost independently of how long the real work
+  // takes, so it raced to ~95% in a couple of seconds and then sat pinned near
+  // 99% for the rest of a 15-30s wait -- fast and dishonest, then a long
+  // apparent hang. This curve instead reaches roughly 50% at 14s, ~75% at 28s,
+  // and keeps creeping (never fully parking) the longer the real call runs.
+  const startRef = React.useRef<number | null>(null);
   useEffect(() => {
-    if (!isVisible) { setDisplayPercent(0); return; }
+    if (!isVisible) { setDisplayPercent(0); startRef.current = null; return; }
+    if (startRef.current === null) startRef.current = Date.now();
+    const TAU_MS = 14000;
+    const CEILING = 97;
     const id = setInterval(() => {
-      setDisplayPercent(p => {
-        const floor = Math.min(percent, 99);          // real checkpoints pull it up
-        const trickled = p + Math.max(0.4, (95 - p) * 0.05); // ease-out creep to 95
-        return Math.min(99, Math.max(p, floor, trickled));
-      });
+      const elapsed = Date.now() - (startRef.current ?? Date.now());
+      const timeBased = CEILING * (1 - Math.exp(-elapsed / TAU_MS));
+      const floor = Math.min(percent, CEILING); // real checkpoints pull it up
+      setDisplayPercent(p => Math.min(CEILING, Math.max(p, floor, timeBased)));
     }, 180);
     return () => clearInterval(id);
   }, [isVisible, percent]);

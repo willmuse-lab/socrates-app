@@ -228,9 +228,9 @@ ${AIAS_SCALE}
 RESEARCH BASE:
 ${RESEARCH_NOTES}
 ${uploadedResearch ? `\nADDITIONAL UPLOADED RESEARCH:\n${uploadedResearch}\n` : ""}
-${wantDiagnosis ? `SCORING GUIDANCE:
+SCORING GUIDANCE:
 ${SCORING_GUIDANCE}
-` : ""}
+
 ${STRATEGY_INDEX}
 
 FRAMEWORK LOCKING RULES — these are requirements, not suggestions:
@@ -262,6 +262,7 @@ ${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bro
    - Fit the SUBJECT and GRADE LEVEL${subject ? ` (${subject})` : ""}${gradeLevel ? ` at ${gradeLevel}` : ""} in vocabulary, complexity, and expectations — a redesign for young students must read differently from one for advanced students.
    - Preserve the teacher's original topic and learning goal — improve HOW it's done, don't replace WHAT it teaches.
    - On top of the moves above, make the redesign build at least ONE human capability AI cannot replicate — independent judgment, original voice, creative synthesis, human connection/empathy, or reasoning from local or limited information — and report these in a 'strengthens' field (2-3, in plain learning words). Never name any framework, study, or acronym in the output.
+   - Give an 'estimatedScore' (0-100): your best estimate of what THIS rewritten assignment would score if it were analyzed fresh, using the SAME scoring guidance bands above. This is a planning preview for the teacher, not a guarantee — actual re-analysis may land a few points off. Estimates should generally rise from Bronze to Silver to Gold, but do NOT force a fixed gap; judge each rewrite on its own resilience.
    - Be realistically SHORT to complete: the whole redesigned assignment must fit within ONE class period (Gold may use at most two). NEVER spread the work across days or weeks, and never write a multi-week or "Week 1 / Week 2 / Day 1" timeline. Keep it to what a student can finish in a class or two.
    - STATE the time it takes a student INSIDE the assignment text itself, in plain student-facing terms, scaled to the level: Bronze a brief in-class task (about 10 to 20 minutes), Silver about one class period, Gold up to two class periods. Weave the timing naturally into the assignment (for example an opening like "In this 15-minute task ..." or a line like "You will have one class period to complete this"), so the handout tells the student how long it should take. Do NOT add a separate label or heading for it.
    Length: Bronze ~2-3 sentences, Silver ~3-4, Gold ~4-5 — specific and usable but TIGHT; every sentence must add a concrete detail, no filler. Give a ONE-sentence description of the concrete change. Do not exceed these lengths — brevity keeps the tool fast. HARD CAP regardless of the source assignment's own length or format: each modifiedAssignment stays under 120 words. If the original assignment includes a grading rubric, percentage breakdown, or multi-part timeline, do NOT reproduce it in full — compress it to at most one short clause. This matters MOST when the source text is already long or detailed (e.g. re-analyzing a prior redesign): do not let the rewrite grow to match it.
@@ -278,7 +279,7 @@ ${wantDiagnosis ? `  "resilienceScore": 0,
   "summary": "2-3 sentence overview",
   "aiFailureBreakdown": { "headline": "one sentence", "failures": [ { "type": "short name", "severity": "High|Medium|Low", "explanation": "what a student could do", "fix": "how to close the gap" } ] },
   "dimensions": [ { "name": "dimension name", "score": 0, "explanation": "why" } ]${wantRedesigns ? "," : ""}` : ""}
-${wantRedesigns ? `  "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "how it applies the teacher's chosen AI strategy", "strengthens": "2-3 human skills this builds, comma-separated (e.g. 'independent judgment, original voice')", "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]` : ""}
+${wantRedesigns ? `  "suggestions": [ { "level": "Bronze|Silver|Gold", "title": "title", "description": "how it applies the teacher's chosen AI strategy", "strengthens": "2-3 human skills this builds, comma-separated (e.g. 'independent judgment, original voice')", "estimatedScore": 0, "modifiedAssignment": "the full rewritten assignment, ready to hand out" } ]` : ""}
 }
 ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimension. " : ""}${wantRedesigns ? "Include exactly three suggestions (one Bronze, one Silver, one Gold). " : ""}Keep every field concise. Do NOT use double-quote characters (") inside any string value — use single quotes (') instead.`;
 

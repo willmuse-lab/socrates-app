@@ -314,6 +314,9 @@ export function AssignmentAnalyzer({
     return { before: previousResult.resilienceScore, after: result.resilienceScore, gains };
   };
   const scoreColor = result ? result.resilienceScore >= 70 ? 'text-[#708D81]' : result.resilienceScore >= 40 ? 'text-[#D4A373]' : 'text-red-400' : '';
+  // Same bands as scoreColor, for the AI's self-estimated score on each redesign
+  // (a planning preview -- re-analyzing the applied redesign is authoritative).
+  const estScoreColor = (score: number) => score >= 70 ? 'text-[#708D81]' : score >= 40 ? 'text-[#D4A373]' : 'text-red-400';
 
   return (
     <div className="flex-1 flex flex-col">
@@ -503,7 +506,12 @@ export function AssignmentAnalyzer({
                       const badges = ['bg-orange-100 text-orange-700', 'bg-slate-100 text-slate-600', 'bg-amber-100 text-amber-700'];
                       return (
                         <div key={i} className={`p-4 rounded-xl border-2 ${colors[i]} space-y-3`}>
-                          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${badges[i]}`}>{TIER_LABELS[sug.level as TierLevel]}</div>
+                          <div className="flex items-center justify-between">
+                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${badges[i]}`}>{TIER_LABELS[sug.level as TierLevel]}</div>
+                            {typeof sug.estimatedScore === 'number' && (
+                              <span className={`text-xs font-bold ${estScoreColor(sug.estimatedScore)}`} title="Estimated score if re-analyzed -- a planning preview, not a guarantee">~{sug.estimatedScore}</span>
+                            )}
+                          </div>
                           <p className="text-xs font-bold">{sug.title}</p>
                           <p className="text-[11px] text-muted-foreground leading-relaxed italic">{sug.description}</p>
                           {sug.strengthens && <p className="text-[10px] font-bold uppercase tracking-wider text-accent">Strengthens: {sug.strengthens}</p>}
@@ -534,7 +542,15 @@ export function AssignmentAnalyzer({
                 {result.suggestions.map((suggestion, i) => (
                   <TabsContent key={i} value={suggestion.level} className="mt-6 space-y-6">
                     <div className="space-y-1">
-                      <h3 className="text-2xl font-serif text-accent">{suggestion.title}</h3>
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="text-2xl font-serif text-accent">{suggestion.title}</h3>
+                        {typeof suggestion.estimatedScore === 'number' && (
+                          <span className="text-right shrink-0">
+                            <span className={`block text-xl font-bold leading-none ${estScoreColor(suggestion.estimatedScore)}`}>~{suggestion.estimatedScore}</span>
+                            <span className="block text-[9px] uppercase tracking-wider text-muted-foreground">Est. if re-analyzed</span>
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
                       {suggestion.strengthens && <p className="text-[11px] font-bold uppercase tracking-wider text-accent mt-1">Strengthens: {suggestion.strengthens}</p>}
                     </div>

@@ -28,6 +28,10 @@ export interface AnalysisResult {
     title: string;
     description: string;
     strengthens?: string;
+    /** The model's own estimate of what this redesign would score on a fresh
+     * analysis (0-100) -- a planning preview, not a guarantee; re-analyzing
+     * the applied redesign is the authoritative score. */
+    estimatedScore?: number;
     modifiedAssignment: string;
     differentiatedVersions?: DifferentiatedVersions;
   }[];
@@ -112,11 +116,15 @@ export async function analyzeAssignment(
 
   // The two halves run in PARALLEL — each is a small, fast request that stays
   // well under the serverless time limit, and the total wait is roughly halved.
-  onProgress?.("Scoring your assignment...", 20);
+  onProgress?.("Scoring your assignment...", 10);
   let finished = 0;
   const tick = (label: string) => <T,>(r: T): T => {
     finished++;
-    onProgress?.(label, finished === 1 ? 60 : 90);
+    // Only ONE of the two parallel calls finishing isn't 60% of the way there --
+    // the slower half (usually redesigns) still governs total wait time, so this
+    // shouldn't overstate completion. See the time-based trickle in
+    // StreamingProgress.tsx for how the bar actually paces itself in between.
+    onProgress?.(label, finished === 1 ? 40 : 90);
     return r;
   };
   const [diagnosis, redesigns] = await Promise.all([
