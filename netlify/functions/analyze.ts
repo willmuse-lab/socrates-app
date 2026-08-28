@@ -264,7 +264,7 @@ ${wantRedesigns ? `${wantDiagnosis ? "4" : "1"}. Exactly three redesigns — Bro
    - On top of the moves above, make the redesign build at least ONE human capability AI cannot replicate — independent judgment, original voice, creative synthesis, human connection/empathy, or reasoning from local or limited information — and report these in a 'strengthens' field (2-3, in plain learning words). Never name any framework, study, or acronym in the output.
    - Be realistically SHORT to complete: the whole redesigned assignment must fit within ONE class period (Gold may use at most two). NEVER spread the work across days or weeks, and never write a multi-week or "Week 1 / Week 2 / Day 1" timeline. Keep it to what a student can finish in a class or two.
    - STATE the time it takes a student INSIDE the assignment text itself, in plain student-facing terms, scaled to the level: Bronze a brief in-class task (about 10 to 20 minutes), Silver about one class period, Gold up to two class periods. Weave the timing naturally into the assignment (for example an opening like "In this 15-minute task ..." or a line like "You will have one class period to complete this"), so the handout tells the student how long it should take. Do NOT add a separate label or heading for it.
-   Length: Bronze ~2-3 sentences, Silver ~3-4, Gold ~4-5 — specific and usable but TIGHT; every sentence must add a concrete detail, no filler. Give a ONE-sentence description of the concrete change. Do not exceed these lengths — brevity keeps the tool fast.
+   Length: Bronze ~2-3 sentences, Silver ~3-4, Gold ~4-5 — specific and usable but TIGHT; every sentence must add a concrete detail, no filler. Give a ONE-sentence description of the concrete change. Do not exceed these lengths — brevity keeps the tool fast. HARD CAP regardless of the source assignment's own length or format: each modifiedAssignment stays under 120 words. If the original assignment includes a grading rubric, percentage breakdown, or multi-part timeline, do NOT reproduce it in full — compress it to at most one short clause. This matters MOST when the source text is already long or detailed (e.g. re-analyzing a prior redesign): do not let the rewrite grow to match it.
    Every redesign MUST pursue the teacher's AI strategy and its per-level guidance above (a "${aiPreference}" assignment, not a generic AI-proof one). Each redesign must use a DIFFERENT strategy; name the strategy category (A-G) in the description.` : ""}
 
 ASSIGNMENT TEXT:
@@ -286,7 +286,7 @@ ${wantDiagnosis ? "Include exactly 3 failures and one entry per scoring dimensio
     console.log("analyze v3: calling model");
     const stream = client.messages.stream({
       model: "claude-haiku-4-5",
-      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 1800 : 2500,
+      max_tokens: part === "diagnosis" ? 1100 : part === "redesigns" ? 2200 : 2500,
       // Cache the large, identical system prompt (research base + catalog) so
       // repeat/re-analyses reuse it at ~0.1x cost instead of re-sending it every
       // time — cuts token load and eases rate-limit pressure from the two-call split.
