@@ -112,6 +112,17 @@ Two more fixes from live feedback after the deploy, NOT part of the PR #11 merge
    not a second scoring pass, so expect it to drift a few points from the real
    re-analysis sometimes.
 
+### Removed the AI Assessment Scale sidebar accordion (commit `a4a5a3a`, Aug 28)
+The results sidebar's "Framework Reference" panel had two accordions: Bloom's/
+Triple-A (tied to a real Settings toggle -- kept) and a static AIAS L1-L5
+reference table (Perkins et al.) that wasn't connected to anything the teacher
+controls -- orphaned clutter. Will asked to remove it for a clean sidebar.
+Removed the accordion from `AssignmentAnalyzer.tsx`. Also updated
+`SCORING_GUIDANCE` in `research-base.ts` so the model no longer cites "AIAS" or
+an AIAS level by name in a visible score explanation (AIAS stays as background
+research context in the system prompt, just not a thing it names on-screen
+anymore, since there's no longer a decoder for the term).
+
 ### If you see issues and need to revert
 The pre-merge state of `main` was commit `b753647` (tip before this PR). To back out
 the WHOLE merge: `git revert -m 1 3d39dbd` (keeps history, adds a revert commit) or, if
@@ -119,7 +130,8 @@ nothing has been built on top of it yet, `git reset --hard b753647` + force-push
 with Will's explicit OK — this rewrites `main`). To back out ONE piece instead of the
 whole merge: `9e49c62` (Gold-label fix), `5307f77` (truncation fix), `618d822` (quote
 attribution), `dc326a5` (owl icon centering + badge size), `a788390` (progress
-bar pacing + redesign score estimates) are each self-contained
+bar pacing + redesign score estimates), `a4a5a3a` (removed AIAS sidebar
+accordion) are each self-contained
 commits — `git revert <sha>` any one of them individually. After any revert, remember
 to Trigger deploy again (see Deployment facts).
 
