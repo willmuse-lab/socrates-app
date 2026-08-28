@@ -1,15 +1,65 @@
-# SocratesIQ 4: Session Handoff Document
+# SocratesIQ 5: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: August 26 2026.
+session. Read this whole file before making changes. Last updated: August 28 2026.
 
-**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 4.md`
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 5.md`
 now, and the number bumps by one on every update (next update renames it to
-`SocratesIQ 5.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ 6.md`, and so on). To continue in a new session, read the HIGHEST-numbered
 `SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
 handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versioned
 file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
 `SocratesIQ N.md` wins.
+
+## Session status (August 28 2026) — PR #11 (EPOCH) MERGED to main, with 3 fixes found while testing
+
+**PR #11 `claude/epoch-redesigns` is MERGED to `main`** (merge commit `3d39dbd`,
+merged over base `b753647`). **NEEDS a Netlify deploy to reach the live site** — see
+Deployment facts below; auto-deploy of `main` does NOT fire.
+
+### What's in this merge
+1. **EPOCH redesigns** (the original point of PR #11): redesigns must now build one
+   human capability AI can't replicate; a "Strengthens: ..." tag renders on each
+   Quick Fix/Rebuild/Reinvent card. `Loaiza & Rigobón, MIT (2025)` was added to
+   server-side `RESEARCH_NOTES` only — the About-page citation chip PR #11 originally
+   proposed was DROPPED during the merge (see below, it conflicted with PR #16).
+2. **Fix: stale "Gold" label** (commit `9e49c62`) — two spots still printed the raw
+   internal tier value instead of the Aug 6 display names (Quick Fix/Rebuild/Reinvent):
+   the "Align the Gold redesign..." line above the lesson-plan panel, and the
+   "Bronze/Silver/Gold redesigns" line in the score-info dialog. Both now read through
+   `TIER_LABELS`. File: `src/components/AssignmentAnalyzer.tsx`.
+3. **Fix: redesign JSON truncation on re-analysis** (commit `5307f77`) — root cause of
+   a live 32% error rate on `/api/analyze` (502s), confirmed from Netlify function logs
+   (`stop_reason=max_tokens`). Re-analyzing an already-long redesign (e.g. an AP-level,
+   rubric-heavy assignment) let the model balloon each `modifiedAssignment` toward the
+   source's own length/rubric detail, blowing the 1800-token ceiling on the "redesigns"
+   half. Added a hard 120-word cap per redesign + told the model to compress any rubric
+   to one clause, and bumped that call's `max_tokens` 1800→2200 as headroom. File:
+   `netlify/functions/analyze.ts`.
+4. **Fix: teacher quote attribution** (commit `618d822`) — the 6 rotating testimonials
+   in `src/lib/comments.ts` were tagged with generic roles ("Pilot program teacher",
+   "High school teacher"). Matched each quote back to its real source in
+   `Socrates_Feedback_Responses.xlsx` (a Google Form export Will provided) and re-tagged
+   with subject + grade band, no names: 4 quotes → "High School English Teacher"
+   (source: Dorsett Davis, English/grade 10), 2 quotes → "Middle & High School Math
+   Teacher" (source: Brian Muse, Math/middle & high school). **Do not add real names to
+   these quotes** — subject/grade band only, per Will's explicit instruction.
+5. **Merge conflict resolved** in `src/components/StaticPages.tsx` (About page): PR #11
+   was based on a pre-PR-#16 `main`, so its added EPOCH citation chip collided with
+   PR #16's removal of ALL named citation chips (the rights/usage consultation decision
+   — see the Aug 26 status block below). Resolved in favor of `main`'s generalized,
+   no-named-citations wording; the EPOCH chip was dropped as a result. If a citation
+   chip needs to come back later for any source, that is a NEW decision to make with
+   Will, not a revert of this resolution.
+
+### If you see issues and need to revert
+The pre-merge state of `main` was commit `b753647` (tip before this PR). To back out
+the WHOLE merge: `git revert -m 1 3d39dbd` (keeps history, adds a revert commit) or, if
+nothing has been built on top of it yet, `git reset --hard b753647` + force-push (only
+with Will's explicit OK — this rewrites `main`). To back out ONE piece instead of the
+whole merge: `9e49c62` (Gold-label fix), `5307f77` (truncation fix), `618d822` (quote
+attribution) are each self-contained commits — `git revert <sha>` any one of them
+individually. After any revert, remember to Trigger deploy again (see Deployment facts).
 
 ## Session status (August 26 2026) — post-launch copy tweaks + marketing rundown + Claude-account note
 
