@@ -51,6 +51,16 @@ Deployment facts below; auto-deploy of `main` does NOT fire.
    no-named-citations wording; the EPOCH chip was dropped as a result. If a citation
    chip needs to come back later for any source, that is a NEW decision to make with
    Will, not a revert of this resolution.
+6. **Fix: off-center analyzing-screen icon** (commit `dc326a5`, pushed directly to
+   `main` right after the merge, not part of PR #11) — `public/owl.png` had a large
+   asymmetric transparent margin baked into the file itself (189px left vs 82px right
+   of the actual artwork within its 512x462 canvas), so the owl always rendered small
+   and shifted right wherever it's used (analyzing-screen badge, nav mark, favicon) no
+   matter how the surrounding CSS centered the box. Cropped to the artwork's true
+   bounds and re-padded symmetrically into a 373x373 canvas. Also enlarged the
+   pulsing analyzing-screen badge (`StreamingProgress.tsx`: container w-16→w-24, icon
+   w-10→w-16) per Will's request — the ping/pulse animation itself is unchanged, he
+   likes it, just wanted the icon bigger and actually centered.
 
 ### If you see issues and need to revert
 The pre-merge state of `main` was commit `b753647` (tip before this PR). To back out
@@ -58,8 +68,9 @@ the WHOLE merge: `git revert -m 1 3d39dbd` (keeps history, adds a revert commit)
 nothing has been built on top of it yet, `git reset --hard b753647` + force-push (only
 with Will's explicit OK — this rewrites `main`). To back out ONE piece instead of the
 whole merge: `9e49c62` (Gold-label fix), `5307f77` (truncation fix), `618d822` (quote
-attribution) are each self-contained commits — `git revert <sha>` any one of them
-individually. After any revert, remember to Trigger deploy again (see Deployment facts).
+attribution), `dc326a5` (owl icon centering + badge size) are each self-contained
+commits — `git revert <sha>` any one of them individually. After any revert, remember
+to Trigger deploy again (see Deployment facts).
 
 ## Session status (August 26 2026) — post-launch copy tweaks + marketing rundown + Claude-account note
 
