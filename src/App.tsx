@@ -20,8 +20,9 @@ import { SavedReportView } from './components/SavedReportView';
 import { loadAssignments, saveAssignments, loadSettings, saveSettings, loadUser, saveUser, clearUser, AppSettings } from '@/src/lib/storage';
 import { supabaseEnabled, onAuthStateChange, fetchAssignmentsFromCloud, saveAssignmentToCloud, deleteAssignmentFromCloud, signOut, getCredits, Credits, fetchProfileFromCloud, saveProfileToCloud } from '@/src/lib/supabase';
 import { loadProfile, saveProfile, clearProfile, TeacherProfile } from '@/src/lib/profile';
+import { billingEnabled, startCheckout, openBillingPortal, consumeCheckoutReturn } from '@/src/lib/billing';
 import { StandardsManager } from './components/StandardsManager';
-import { Settings, ShieldCheck, Zap, Plus, Trash2 } from 'lucide-react';
+import { Settings, ShieldCheck, Zap, Plus, Trash2, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 
@@ -68,6 +69,52 @@ export default function App() {
   useEffect(() => {
     if (isSettingsOpen && user?.id && supabaseEnabled) getCredits().then(setCredits);
   }, [isSettingsOpen, user?.id]);
+
+  // ---- Stripe billing ------------------------------------------------------
+  // The plan itself is flipped server-side by the webhook; the app only sends
+  // teachers to Stripe and re-reads their balance when they come back.
+  const [billingBusy, setBillingBusy] = useState(false);
+  // Bumped after a confirmed upgrade so the analyzer's own counter re-reads.
+  const [creditsRefreshKey, setCreditsRefreshKey] = useState(0);
+
+  const handleCheckout = useCallback(async (plan: 'monthly' | 'annual') => {
+    setBillingBusy(true);
+    const res = await startCheckout(plan);
+    if (res?.error) { toast.error(res.error); setBillingBusy(false); }
+  }, []);
+
+  const handleManageBilling = useCallback(async () => {
+    setBillingBusy(true);
+    const res = await openBillingPortal();
+    if (res?.error) { toast.error(res.error); setBillingBusy(false); }
+  }, []);
+
+  // Returning from Stripe. The webhook usually lands before the browser does,
+  // but not always — poll briefly rather than showing a teacher who just paid
+  // their old trial counter.
+  useEffect(() => {
+    const outcome = consumeCheckoutReturn();
+    if (!outcome) return;
+    if (outcome === 'cancel') { toast.info('Checkout cancelled — nothing was charged.'); return; }
+    let cancelled = false;
+    (async () => {
+      for (let attempt = 0; attempt < 8 && !cancelled; attempt++) {
+        const c = await getCredits();
+        if (c) setCredits(c);
+        if (c && c.plan !== 'trial') {
+          setCreditsRefreshKey(k => k + 1);
+          toast.success("You're on the Teacher plan — 15 redesigns a month, starting now.", { duration: 8000 });
+          return;
+        }
+        await new Promise(r => setTimeout(r, 1500));
+      }
+      if (!cancelled) {
+        setCreditsRefreshKey(k => k + 1);
+        toast.success('Payment received! Your plan is being activated — refresh in a moment if the counter still says trial.', { duration: 10000 });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const storedUser = loadUser();
@@ -268,6 +315,7 @@ export default function App() {
                 onSave={handleSaveAssignment} onReset={() => setOpenedAssignment(null)}
                 initialText={openedAssignment?.fullText || ''}
                 userId={user?.id || ''}
+                creditsRefreshKey={creditsRefreshKey}
               />
               <section id="how-to-use" className="py-20 md:py-24 px-6 md:px-10 border-t border-border">
                 <div className="max-w-5xl mx-auto space-y-14">
@@ -357,7 +405,15 @@ export default function App() {
           )}
           {viewMode === 'pricing' && (
             <motion.div key="pricing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1">
-              <Pricing onBack={() => setViewMode('studio')} />
+              <Pricing
+                onBack={() => setViewMode('studio')}
+                signedIn={!!user}
+                currentPlan={credits?.plan}
+                onSignUp={() => openLogin('signup')}
+                onCheckout={handleCheckout}
+                onManageBilling={handleManageBilling}
+                busy={billingBusy}
+              />
             </motion.div>
           )}
           {viewMode === 'about' && (
@@ -433,6 +489,11 @@ export default function App() {
                         </p>
                         {credits.plan === 'trial' && (
                           <button onClick={() => { setIsSettingsOpen(false); setViewMode('pricing'); }} className="text-xs font-semibold text-accent hover:underline">See plans</button>
+                        )}
+                        {credits.plan === 'paid' && billingEnabled && (
+                          <button onClick={handleManageBilling} disabled={billingBusy} className="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1 disabled:opacity-50">
+                            <CreditCard className="w-3 h-3" />{billingBusy ? 'Opening…' : 'Manage billing'}
+                          </button>
                         )}
                       </div>
                       <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">

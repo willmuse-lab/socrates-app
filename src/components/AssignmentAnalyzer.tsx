@@ -21,6 +21,7 @@ import { StandardsManager } from './StandardsManager';
 import { LessonPlanPanel } from './LessonPlanPanel';
 import { StandardsDocument, refineAssignment, setUsageUserId } from '@/src/lib/standards';
 import { logClientUsage, getCredits, consumeCredit, supabaseEnabled, Credits } from '@/src/lib/supabase';
+import { billingEnabled, startCheckout } from '@/src/lib/billing';
 import { getTemplatesBySubject } from '@/src/lib/templates';
 
 type FeedbackMap = Record<number, 'up' | 'down' | null>;
@@ -53,11 +54,14 @@ const TIER_LABELS: Record<TierLevel, string> = {
 
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
-  bloomsLevel = 'Analyze', subject = '', gradeLevel = '', teacherName = '', schoolName = '', onSave, onReset, initialText = '', userId = ''
+  bloomsLevel = 'Analyze', subject = '', gradeLevel = '', teacherName = '', schoolName = '', onSave, onReset, initialText = '', userId = '',
+  creditsRefreshKey = 0
 }: {
   defaultPreference?: AIPreference, dimensions?: FrameworkDimension[], activeFramework?: 'triple-a' | 'blooms',
   bloomsLevel?: BloomsLevel, subject?: string, gradeLevel?: string, teacherName?: string, schoolName?: string,
-  onSave?: (assignment: Omit<SavedAssignment, 'id' | 'date'>) => void, onReset?: () => void, initialText?: string, userId?: string
+  onSave?: (assignment: Omit<SavedAssignment, 'id' | 'date'>) => void, onReset?: () => void, initialText?: string, userId?: string,
+  /** Bumped by App after a successful upgrade so the counter re-reads the plan. */
+  creditsRefreshKey?: number
 }) {
   const [text, setText] = useState(initialText);
   const [aiPreference, setAiPreference] = useState<AIPreference>(defaultPreference);
@@ -146,7 +150,8 @@ export function AssignmentAnalyzer({
   const refreshCredits = React.useCallback(async () => {
     if (!gated) { setCredits(null); return; }
     setCredits(await getCredits());
-  }, [gated]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gated, creditsRefreshKey]);
   React.useEffect(() => { refreshCredits(); }, [refreshCredits]);
 
   // ---- Draft autosave ------------------------------------------------------
@@ -337,6 +342,17 @@ export function AssignmentAnalyzer({
     } catch (err: any) {
       toast.error(err?.message || 'Revision failed. Please try again.');
     } finally { setRefining(null); }
+  };
+
+  // Send a walled teacher to Stripe Checkout. Only reachable when billing is
+  // switched on; otherwise the wall keeps its "launching soon" note.
+  const [upgrading, setUpgrading] = useState(false);
+  const handleUpgrade = async () => {
+    setUpgrading(true);
+    const res = await startCheckout('monthly');
+    // On success the browser has already navigated to Stripe; we only get here
+    // when something went wrong.
+    if (res?.error) { toast.error(res.error); setUpgrading(false); }
   };
 
   const handleStrengthen = () => { setActiveLevel('Gold'); suggestionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast.info(`Showing the ${TIER_LABELS.Gold} redesign`); };
@@ -851,17 +867,28 @@ export function AssignmentAnalyzer({
               <p className="text-lg font-bold text-foreground">$9.99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
               <p className="text-xs"><strong className="text-foreground">15 assignment redesigns every month.</strong> Each one includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
             </div>
-            {credits?.plan !== 'paid' && (
+            {credits?.plan !== 'paid' && !billingEnabled && (
               <p className="text-xs bg-secondary/40 border border-border rounded-lg p-3">
                 💌 <strong className="text-foreground">Paid plans are launching soon.</strong> We'll email you the moment they're ready. No need to do anything.
               </p>
             )}
+            {credits?.plan !== 'paid' && billingEnabled && (
+              <p className="text-[11px] text-muted-foreground">Secure checkout by Stripe. Cancel any time from Settings.</p>
+            )}
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1" onClick={() => setShowWall(false)}>Got it</Button>
-              <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
-                onClick={() => { setShowWall(false); toast.success("You're on the list. We'll email you when plans go live."); }}>
-                Notify me
-              </Button>
+              {credits?.plan === 'paid' ? null : billingEnabled ? (
+                <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
+                  disabled={upgrading} onClick={handleUpgrade}>
+                  {upgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  {upgrading ? 'Opening…' : 'Upgrade — $9.99/mo'}
+                </Button>
+              ) : (
+                <Button className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={() => { setShowWall(false); toast.success("You're on the list. We'll email you when plans go live."); }}>
+                  Notify me
+                </Button>
+              )}
             </div>
           </div>
         </DialogContent>

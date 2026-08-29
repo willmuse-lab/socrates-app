@@ -11,6 +11,125 @@ handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versi
 file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
 `SocratesIQ N.md` wins.
 
+## Session status (August 29 2026, later) — Stripe billing BUILT (branch, NOT merged, switched OFF)
+
+Parked task 7 (payments). All of it is on the same branch
+`claude/socrates-handoff-continue-z2f5c7`, and it is **inert until Will does the
+dashboard setup below** — with no Stripe env vars the app behaves exactly as it
+does today ("paid plans launching soon"). Nothing about the existing plan model
+changed: trial = 2 lifetime, paid = 15/month, unlimited = comped.
+
+⚠️ **Before charging real money:** the ToS still needs the lawyer review noted in
+parked task 7, and Stripe will ask for business details during activation. Test
+mode needs neither — do the whole walkthrough in test mode first.
+
+### How it works (three functions, one webhook)
+- `netlify/functions/billing-checkout.ts` → `POST /api/billing/checkout`
+  `{plan:"monthly"|"annual"}` with the teacher's Supabase access token. Verifies
+  that token with Supabase (so a forged id can't buy for someone else), then
+  returns a **hosted Stripe Checkout** URL. No card form and no card data ever
+  touches this app.
+- `netlify/functions/billing-portal.ts` → `POST /api/billing/portal`. Stripe's
+  Customer Portal: update card, invoices, cancel.
+- `netlify/functions/stripe-webhook.ts` → `POST /api/stripe/webhook`. **The only
+  thing that changes a teacher's plan.** Verifies Stripe's signature on the RAW
+  body, then: `checkout.session.completed` → plan='paid', used=0;
+  `invoice.paid` (renewal) → used=0, new period; `customer.subscription.deleted`
+  → back to 'trial'; `invoice.payment_failed` / `past_due` → keep access while
+  Stripe retries the card (losing the tool mid-lesson over a temporary decline is
+  the wrong call). Answers 500 on an internal error so Stripe RETRIES — a dropped
+  event would strand a paying teacher behind the wall.
+- Two rules live in `_shared/billing.ts` and nowhere else: a **'unlimited'
+  (comped) account is never demoted** by any Stripe event, and a **downgrade never
+  resets `used`** (otherwise cancel + re-subscribe farms free redesigns).
+- The webhook writes with the **service-role key**, because teachers have
+  SELECT-only RLS on `user_credits` — they still cannot upgrade themselves.
+
+### Front end
+- `src/lib/billing.ts` — `startCheckout()`, `openBillingPortal()`,
+  `consumeCheckoutReturn()`. `billingEnabled` = `VITE_BILLING_ENABLED === 'true'`
+  AND Supabase configured. **This is the master switch.**
+- Pricing page Teacher CTA now has five states: comped → "Your account is comped";
+  paid → "Manage billing"; billing off → "Launching soon" (disabled, today's
+  behaviour); signed out → "Get started" → sign-up; otherwise → Stripe Checkout at
+  whichever of monthly/annual the toggle is on.
+- The out-of-credits wall gets an "Upgrade — $9.99/mo" button (replacing "Notify
+  me") only when billing is on.
+- Settings → the allowance card gets "Manage billing" for paid teachers.
+- Returning from Stripe, `?checkout=success` polls the balance for ~12s (the
+  webhook usually lands first, but not always) then confirms with a toast; the
+  analyzer's counter is re-read via a new `creditsRefreshKey` prop.
+
+### WILL'S STRIPE STEPS — do these IN TEST MODE FIRST (one at a time)
+1. **Create the account.** stripe.com → sign up as **will@socratesiq.com**
+   (the business account, per the account-migration note above). Keep the
+   **Test mode** toggle ON, top right, for everything below.
+2. **Make the product.** Product catalogue → Add product → name `SocratesIQ
+   Teacher`. Add TWO recurring prices on that one product: **$9.99 USD monthly**
+   and **$99.99 USD yearly**. Copy both price ids (they look like
+   `price_1ABC...`) — NOT the product id (`prod_...`).
+3. **Get the secret key.** Developers → API keys → Secret key → Reveal → copy
+   (`sk_test_...`). This is a password: paste it into Netlify, nowhere else.
+4. **Turn on the Customer Portal.** Settings → Billing → Customer portal → allow
+   "cancel subscription" and "update payment method" → **Save**. Skipping this is
+   the #1 cause of "Manage billing" failing later. (It must be saved separately
+   in test mode and in live mode.)
+5. **Netlify env vars** (Site configuration → Environment variables → all
+   contexts). Mark the first two **secret**:
+   `STRIPE_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (Supabase → Settings → API →
+   `service_role` — NEVER prefix it with VITE_, that would publish it in the
+   browser bundle), `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_ANNUAL`, and
+   `VITE_BILLING_ENABLED` = `true`.
+6. **Run the SQL.** Supabase → SQL Editor → New query → paste + run
+   `supabase/migration-stripe.sql`. Expect "Success. No rows returned." (Adds the
+   Stripe columns to `user_credits` plus a `metrics_subscriptions` view.)
+7. **Deploy**, then **add the webhook**: Stripe → Developers → Webhooks → Add
+   endpoint → URL `https://socratesiq.com/api/stripe/webhook` (or the
+   netlify.app address) → select events: `checkout.session.completed`,
+   `customer.subscription.created`, `customer.subscription.updated`,
+   `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed` →
+   Add. Copy its **Signing secret** (`whsec_...`) into Netlify as
+   `STRIPE_WEBHOOK_SECRET`, then **trigger another deploy** (env changes only take
+   effect on a new build).
+8. **Test end to end** with Stripe's test card `4242 4242 4242 4242`, any future
+   expiry, any CVC, any ZIP: sign in as a trial teacher → Pricing → Get the
+   monthly plan → pay → you should land back on the site with "You're on the
+   Teacher plan" and the counter reading 15. Check Supabase →
+   `select * from metrics_subscriptions;`. Then cancel from Settings → Manage
+   billing and confirm the account drops back to trial at period end.
+9. **Going live** (only after the ToS review): Stripe → activate the account
+   (business details, bank account) → flip OFF test mode → **redo steps 2, 3, 4
+   and 7 in live mode** (live prices, `sk_live_...`, portal save, a live webhook
+   endpoint with its own `whsec_...`) → update the Netlify vars → deploy.
+   Test-mode ids do not work in live mode and vice versa.
+
+### Verified this session
+`npx tsc --noEmit` and `npx vite build` clean; all three functions bundle with
+esbuild. Two hermetic test suites were run against the real handlers with the
+Stripe SDK's own signature generator and an in-memory stand-in for Supabase:
+- webhook (9 scenarios): forged signature rejected with 400 and no write;
+  checkout completion upgrades and stores the customer/subscription ids; a
+  replayed event (Stripe retries) is a no-op; a failed payment keeps access;
+  cancel-at-period-end keeps them paid; renewal resets the month; a real deletion
+  drops to trial WITHOUT resetting `used`; a comped account survives a
+  cancellation; an unknown customer is ignored, not crashed.
+- checkout/portal (7 scenarios): no token and forged token both 401 with Stripe
+  never called; monthly and annual map to the right price ids; the session is
+  tied to the Supabase account; **a hostile `Origin` header cannot redirect the
+  teacher off-site** (deploy-preview origins are still allowed back to
+  themselves); a returning subscriber reuses their Stripe customer; the portal
+  404s for someone who never subscribed.
+Also drove the Pricing CTA in headless Chromium through all five states plus the
+billing-off "Launching soon" fallback.
+
+### Not done / decisions left
+- **School & District plans stay "Contact us"** — no Stripe prices for them.
+- No proration/upgrade path between monthly and annual: a teacher switches by
+  cancelling and re-subscribing, or Will does it from the Stripe dashboard.
+- Stripe Tax is OFF. Turn it on in the dashboard if sales tax becomes a question.
+- Dunning emails (failed-card reminders) are Stripe's own — enable them in
+  Settings → Billing → Subscriptions and emails.
+
 ## Session status (August 29 2026) — redesign version history (branch, NOT merged)
 
 Picked up the top of the parked backlog (task 0, requested July 13 2026):
@@ -591,6 +710,10 @@ EMPTY (no uploaded papers) so research size is not the bottleneck.
 - Env vars on brilliant-mandazi: `ANTHROPIC_API_KEY` (secret, all contexts),
   `VITE_SUPABASE_URL` = https://llvtiuhtjpprtwlvnauu.supabase.co,
   `VITE_SUPABASE_ANON_KEY`. VITE_ vars bake at build time → redeploy after changes.
+  Stripe adds five more once billing is switched on (`STRIPE_SECRET_KEY`,
+  `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_ANNUAL`,
+  `SUPABASE_SERVICE_ROLE_KEY` — the first two and the service-role key marked
+  SECRET) plus `VITE_BILLING_ENABLED`. See the Aug 29 Stripe block.
 
 ## Branch state
 
@@ -1142,12 +1265,12 @@ is future work.
 5. Unlink the stale `musesocrates` Netlify site.
 6. Custom domain (he wanted "socrates.ai.com" — explained invalid; choose
    socrates.ai (~$70-100/yr) vs socratesai.com (~$12/yr); not decided).
-7. Payments (Stripe) when ready to charge; ToS page exists but needs lawyer
-   review before charging. NOTE (July 20 2026): the credit/allowance system it
-   plugs into is now BUILT (see "Assignment credits" section) — trial=3, paid=20/
-   mo. Stripe's job is just: on successful checkout, flip the teacher's
-   user_credits row to plan='paid' (a webhook, or a Netlify function calling the
-   same update statement). The wall + counter + monthly reset already exist.
+7. ~~Payments (Stripe)~~ BUILT Aug 29 2026 on
+   `claude/socrates-handoff-continue-z2f5c7` — hosted Checkout + webhook +
+   customer portal, switched OFF until Will does the dashboard setup (full
+   walkthrough in the Aug 29 Stripe block at the top). STILL BLOCKING before
+   charging real money: the **ToS needs the lawyer review**, and Stripe account
+   activation needs business/bank details. Test mode needs neither.
 8. Admin password is a soft gate (VITE_ADMIN_PASSWORD, default socrates2025,
    visible in bundle — known limitation).
 9. Four-role buyer review exercise (teacher/principal/head/acquirer) was

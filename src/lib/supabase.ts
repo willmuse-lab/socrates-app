@@ -122,6 +122,20 @@ export async function signOut() {
   await sb.auth.signOut();
 }
 
+/**
+ * The current session's access token, for calling our own Netlify functions on
+ * behalf of the signed-in teacher (billing). The functions verify it with
+ * Supabase, so it is proof of identity, not a hint.
+ */
+export async function getAccessToken(): Promise<string | null> {
+  try {
+    const sb = await getClient();
+    if (!sb) return null;
+    const { data } = await sb.auth.getSession();
+    return data?.session?.access_token ?? null;
+  } catch { return null; }
+}
+
 export async function onAuthStateChange(callback: (user: any, event?: string) => void) {
   const sb = await getClient();
   if (!sb) return () => {};
