@@ -136,12 +136,17 @@ export function ScoringPage({ onBack }: PageProps) {
   );
 }
 
+// Hardcoded for the same reason as TERMS_LAST_UPDATED below: a rendered
+// `new Date()` always printed the current month, so the page could never show
+// when the policy actually changed. Bump by hand with any substantive edit.
+const PRIVACY_LAST_UPDATED = 'May 31, 2026';
+
 export function PrivacyPage({ onBack }: PageProps) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-12">
       <BackLink onBack={onBack} />
       <PageHeader eyebrow="Privacy & security" title="Data privacy and security">
-        Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+        Last updated: {PRIVACY_LAST_UPDATED}
       </PageHeader>
       <ProseSections sections={[
         { title: 'What data we collect', content: 'We collect the minimum necessary: your name and email address, assignment text you submit for analysis, your saved assignments and analysis results, and basic usage metadata.\n\nWe do NOT collect student names, student work, grades, or any personally identifiable student information.' },
@@ -188,12 +193,18 @@ export function FeedbackPage({ onBack }: PageProps) {
   );
 }
 
+// Hardcoded on purpose. This used to render `new Date()`, so it always printed
+// the CURRENT month -- the page could never show when the terms actually
+// changed, and section 12 promises this date moves when they do. Bump it by
+// hand with any substantive edit to the text below.
+const TERMS_LAST_UPDATED = 'May 31, 2026';
+
 export function TermsPage({ onBack }: PageProps) {
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl mx-auto p-6 md:p-10 space-y-12">
       <BackLink onBack={onBack} />
       <PageHeader eyebrow="Terms of service" title="Terms of service">
-        Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+        Last updated: {TERMS_LAST_UPDATED}
       </PageHeader>
       <ProseSections sections={[
         { title: '1. Agreement to these terms', content: 'These Terms of Service ("Terms") govern your access to and use of SocratesIQ ("the Service"), operated by SocratesIQ ("we," "us"). By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.' },
