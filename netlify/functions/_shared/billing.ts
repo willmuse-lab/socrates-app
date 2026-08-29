@@ -120,7 +120,12 @@ export async function updateCredits(userId: string, patch: Record<string, any>):
   // Upsert, because a teacher who has never analysed anything has no row yet
   // (get_assignment_credits creates it lazily) and can still buy a plan.
   const { error } = await sb.from("user_credits").upsert(row, { onConflict: "user_id" });
-  if (error) console.error("billing: credits update failed", error.message);
+  // THROW, don't just log. A swallowed failure here means a teacher paid and
+  // silently stayed on the trial wall. Throwing makes the webhook answer 500,
+  // which shows up in Stripe's dashboard and gets retried for up to 3 days --
+  // so a payment taken before migration-stripe.sql was run still lands once
+  // the columns exist.
+  if (error) throw new Error(`credits update failed: ${error.message}`);
 }
 
 /** ISO timestamp from a Stripe unix seconds field, or null. */

@@ -83,6 +83,10 @@ mode needs neither — do the whole walkthrough in test mode first.
 6. **Run the SQL.** Supabase → SQL Editor → New query → paste + run
    `supabase/migration-stripe.sql`. Expect "Success. No rows returned." (Adds the
    Stripe columns to `user_credits` plus a `metrics_subscriptions` view.)
+   Must happen BEFORE the first test payment: without those columns the webhook's
+   write fails. It answers 500 in that case, so Stripe keeps retrying for ~3 days
+   and the upgrade lands once the SQL is run — but the teacher sits behind the
+   wall until then, and the failures show up red in Stripe → Webhooks.
 7. **Deploy**, then **add the webhook**: Stripe → Developers → Webhooks → Add
    endpoint → URL `https://socratesiq.com/api/stripe/webhook` (or the
    netlify.app address) → select events: `checkout.session.completed`,
