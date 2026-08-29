@@ -25,6 +25,12 @@ import { getTemplatesBySubject } from '@/src/lib/templates';
 
 type FeedbackMap = Record<number, 'up' | 'down' | null>;
 
+// One entry in a redesign's version chain (see "Redesign version history"
+// below). `note` carries the revise instruction that produced the version, so
+// two revisions of the same redesign are tellable apart at a glance.
+type RedesignVersion = { text: string; kind: 'original' | 'revision' | 'edit'; note?: string };
+const versionLabel = (i: number) => (i === 0 ? 'Original' : `Rev ${i}`);
+
 // Display names for the three AI strategies (renamed July 12 2026 — the
 // internal keys 'avoid'/'augment'/'embrace' are unchanged everywhere).
 const STRATEGY_LABELS: Record<AIPreference, string> = {
@@ -71,6 +77,55 @@ export function AssignmentAnalyzer({
   const [editedTexts, setEditedTexts] = useState<Record<number, string>>({});
   const [refineInputs, setRefineInputs] = useState<Record<number, string>>({});
   const [refining, setRefining] = useState<number | null>(null);
+
+  // ---- Redesign version history --------------------------------------------
+  // Revising used to OVERWRITE the redesign, so an earlier take was gone for
+  // good. Each redesign now keeps a chain: entry 0 is the model's original
+  // text, every later entry an AI revision or a banked inline edit. The
+  // selected version is mirrored into editedTexts[i] — what the preview,
+  // downloads, lesson plan and Apply/re-analysis already read — so nothing
+  // downstream had to change. Session-only: the chain rides along in the local
+  // draft autosave and is not stored server-side.
+  const [versions, setVersions] = useState<Record<number, RedesignVersion[]>>({});
+  // Which version is on screen. Missing or -1 means "follow the latest", so a
+  // new revision shows up without a second state write racing the first.
+  const [activeVersion, setActiveVersion] = useState<Record<number, number>>({});
+  const [comparing, setComparing] = useState<number | null>(null);
+  const [compareWith, setCompareWith] = useState<Record<number, number>>({});
+
+  const chainOf = (i: number, original: string): RedesignVersion[] =>
+    versions[i]?.length ? versions[i] : [{ text: original, kind: 'original' }];
+  const activeIdxOf = (i: number, chain: RedesignVersion[]) => {
+    const v = activeVersion[i];
+    return v == null || v < 0 || v >= chain.length ? chain.length - 1 : v;
+  };
+  const addVersion = (i: number, original: string, text: string, kind: RedesignVersion['kind'], note?: string) => {
+    setVersions(prev => {
+      const chain = prev[i]?.length ? prev[i] : [{ text: original, kind: 'original' as const }];
+      return { ...prev, [i]: [...chain, { text, kind, note }] };
+    });
+    setActiveVersion(prev => ({ ...prev, [i]: -1 }));
+    setEditedTexts(prev => ({ ...prev, [i]: text }));
+  };
+  const selectVersion = (i: number, vi: number, chain: RedesignVersion[]) => {
+    setActiveVersion(prev => ({ ...prev, [i]: vi }));
+    setEditedTexts(prev => ({ ...prev, [i]: chain[vi].text }));
+  };
+  // Typing inline updates editedTexts live (so the preview and downloads stay
+  // truthful); closing the editor banks that text as its own version.
+  const toggleInlineEdit = (i: number, original: string) => {
+    if (editingIndex !== i) { setEditingIndex(i); return; }
+    const chain = chainOf(i, original);
+    const current = editedTexts[i] ?? original;
+    if (current.trim() && current !== chain[activeIdxOf(i, chain)].text) addVersion(i, original, current, 'edit');
+    setEditingIndex(null);
+  };
+  // A fresh analysis replaces the suggestions, so edits and history from the
+  // previous run no longer refer to anything on screen.
+  const resetVersionState = () => {
+    setEditedTexts({}); setVersions({}); setActiveVersion({});
+    setCompareWith({}); setComparing(null); setEditingIndex(null); setRefineInputs({});
+  };
   // Holds the analysis of the ORIGINAL assignment when a redesign is applied,
   // so the next analysis can show the before→after "transformation" jump.
   const [previousResult, setPreviousResult] = useState<AnalysisResult | null>(null);
@@ -120,6 +175,8 @@ export function AssignmentAnalyzer({
           if (typeof d.text === 'string') setText(d.text);
           if (d.result) { setResult(d.result); lastChargedRef.current = (d.text || '').trim().slice(0, 120); }
           if (d.editedTexts) setEditedTexts(d.editedTexts);
+          if (d.versions) setVersions(d.versions);
+          if (d.activeVersion) setActiveVersion(d.activeVersion);
           if (d.activeLevel) setActiveLevel(d.activeLevel);
           if (d.aiPreference) setAiPreference(d.aiPreference);
           if (d.previousResult) setPreviousResult(d.previousResult);
@@ -144,14 +201,14 @@ export function AssignmentAnalyzer({
       try {
         const savedAt = Date.now();
         localStorage.setItem(DRAFT_KEY, JSON.stringify({
-          text, result, editedTexts, activeLevel, aiPreference, previousResult,
-          lessonPlan, studentDirections, savedAt,
+          text, result, editedTexts, versions, activeVersion, activeLevel, aiPreference,
+          previousResult, lessonPlan, studentDirections, savedAt,
         }));
         setDraftSavedAt(savedAt);
       } catch {}
     }, 800);
     return () => clearTimeout(id);
-  }, [text, result, editedTexts, activeLevel, aiPreference, previousResult, lessonPlan, studentDirections]);
+  }, [text, result, editedTexts, versions, activeVersion, activeLevel, aiPreference, previousResult, lessonPlan, studentDirections]);
 
   const getChangeSummary = (original: string, modified: string): string[] => {
     const origSentences = original.match(/[^.!?]+[.!?]+/g) || original.split('\n').filter(Boolean);
@@ -163,7 +220,7 @@ export function AssignmentAnalyzer({
   // Make the signed-in id available to generate-usage logging (metadata only).
   React.useEffect(() => { setUsageUserId(userId || null); }, [userId]);
   React.useEffect(() => { if (!text && !result) setAiPreference(defaultPreference); }, [defaultPreference]);
-  React.useEffect(() => { if (initialText) { setText(initialText); setResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; } }, [initialText]);
+  React.useEffect(() => { if (initialText) { setText(initialText); setResult(null); setLessonPlan(null); setStudentDirections(null); resetVersionState(); lastChargedRef.current = ''; } }, [initialText]);
 
   // overrideText lets callers analyze text that was JUST set in state (React
   // state updates land asynchronously, so reading `text` right after setText
@@ -191,7 +248,7 @@ export function AssignmentAnalyzer({
       setProgressStage('Reading your assignment...'); setProgressPercent(5);
       const analysis = await analyzeAssignment(input, aiPreference, dimensions, activeFramework, bloomsLevel, subject, gradeLevel,
         (stage, pct) => { setProgressStage(stage); setProgressPercent(pct); }, userId);
-      setResult(analysis); setActiveLevel('Bronze');
+      setResult(analysis); setActiveLevel('Bronze'); resetVersionState();
     } catch (error: any) {
       console.error('Analysis failed:', error);
       toast.error(error?.message || 'Failed to analyze assignment. Please try again.', { duration: 12000 });
@@ -261,19 +318,22 @@ export function AssignmentAnalyzer({
   };
 
   // "Anything you'd like to change?" — revise the selected redesign via AI
-  // BEFORE the lesson plan is generated. The revision lands in editedTexts, so
-  // it flows into the display, downloads, lesson plan, and re-analysis.
+  // BEFORE the lesson plan is generated. The revision is APPENDED to the
+  // redesign's version chain and selected, so it flows into the display,
+  // downloads, lesson plan and re-analysis while the earlier takes stay one
+  // click away.
   const handleRefine = async (i: number) => {
     if (!result) return;
     const instruction = (refineInputs[i] ?? '').trim();
     if (!instruction) return;
     setRefining(i);
     try {
-      const current = editedTexts[i] ?? result.suggestions[i].modifiedAssignment;
+      const original = result.suggestions[i].modifiedAssignment;
+      const current = editedTexts[i] ?? original;
       const revised = await refineAssignment(current, instruction, subject, gradeLevel);
-      setEditedTexts(prev => ({ ...prev, [i]: revised }));
+      addVersion(i, original, revised, 'revision', instruction);
       setRefineInputs(prev => ({ ...prev, [i]: '' }));
-      toast.success('Revised! The updated version is shown. Revise again or continue to the lesson plan.');
+      toast.success('Revised! Saved as a new version — earlier versions are still one click away.');
     } catch (err: any) {
       toast.error(err?.message || 'Revision failed. Please try again.');
     } finally { setRefining(null); }
@@ -292,7 +352,7 @@ export function AssignmentAnalyzer({
     });
     toast.success('Assignment saved to your library!');
   };
-  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); lastChargedRef.current = ''; clearDraft(); onReset?.(); };
+  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); resetVersionState(); lastChargedRef.current = ''; clearDraft(); onReset?.(); };
 
   // Which dimensions improved between the original and the redesigned analysis.
   const improvedDimensions = (): string[] => {
@@ -539,7 +599,15 @@ export function AssignmentAnalyzer({
                   <TabsTrigger value="Silver" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">{TIER_LABELS.Silver}</TabsTrigger>
                   <TabsTrigger value="Gold" className="text-xs font-semibold data-[state=active]:bg-card data-[state=active]:shadow-sm">{TIER_LABELS.Gold}</TabsTrigger>
                 </TabsList>
-                {result.suggestions.map((suggestion, i) => (
+                {result.suggestions.map((suggestion, i) => {
+                  const original = suggestion.modifiedAssignment;
+                  const chain = chainOf(i, original);
+                  const vIdx = activeIdxOf(i, chain);
+                  // While the inline editor is open, editedTexts holds keystrokes
+                  // that are not a version yet — show those, not the banked text.
+                  const shown = editedTexts[i] ?? original;
+                  const compareIdx = Math.min(compareWith[i] ?? Math.max(0, vIdx - 1), chain.length - 1);
+                  return (
                   <TabsContent key={i} value={suggestion.level} className="mt-6 space-y-6">
                     <div className="space-y-1">
                       <div className="flex items-center justify-between gap-3">
@@ -547,33 +615,72 @@ export function AssignmentAnalyzer({
                         {typeof suggestion.estimatedScore === 'number' && (
                           <span className="text-right shrink-0">
                             <span className={`block text-xl font-bold leading-none ${estScoreColor(suggestion.estimatedScore)}`}>~{suggestion.estimatedScore}</span>
-                            <span className="block text-[9px] uppercase tracking-wider text-muted-foreground">Est. if re-analyzed</span>
+                            {/* The estimate came from the call that wrote the ORIGINAL
+                                redesign, so say so once a later version is on screen. */}
+                            <span className="block text-[9px] uppercase tracking-wider text-muted-foreground">{vIdx === 0 ? 'Est. if re-analyzed' : 'Est. for Original'}</span>
                           </span>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">{suggestion.description}</p>
                       {suggestion.strengthens && <p className="text-[11px] font-bold uppercase tracking-wider text-accent mt-1">Strengthens: {suggestion.strengthens}</p>}
                     </div>
-                    <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{editedTexts[i] ?? suggestion.modifiedAssignment}</div>
-                    {editedTexts[i] != null && editedTexts[i] !== suggestion.modifiedAssignment && (
-                      <p className="text-[10px] text-muted-foreground italic -mt-4">✏️ Showing your revised version. Downloads and the lesson plan will use it.</p>
+                    <div className="bg-secondary/30 p-6 md:p-8 rounded-xl font-sans text-base leading-relaxed whitespace-pre-wrap border border-border/50 max-h-[400px] overflow-y-auto text-foreground/80">{shown}</div>
+                    {chain.length > 1 && (
+                      <div className="space-y-2 -mt-4">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-1">Versions:</span>
+                          {chain.map((v, vi) => (
+                            <button key={vi} onClick={() => selectVersion(i, vi, chain)}
+                              title={v.note ? `Revised: “${v.note}”` : vi === 0 ? 'The original redesign' : 'Your inline edit'}
+                              className={`h-7 px-2.5 rounded-full border text-[11px] font-semibold transition-colors ${vi === vIdx ? 'bg-accent text-white border-accent' : 'bg-background text-muted-foreground border-border hover:text-foreground hover:border-accent/50'}`}>
+                              {versionLabel(vi)}{v.kind === 'edit' ? ' ✏️' : ''}
+                            </button>
+                          ))}
+                          <button onClick={() => setComparing(comparing === i ? null : i)}
+                            className="h-7 px-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-accent">
+                            {comparing === i ? 'Hide compare' : 'Compare'}
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground italic">
+                          Showing {versionLabel(vIdx)}{chain[vIdx].note ? ` — “${chain[vIdx].note}”` : ''}. Downloads, the lesson plan and Apply use the version you pick here.
+                        </p>
+                      </div>
+                    )}
+                    {chain.length === 1 && shown !== original && (
+                      <p className="text-[10px] text-muted-foreground italic -mt-4">✏️ Showing your edit. Downloads and the lesson plan will use it.</p>
+                    )}
+                    {comparing === i && chain.length > 1 && (
+                      <div className="space-y-3 rounded-xl border border-border/50 p-4 -mt-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <select value={compareIdx} onChange={e => setCompareWith(prev => ({ ...prev, [i]: Number(e.target.value) }))}
+                            className="h-7 text-[11px] px-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-accent">
+                            {chain.map((_, vi) => <option key={vi} value={vi}>{versionLabel(vi)}</option>)}
+                          </select>
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">compared with</span>
+                          <span className="text-[11px] font-semibold text-accent">{versionLabel(vIdx)} (showing)</span>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          <div className="bg-secondary/20 border border-border/40 p-4 rounded-lg text-xs leading-relaxed whitespace-pre-wrap max-h-[280px] overflow-y-auto text-foreground/70">{chain[compareIdx].text}</div>
+                          <div className="bg-secondary/30 border border-accent/30 p-4 rounded-lg text-xs leading-relaxed whitespace-pre-wrap max-h-[280px] overflow-y-auto text-foreground/80">{chain[vIdx].text}</div>
+                        </div>
+                      </div>
                     )}
                     {editingIndex === i && (
                       <div className="space-y-2">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Edit directly:</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">Edit directly (saved as a new version when you're done):</p>
                         <textarea className="w-full min-h-[180px] text-sm leading-relaxed p-4 border border-accent/30 rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-accent resize-y"
-                          value={editedTexts[i] ?? suggestion.modifiedAssignment}
+                          value={shown}
                           onChange={e => setEditedTexts(prev => ({ ...prev, [i]: e.target.value }))} />
                       </div>
                     )}
                     <div className="flex flex-wrap items-center gap-3">
-                      <Button variant="outline" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5" onClick={() => copyToClipboard(editedTexts[i] ?? suggestion.modifiedAssignment, i)}>
+                      <Button variant="outline" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5" onClick={() => copyToClipboard(shown, i)}>
                         {copiedIndex === i ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}{copiedIndex === i ? 'Copied' : 'Copy'}
                       </Button>
-                      <Button variant="default" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5 bg-accent text-white hover:bg-accent/90" onClick={() => applyVersion(editedTexts[i] ?? suggestion.modifiedAssignment, i)}>
+                      <Button variant="default" size="sm" className="h-9 text-xs font-bold uppercase tracking-wider gap-1.5 bg-accent text-white hover:bg-accent/90" onClick={() => applyVersion(shown, i)}>
                         <Replace className="w-3.5 h-3.5" />Apply This Version
                       </Button>
-                      <Button variant="ghost" size="sm" className="h-9 text-xs gap-1.5 text-muted-foreground hover:text-foreground" onClick={() => setEditingIndex(editingIndex === i ? null : i)}>
+                      <Button variant="ghost" size="sm" className="h-9 text-xs gap-1.5 text-muted-foreground hover:text-foreground" onClick={() => toggleInlineEdit(i, original)}>
                         ✏️ {editingIndex === i ? 'Done' : 'Edit inline'}
                       </Button>
                       <div className="ml-auto flex items-center gap-1">
@@ -609,7 +716,8 @@ export function AssignmentAnalyzer({
                       )}
                     </div>
                   </TabsContent>
-                ))}
+                  );
+                })}
               </Tabs>
             </Card>
             {(() => {

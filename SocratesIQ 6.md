@@ -1,15 +1,67 @@
 # SocratesIQ 5: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: August 28 2026.
+session. Read this whole file before making changes. Last updated: August 29 2026.
 
-**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 5.md`
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 6.md`
 now, and the number bumps by one on every update (next update renames it to
-`SocratesIQ 6.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ 7.md`, and so on). To continue in a new session, read the HIGHEST-numbered
 `SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
 handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versioned
 file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
 `SocratesIQ N.md` wins.
+
+## Session status (August 29 2026) — redesign version history (branch, NOT merged)
+
+Picked up the top of the parked backlog (task 0, requested July 13 2026):
+**version history in the Revise box**. On branch
+`claude/socrates-handoff-continue-z2f5c7`, one commit, NOT merged — needs Will's
+look on the Deploy Preview first (previews auto-build; `main` does not).
+
+### What changed
+`src/components/AssignmentAnalyzer.tsx` only — no API, no DB, no prompt changes.
+- Each redesign now keeps a **version chain**: entry 0 is the model's original
+  text, every later entry is either an AI revision or a banked inline edit.
+  Chips (`Original` `Rev 1` `Rev 2` …) render above the redesign body once there
+  is more than one; clicking one shows it.
+- **Revise APPENDS instead of overwriting.** Before, `handleRefine` wrote
+  straight into `editedTexts[i]` and the previous text was gone; now it appends
+  and selects. The revise instruction is stored on the version and shown under
+  the chips ("Showing Rev 1 — "make it a group project"") and as the chip's
+  tooltip, so two revisions are tellable apart.
+- **Inline edit banks a version.** Typing still updates the live preview
+  keystroke by keystroke; clicking Done adds it to the chain as `Rev N ✏️`.
+- **Compare**: a `Compare` toggle opens a two-column side-by-side — a dropdown
+  picks the left version, the right is whatever is selected.
+- **The selected version is the one that counts.** Implementation keeps
+  `editedTexts[i]` as the single source of truth (selecting a version mirrors its
+  text into it), so downloads, the lesson plan, Copy, and Apply This Version /
+  re-analysis all picked this up with no changes of their own.
+- The `~NN Est. if re-analyzed` badge now reads **`Est. for Original`** when a
+  later version is on screen — that number came from the call that wrote the
+  original redesign and does not describe a revision.
+- History rides along in the existing local **draft autosave** (`siq_draft_v1`),
+  so a reload restores the chain. Nothing extra is stored server-side and the
+  library snapshot is unchanged — matches "all in-browser for the session".
+- **Fixed a latent leak while in there:** `editedTexts` was never cleared when a
+  NEW analysis came back, so a previous assignment's edited text could render
+  over a fresh redesign. Now cleared (with the new history state) on a new
+  analysis, on New Assignment, and when the parent hands in a library item.
+
+### Verified
+`npx tsc --noEmit` clean, `npx vite build` clean. Drove the real component in
+headless Chromium against a stubbed `/api/analyze` + `/api/generate`: analyze →
+revise ×2 → chips `Original / Rev 1 / Rev 2` → click back to `Original` (text
+reverts, badge label flips back) → Compare dropdown lists all three → inline edit
+→ `Rev 3 ✏️` → reload restores the chain from the draft. No console errors. The
+chain is per-redesign (switching Quick Fix / Rebuild / Reinvent does not leak
+versions between tiers).
+
+### Next
+1. Will: open the branch's Deploy Preview, try Revise twice on a real
+   assignment, then say merge or change.
+2. Still pending from Aug 26/28 and NOT done here: **trigger a Netlify deploy of
+   `main`** (auto-deploy does not fire) so the already-merged copy/fix work is live.
 
 ## Session status (August 28 2026) — PR #11 (EPOCH) MERGED to main, with 3 fixes found while testing
 
@@ -1056,8 +1108,11 @@ is future work.
 
 ## Parked tasks (Will's backlog, roughly by priority)
 
-0. **Redesign version history in the "Revise" box (requested July 13 2026).**
-   Today the Revise box under each redesign OVERWRITES the current version
+0. ~~**Redesign version history in the "Revise" box**~~ BUILT Aug 29 2026 on
+   `claude/socrates-handoff-continue-z2f5c7` (chips + compare + inline-edit
+   versions; see the Aug 29 block at the top) — awaiting Will's preview test and
+   merge. Original ask, for reference:
+   Before, the Revise box under each redesign OVERWROTE the current version
    (handleRefine sets editedTexts[i]); no history, no compare, no undo. Build:
    keep a running list of versions per redesign (Original → Rev 1 → Rev 2…),
    each Revise ADDS a version instead of overwriting; teacher clicks chips (or
