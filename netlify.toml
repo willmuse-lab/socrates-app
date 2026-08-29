@@ -5,7 +5,7 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["@anthropic-ai/sdk", "@supabase/supabase-js"]
+  external_node_modules = ["@anthropic-ai/sdk", "@supabase/supabase-js", "stripe"]
 
 [[redirects]]
   from = "/api/auth/google/url"
@@ -40,6 +40,22 @@
 [[redirects]]
   from = "/api/generate"
   to = "/.netlify/functions/generate"
+  status = 200
+
+# Stripe billing. The webhook is called by Stripe itself, not the browser.
+[[redirects]]
+  from = "/api/billing/checkout"
+  to = "/.netlify/functions/billing-checkout"
+  status = 200
+
+[[redirects]]
+  from = "/api/billing/portal"
+  to = "/.netlify/functions/billing-portal"
+  status = 200
+
+[[redirects]]
+  from = "/api/stripe/webhook"
+  to = "/.netlify/functions/stripe-webhook"
   status = 200
 
 [[redirects]]

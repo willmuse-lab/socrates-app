@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
-import { Check, X, ArrowRight, Zap, Mail } from 'lucide-react';
+import { Check, X, ArrowRight, Zap, Mail, Loader2, CreditCard } from 'lucide-react';
+import { billingEnabled } from '@/src/lib/billing';
 
-interface PricingProps { onBack: () => void; }
+interface PricingProps {
+  onBack: () => void;
+  /** Signed out: the CTA sends them to sign-up instead of Stripe. */
+  signedIn?: boolean;
+  /** 'trial' | 'paid' | 'unlimited' — what the teacher is on right now. */
+  currentPlan?: string;
+  onSignUp?: () => void;
+  onCheckout?: (plan: 'monthly' | 'annual') => void;
+  onManageBilling?: () => void;
+  busy?: boolean;
+}
 
 const CONTACT_MAILTO = 'mailto:hello@socratesiq.com?subject=SocratesIQ%20school%20%2F%20district%20pricing';
 
-export function Pricing({ onBack }: PricingProps) {
+export function Pricing({ onBack, signedIn = false, currentPlan, onSignUp, onCheckout, onManageBilling, busy = false }: PricingProps) {
   const [billing, setBilling] = useState<'annual' | 'monthly'>('annual');
 
   const teacherMonthly = 9.99;
@@ -46,7 +57,29 @@ export function Pricing({ onBack }: PricingProps) {
             <p className="text-sm font-semibold text-foreground pt-1">15 assignment redesigns every month.</p>
             <p className="text-xs text-muted-foreground">Each includes unlimited revisions, a lesson plan, student directions, and downloads.</p>
           </div>
-          <Button className="w-full gap-2 font-bold bg-accent hover:bg-accent/90">Get started <ArrowRight className="w-4 h-4" /></Button>
+          {/* One button, four states: comped accounts have nothing to buy, paid
+              teachers get their billing portal, signed-out visitors sign up
+              first, and everyone else goes to Stripe Checkout. With billing
+              switched off (VITE_BILLING_ENABLED unset) it stays the honest
+              "launching soon" note it has always been. */}
+          {currentPlan === 'unlimited' ? (
+            <Button disabled className="w-full gap-2 font-bold">Your account is comped ✦</Button>
+          ) : currentPlan === 'paid' ? (
+            <Button variant="outline" className="w-full gap-2 font-bold" disabled={busy} onClick={onManageBilling}>
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}Manage billing
+            </Button>
+          ) : !billingEnabled ? (
+            <Button disabled className="w-full gap-2 font-bold">Launching soon</Button>
+          ) : !signedIn ? (
+            <Button className="w-full gap-2 font-bold bg-accent hover:bg-accent/90" onClick={onSignUp}>Get started <ArrowRight className="w-4 h-4" /></Button>
+          ) : (
+            <Button className="w-full gap-2 font-bold bg-accent hover:bg-accent/90" disabled={busy}
+              onClick={() => onCheckout?.(billing === 'annual' ? 'annual' : 'monthly')}>
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {busy ? 'Opening checkout…' : billing === 'annual' ? `Get the annual plan — $${teacherAnnual}/yr` : `Get the monthly plan — $${teacherMonthly}/mo`}
+              {!busy && <ArrowRight className="w-4 h-4" />}
+            </Button>
+          )}
           <div className="space-y-2.5">
             {['15 assignment redesigns a month','Quick Fix, Rebuild & Reinvent redesigns','Lesson plans & student directions','Personal assignment library','PDF, Word & Google Doc export'].map(f => (
               <div key={f} className="flex items-start gap-2.5 text-xs"><Check className="w-3.5 h-3.5 text-green-600 flex-shrink-0 mt-0.5" />{f}</div>
@@ -104,6 +137,7 @@ export function Pricing({ onBack }: PricingProps) {
           { q: 'How does school and district pricing work?', a: "Every school is different, so we price school and district plans individually. Email hello@socratesiq.com and we'll put together a quote for your size and needs." },
           { q: 'Is student work sent to AI companies?', a: "Assignment text is sent to Anthropic's Claude API for analysis only. It is not stored or used for training. We never collect student PII." },
           { q: 'Do you offer discounts for Title I schools?', a: 'Yes. Email hello@socratesiq.com and we\'ll work something out.' },
+          ...(billingEnabled ? [{ q: 'Can I cancel any time?', a: 'Yes. Open Settings → Manage billing to cancel, change your card, or download invoices. You keep your redesigns through the end of the period you have already paid for.' }] : []),
         ].map(({ q, a }) => (
           <div key={q} className="bg-secondary/30 rounded-xl p-4 space-y-1 border border-border">
             <p className="text-sm font-bold">{q}</p>
