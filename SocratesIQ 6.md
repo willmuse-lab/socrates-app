@@ -19,9 +19,16 @@ dashboard setup below** — with no Stripe env vars the app behaves exactly as i
 does today ("paid plans launching soon"). Nothing about the existing plan model
 changed: trial = 2 lifetime, paid = 15/month, unlimited = comped.
 
-⚠️ **Before charging real money:** the ToS still needs the lawyer review noted in
-parked task 7, and Stripe will ask for business details during activation. Test
-mode needs neither — do the whole walkthrough in test mode first.
+✅ **ToS lawyer review: DONE** (Will confirmed Aug 29 2026). That was the last
+pre-revenue blocker in parked task 7.
+
+⚠️ **Will went straight to LIVE mode**, not the sandbox — the account was
+activated and the two prices were created live. So the walkthrough below is
+written test-mode-first, but the actual setup used live values throughout:
+`sk_live_…`, live price ids, a live webhook endpoint with its own `whsec_…`,
+and the Customer Portal saved in live mode (it is configured per-mode). To
+rehearse anything later without moving money, use a 99%-off coupon +
+promotion code — checkout already passes `allow_promotion_codes: true`.
 
 ### How it works (three functions, one webhook)
 - `netlify/functions/billing-checkout.ts` → `POST /api/billing/checkout`
@@ -1271,10 +1278,10 @@ is future work.
    socrates.ai (~$70-100/yr) vs socratesai.com (~$12/yr); not decided).
 7. ~~Payments (Stripe)~~ BUILT Aug 29 2026 on
    `claude/socrates-handoff-continue-z2f5c7` — hosted Checkout + webhook +
-   customer portal, switched OFF until Will does the dashboard setup (full
-   walkthrough in the Aug 29 Stripe block at the top). STILL BLOCKING before
-   charging real money: the **ToS needs the lawyer review**, and Stripe account
-   activation needs business/bank details. Test mode needs neither.
+   customer portal (full walkthrough in the Aug 29 Stripe block at the top).
+   The two pre-revenue blockers are CLEARED: the **ToS lawyer review is done**
+   (Will, Aug 29 2026) and the Stripe account is activated. Going LIVE, not
+   sandbox. Remaining: finish the dashboard wiring (env vars, SQL, webhook).
 8. Admin password is a soft gate (VITE_ADMIN_PASSWORD, default socrates2025,
    visible in bundle — known limitation).
 9. Four-role buyer review exercise (teacher/principal/head/acquirer) was
