@@ -5,13 +5,14 @@
 //  The frontend then sends the browser to that URL; Stripe collects payment on
 //  its own pages and calls stripe-webhook.ts when the subscription is live.
 // ============================================================================
-import { stripe, billingConfigured, priceIdFor, userFromRequest, creditsByUserId, json, CORS, siteOrigin } from "./_shared/billing";
+import { stripe, billingConfigured, billingConfigStatus, priceIdFor, userFromRequest, creditsByUserId, json, CORS, siteOrigin } from "./_shared/billing";
 
 export default async function handler(req: Request) {
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers: CORS });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   if (!billingConfigured() || !stripe) {
+    console.error(`billing-checkout: billing not configured — ${billingConfigStatus()}`);
     // Deployed before the Stripe keys exist — the app falls back to its
     // "paid plans launching soon" message rather than showing an error.
     return json({ error: "Billing is not configured yet.", code: "billing_disabled" }, 503);
@@ -27,7 +28,10 @@ export default async function handler(req: Request) {
   } catch { /* default to monthly */ }
 
   const price = priceIdFor(plan);
-  if (!price) return json({ error: `No Stripe price configured for the ${plan} plan.`, code: "billing_disabled" }, 503);
+  if (!price) {
+    console.error(`billing-checkout: no price id for the ${plan} plan — ${billingConfigStatus()}`);
+    return json({ error: `No Stripe price configured for the ${plan} plan.`, code: "billing_disabled" }, 503);
+  }
 
   try {
     // Reuse the Stripe customer if this teacher has subscribed before, so their
