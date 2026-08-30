@@ -70,6 +70,16 @@ export default function App() {
     if (isSettingsOpen && user?.id && supabaseEnabled) getCredits().then(setCredits);
   }, [isSettingsOpen, user?.id]);
 
+  // Every view swap kept the window's scroll position, so following a footer
+  // link (which lives at the BOTTOM of a long page) dropped you into the new
+  // page already scrolled past its heading -- often onto blank space. Same on
+  // every Back button. Put the reader at the top of whatever they just opened.
+  // Instant, not smooth: the content has already changed, so animating a long
+  // scroll through it just looks like a glitch.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [viewMode, openedReport, openedAssignment]);
+
   // ---- Recover from a stuck modal lock ---------------------------------------
   // Radix makes the page inert while a dialog is open: <body> gets
   // pointer-events:none and data-scroll-locked. It normally cleans that up on
