@@ -37,7 +37,30 @@ both merged to `main`.
   money, make a 99%-off coupon + promotion code (checkout already passes
   `allow_promotion_codes: true`) and buy with a real card for ~10¢.
 
-### ⚠️ The bug that ate the afternoon — READ THIS BEFORE CHASING THE CREDIT SYSTEM
+### ⚠️ TWO separate bugs looked like one. Both are fixed. Read this.
+
+**Bug A — `consume_assignment_credit()` never worked, from July 20 to Aug 30.**
+The function declares `returns table (plan, used, allowance, remaining, allowed,
+period_start)`, which puts `used` in scope as an OUT parameter. Its increment
+statement read `update public.user_credits set used = used + 1` — and Postgres
+refuses that as ambiguous, error **42702**, because the right-hand `used` could
+be the column or the variable. It threw on every single call. The client fails
+OPEN by design, so the analysis went through and nothing surfaced: **no teacher
+was ever charged a credit, and the trial wall never fired for anyone.** That is
+why every `user_credits` row read `used = 0` — the rows were created lazily by
+the READ function (`get_assignment_credits`, whose only write is `set used = 0`,
+a literal, hence unambiguous) and never touched again.
+
+The fix is one table alias: `update public.user_credits as uc set used =
+uc.used + 1`. It is in `supabase/migration-credits.sql` with a comment saying why
+the alias must stay. Verified against a local Postgres 16 — the bug reproduces
+exactly on the old function, and the fixed one spends twice on trial then walls
+without incrementing, resets a rolled-over paid month, never walls a comped
+account, creates-and-charges a new teacher, and refuses a signed-out caller
+without creating a row. **This was found only because the credit helpers now log
+the Postgres error instead of failing silently.**
+
+### Bug B — the page went inert (this is what made Bug A so hard to see)
 Symptom: the app "hung up", and the free-assignment counter sat at 2 of 2 and
 never counted down. `user_credits` showed `used = 0` for every teacher, which
 looks exactly like the credit RPC being broken. **It was not.** Two wrong
@@ -64,7 +87,13 @@ root cause is still there worth finding.
 infrastructure hiccup must never block a teacher) and used to fail SILENTLY.
 They now log the Postgres error. Before theorising about the database, look at
 the browser: Network tab for the RPC call, Console for `[credits]` lines. If
-there is no request at all, the bug is in the app, not the DB.
+there is no request at all, the bug is in the app, not the DB. Three separate
+theories were chased on this before the console line named the cause in one
+sentence — the logging paid for itself the same day it shipped.
+
+**Also worth internalising:** fail-open plus silence is how a revenue bug hides
+for six weeks. Anywhere else the app swallows an error to keep a teacher moving,
+make sure it still says something to the console.
 
 ### Other fixes in PR #19
 - **Scroll reset on navigation.** There was none at any of the ~20 `setViewMode`
@@ -98,7 +127,11 @@ under 15 the cap is decoration; if teachers genuinely hit it, that is a signal t
 build the tier above, not to shrink this one.
 
 ### Open / next
-1. **Deploy `main`** (PR #19 is merged but not deployed).
+1. ~~Deploy `main`~~ DONE Aug 30 2026 — PR #19 is live (the header counter is
+   the visible marker that this build is deployed).
+1b. **Run the fixed `consume_assignment_credit()`** in Supabase if it has not
+   been run yet — paste from `supabase/migration-credits.sql`. Until it is run,
+   nobody is charged for anything.
 2. **Verify the first real purchase end to end** (see the checklist above).
 3. **Intermittent "The analysis came back in an unexpected format."** Seen once on
    the live site, succeeded on a later attempt. Note the client already retries a
