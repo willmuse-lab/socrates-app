@@ -55,13 +55,15 @@ const TIER_LABELS: Record<TierLevel, string> = {
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
   bloomsLevel = 'Analyze', subject = '', gradeLevel = '', teacherName = '', schoolName = '', onSave, onReset, initialText = '', userId = '',
-  creditsRefreshKey = 0
+  creditsRefreshKey = 0, onCreditsChange
 }: {
   defaultPreference?: AIPreference, dimensions?: FrameworkDimension[], activeFramework?: 'triple-a' | 'blooms',
   bloomsLevel?: BloomsLevel, subject?: string, gradeLevel?: string, teacherName?: string, schoolName?: string,
   onSave?: (assignment: Omit<SavedAssignment, 'id' | 'date'>) => void, onReset?: () => void, initialText?: string, userId?: string,
   /** Bumped by App after a successful upgrade so the counter re-reads the plan. */
-  creditsRefreshKey?: number
+  creditsRefreshKey?: number,
+  /** Lets the header's counter follow credits spent in here. */
+  onCreditsChange?: (c: Credits | null) => void
 }) {
   const [text, setText] = useState(initialText);
   const [aiPreference, setAiPreference] = useState<AIPreference>(defaultPreference);
@@ -148,8 +150,9 @@ export function AssignmentAnalyzer({
   const lastChargedRef = React.useRef<string>('');
   const gated = !!userId && supabaseEnabled;
   const refreshCredits = React.useCallback(async () => {
-    if (!gated) { setCredits(null); return; }
-    setCredits(await getCredits());
+    if (!gated) { setCredits(null); onCreditsChange?.(null); return; }
+    const c = await getCredits();
+    setCredits(c); onCreditsChange?.(c);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gated, creditsRefreshKey]);
   React.useEffect(() => { refreshCredits(); }, [refreshCredits]);
@@ -241,8 +244,8 @@ export function AssignmentAnalyzer({
     const isNewAssignment = !opts?.free && prefix !== lastChargedRef.current;
     if (isNewAssignment && gated) {
       const res = await consumeCredit();
-      if (res && !res.allowed) { setCredits(res.credits); setShowWall(true); return; }
-      if (res) setCredits(res.credits); // null = infra hiccup → fail open, let it through
+      if (res && !res.allowed) { setCredits(res.credits); onCreditsChange?.(res.credits); setShowWall(true); return; }
+      if (res) { setCredits(res.credits); onCreditsChange?.(res.credits); } // null = infra hiccup → fail open, let it through
       lastChargedRef.current = prefix; // this assignment is now paid for this session
     }
     // Scroll to the top so the progress screen is front-and-center, rather

@@ -64,11 +64,6 @@ export default function App() {
   const [cloudSynced, setCloudSynced] = useState(false);
   const [credits, setCredits] = useState<Credits | null>(null);
 
-  // Refresh the assignment-allowance counter when the profile/settings panel
-  // opens, so it reflects any credits spent in the analyzer this session.
-  useEffect(() => {
-    if (isSettingsOpen && user?.id && supabaseEnabled) getCredits().then(setCredits);
-  }, [isSettingsOpen, user?.id]);
 
   // Every view swap kept the window's scroll position, so following a footer
   // link (which lives at the BOTTOM of a long page) dropped you into the new
@@ -112,6 +107,14 @@ export default function App() {
   const [billingBusy, setBillingBusy] = useState(false);
   // Bumped after a confirmed upgrade so the analyzer's own counter re-reads.
   const [creditsRefreshKey, setCreditsRefreshKey] = useState(0);
+
+  // The allowance now shows in the header under the teacher's name, so it has
+  // to load as soon as someone is signed in — not only when Settings opens.
+  // Re-read on sign-in, when Settings opens, and after an upgrade.
+  useEffect(() => {
+    if (user?.id && supabaseEnabled) getCredits().then(setCredits);
+    else setCredits(null);
+  }, [user?.id, isSettingsOpen, creditsRefreshKey]);
 
   const handleCheckout = useCallback(async (plan: 'monthly' | 'annual') => {
     setBillingBusy(true);
@@ -316,6 +319,7 @@ export default function App() {
               this block to bring it back. (cloudSynced state is still maintained.) */}
           {user ? (
             <UserMenu user={user}
+              credits={credits}
               onLogout={handleLogout}
               onViewLibrary={() => setViewMode('library')}
               onViewSettings={() => setIsSettingsOpen(true)}
@@ -352,6 +356,7 @@ export default function App() {
                 initialText={openedAssignment?.fullText || ''}
                 userId={user?.id || ''}
                 creditsRefreshKey={creditsRefreshKey}
+                onCreditsChange={setCredits}
               />
               <section id="how-to-use" className="py-20 md:py-24 px-6 md:px-10 border-t border-border">
                 <div className="max-w-5xl mx-auto space-y-14">
