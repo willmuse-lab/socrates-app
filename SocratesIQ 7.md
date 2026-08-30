@@ -1,17 +1,168 @@
-# SocratesIQ 5: Session Handoff Document
+# SocratesIQ 7: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
 session. Read this whole file before making changes. Last updated: August 29 2026.
 
-**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 6.md`
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 7.md`
 now, and the number bumps by one on every update (next update renames it to
-`SocratesIQ 7.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ 8.md`, and so on). To continue in a new session, read the HIGHEST-numbered
 `SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
 handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versioned
 file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
 `SocratesIQ N.md` wins.
 
-## Session status (August 29 2026, later) — Stripe billing BUILT (branch, NOT merged, switched OFF)
+## Session status (August 29 2026, evening) — PAYMENTS ARE LIVE. Two PRs merged.
+
+**SocratesIQ now takes real money.** Stripe is wired up in **LIVE mode** (not a
+sandbox), the account is activated, and the ToS lawyer review that had been
+blocking revenue since July is **done** (Will confirmed). PR #18 and PR #19 are
+both merged to `main`.
+
+### Where things actually stand
+- **PR #18** (`ce4b450`) — MERGED and DEPLOYED. Redesign version history, Stripe
+  billing, real last-updated dates on Terms/Privacy, brand icon exports.
+- **PR #19** (`4c82f6f`) — MERGED, **needs a Netlify deploy** at time of writing.
+  The inert-page fix, credit error logging, scroll reset, sidebar fill, header
+  allowance counter. If the live site still freezes after clicking through
+  Settings, this simply has not been deployed yet — Trigger deploy.
+- **Stripe live config, all done by Will:** product `SocratesIQ Teacher` with two
+  live prices ($9.99/mo, $99.99/yr), `sk_live_…`, Customer Portal saved in live
+  mode, all six Netlify env vars set (same value across every deploy context),
+  `migration-stripe.sql` run, webhook endpoint live at
+  `https://socratesiq.com/api/stripe/webhook` with the six events.
+- ⚠️ **NOT yet verified end to end.** No real purchase has been put through. The
+  next session should confirm: checkout completes → the webhook shows a green 200
+  in Stripe → `select * from metrics_subscriptions;` shows the row as `paid`
+  → Settings → Manage billing opens the portal. To rehearse without moving real
+  money, make a 99%-off coupon + promotion code (checkout already passes
+  `allow_promotion_codes: true`) and buy with a real card for ~10¢.
+
+### ⚠️ TWO separate bugs looked like one. Both are fixed. Read this.
+
+**Bug A — `consume_assignment_credit()` never worked, from July 20 to Aug 30.**
+The function declares `returns table (plan, used, allowance, remaining, allowed,
+period_start)`, which puts `used` in scope as an OUT parameter. Its increment
+statement read `update public.user_credits set used = used + 1` — and Postgres
+refuses that as ambiguous, error **42702**, because the right-hand `used` could
+be the column or the variable. It threw on every single call. The client fails
+OPEN by design, so the analysis went through and nothing surfaced: **no teacher
+was ever charged a credit, and the trial wall never fired for anyone.** That is
+why every `user_credits` row read `used = 0` — the rows were created lazily by
+the READ function (`get_assignment_credits`, whose only write is `set used = 0`,
+a literal, hence unambiguous) and never touched again.
+
+The fix is one table alias: `update public.user_credits as uc set used =
+uc.used + 1`. It is in `supabase/migration-credits.sql` with a comment saying why
+the alias must stay. Verified against a local Postgres 16 — the bug reproduces
+exactly on the old function, and the fixed one spends twice on trial then walls
+without incrementing, resets a rolled-over paid month, never walls a comped
+account, creates-and-charges a new teacher, and refuses a signed-out caller
+without creating a row. **This was found only because the credit helpers now log
+the Postgres error instead of failing silently.**
+
+### Bug B — the page went inert (this is what made Bug A so hard to see)
+Symptom: the app "hung up", and the free-assignment counter sat at 2 of 2 and
+never counted down. `user_credits` showed `used = 0` for every teacher, which
+looks exactly like the credit RPC being broken. **It was not.** Two wrong
+theories were chased first (a Postgres cached plan invalidated by the new Stripe
+columns; then a PostgREST schema-cache miss). Re-running the functions fixed
+nothing, because nothing was broken.
+
+The real cause was in the DOM: `<body>` was left with `pointer-events: none` and
+`data-scroll-locked="1"` with **no dialog open**. That is Radix's modal lock. It
+is cleaned up when a dialog CLOSES, but not when a dialog is UNMOUNTED before it
+can — which is what happens when a dialog closes and the whole view swaps in the
+same tick (Settings → "See plans" → pricing does it). After that the page
+swallows every click until a reload. Analyze never fired, so no analysis ran, so
+no credit was ever spent. **One cause, both symptoms.** The database had been
+telling the truth all along.
+
+Fixed in PR #19: `App.tsx` watches `<body>` and lifts the lock whenever it is set
+while no dialog is actually mounted (a real one always has `[role="dialog"]` in
+the DOM, so genuine locks are untouched). If it ever catches one, the console
+logs `[ui] cleared a stale modal lock` — that means the safety net worked but a
+root cause is still there worth finding.
+
+**Lesson for next time:** the credit helpers fail OPEN by design (an
+infrastructure hiccup must never block a teacher) and used to fail SILENTLY.
+They now log the Postgres error. Before theorising about the database, look at
+the browser: Network tab for the RPC call, Console for `[credits]` lines. If
+there is no request at all, the bug is in the app, not the DB. Three separate
+theories were chased on this before the console line named the cause in one
+sentence — the logging paid for itself the same day it shipped.
+
+**Also worth internalising:** fail-open plus silence is how a revenue bug hides
+for six weeks. Anywhere else the app swallows an error to keep a teacher moving,
+make sure it still says something to the console.
+
+### Other fixes in PR #19
+- **Scroll reset on navigation.** There was none at any of the ~20 `setViewMode`
+  call sites. Footer links live at the BOTTOM of a long page, so clicking Pricing
+  or Terms dropped you into the new page already scrolled past its heading. One
+  effect covers all of them; Apply This Version and New Assignment also return to
+  the Analyze box.
+- **Results sidebar** (the hole left by removing the AIAS table): context chips
+  under the score (subject · grade · AI strategy) and the allowance with an
+  upgrade link. Both are about THIS analysis — that is the bar, since generic
+  reference material is what made the old panel worth cutting. A score-movement
+  card was considered and dropped: the before/after block in the main column
+  already covers it.
+- **Allowance in the header**, under the teacher's name: `1 of 2 free left` /
+  `11 of 15 left` / `Unlimited`, amber at zero, nothing while loading. Credits
+  now load on sign-in rather than only when Settings opens, and the analyzer
+  reports changes upward via `onCreditsChange` so the header updates immediately.
+
+### Pricing: keep 15/month (recommendation, not yet a change)
+Will asked whether to drop the paid allowance from 15 to 10. Recommendation was
+**keep 15**, for three reasons: (1) there is nowhere to upgrade TO — the only
+step up is School/District at "call for pricing", which an individual teacher
+will not buy, so hitting the wall means churn rather than revenue; (2) a full
+transformation costs ~4¢, so 15 of them is ~60¢ against $9.99 — dropping to 10
+saves about twenty cents a month per subscriber; (3) the teachers who would hit
+10 are the enthusiasts who tell their department about you. Caps are easy to
+RAISE later and a broken promise to LOWER on existing subscribers, so err high.
+**Decide it with data in ~60 days** — `usage_events` has been logging since July;
+look at the distribution in `metrics_by_user`. If the 95th percentile is well
+under 15 the cap is decoration; if teachers genuinely hit it, that is a signal to
+build the tier above, not to shrink this one.
+
+### Open / next
+1. ~~Deploy `main`~~ DONE Aug 30 2026 — PR #19 is live (the header counter is
+   the visible marker that this build is deployed).
+1b. **Run the fixed `consume_assignment_credit()`** in Supabase if it has not
+   been run yet — paste from `supabase/migration-credits.sql`. Until it is run,
+   nobody is charged for anything.
+2. **Verify the first real purchase end to end** (see the checklist above).
+3. **Intermittent "The analysis came back in an unexpected format."** Seen once on
+   the live site, succeeded on a later attempt. Note the client already retries a
+   parse failure 3 times (502 is in `RETRYABLE` in `gemini.ts`, backoff
+   2s/8s/20s), so that toast means FOUR attempts failed. To fix it properly, get
+   the `analyze v3: JSON parse failed (part=… len=… stop=…) head: … tail: …` line
+   from Netlify → Logs → Functions → `analyze`. `stop=max_tokens` means
+   truncation (the Aug 28 fix not holding for that input); a clean-ending tail
+   with stray characters is a different problem. Do not guess without the line.
+4. Terms and Privacy now carry a hardcoded **May 31 2026** last-updated date
+   (`TERMS_LAST_UPDATED` / `PRIVACY_LAST_UPDATED` in `StaticPages.tsx`). They used
+   to render `new Date()`, so the date moved every day on its own and could never
+   show when the documents actually changed. **Bump these by hand** with any
+   substantive edit — section 12 of the Terms promises exactly that.
+
+### Housekeeping worth knowing
+- **The stale Supabase SQL tab is gone.** A saved query named "SocratesIQ –
+  credits" still held the ORIGINAL July allowance (20 paid / 3 trial) and would
+  have silently rolled pricing back if re-run. It was deleted. The canonical
+  version is `supabase/migration-credits.sql` in this repo — paste from there,
+  not from a saved tab.
+- **Brand icons** for Stripe and any other square slot live in `marketing/brand/`
+  with a README and the brand hex values (primary navy `#17213B`, accent slate
+  `#3E5C86`, warm paper `#F4EFE4`, logo teal `#007880`).
+- **How the Stripe code was tested**, for anyone extending it: two hermetic Node
+  suites drive the real handlers using the Stripe SDK's own signature generator
+  and an in-memory Supabase double (module doubles in a scratch `node_modules`,
+  functions bundled with esbuild and `--external`). UI is driven in headless
+  Chromium against the built app. Neither needs a Stripe account or a live DB.
+
+## Session status (August 29 2026, later) — Stripe billing BUILT (MERGED in PR #18, now LIVE — see the evening block above)
 
 Parked task 7 (payments). All of it is on the same branch
 `claude/socrates-handoff-continue-z2f5c7`, and it is **inert until Will does the
@@ -141,7 +292,7 @@ billing-off "Launching soon" fallback.
 - Dunning emails (failed-card reminders) are Stripe's own — enable them in
   Settings → Billing → Subscriptions and emails.
 
-## Session status (August 29 2026) — redesign version history (branch, NOT merged)
+## Session status (August 29 2026) — redesign version history (MERGED in PR #18)
 
 Picked up the top of the parked backlog (task 0, requested July 13 2026):
 **version history in the Revise box**. On branch
@@ -1276,12 +1427,10 @@ is future work.
 5. Unlink the stale `musesocrates` Netlify site.
 6. Custom domain (he wanted "socrates.ai.com" — explained invalid; choose
    socrates.ai (~$70-100/yr) vs socratesai.com (~$12/yr); not decided).
-7. ~~Payments (Stripe)~~ BUILT Aug 29 2026 on
-   `claude/socrates-handoff-continue-z2f5c7` — hosted Checkout + webhook +
-   customer portal (full walkthrough in the Aug 29 Stripe block at the top).
-   The two pre-revenue blockers are CLEARED: the **ToS lawyer review is done**
-   (Will, Aug 29 2026) and the Stripe account is activated. Going LIVE, not
-   sandbox. Remaining: finish the dashboard wiring (env vars, SQL, webhook).
+7. ~~Payments (Stripe)~~ **DONE and LIVE Aug 29 2026** — merged in PR #18,
+   configured in Stripe LIVE mode, ToS review cleared, dashboard wiring finished
+   (env vars, SQL, webhook). The only thing left is putting a real purchase
+   through end to end; see the evening block at the top of this file.
 8. Admin password is a soft gate (VITE_ADMIN_PASSWORD, default socrates2025,
    visible in bundle — known limitation).
 9. Four-role buyer review exercise (teacher/principal/head/acquirer) was
