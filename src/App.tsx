@@ -70,6 +70,32 @@ export default function App() {
     if (isSettingsOpen && user?.id && supabaseEnabled) getCredits().then(setCredits);
   }, [isSettingsOpen, user?.id]);
 
+  // ---- Recover from a stuck modal lock ---------------------------------------
+  // Radix makes the page inert while a dialog is open: <body> gets
+  // pointer-events:none and data-scroll-locked. It normally cleans that up on
+  // close -- but if the dialog is UNMOUNTED before it can (closing a dialog and
+  // swapping the whole view in the same tick does it, e.g. Settings -> "See
+  // plans" -> pricing), the lock is left behind and every click on the page is
+  // swallowed until a reload. It looks exactly like the app freezing.
+  //
+  // This watches <body> and lifts the lock whenever it is set but no dialog is
+  // actually mounted. A real open dialog always has [role="dialog"] in the DOM,
+  // so a legitimate lock is never touched.
+  useEffect(() => {
+    const unstick = () => {
+      const locked = document.body.style.pointerEvents === 'none' || document.body.hasAttribute('data-scroll-locked');
+      if (!locked) return;
+      if (document.querySelector('[role="dialog"],[role="alertdialog"]')) return; // genuinely open
+      document.body.style.pointerEvents = '';
+      document.body.removeAttribute('data-scroll-locked');
+      console.warn('[ui] cleared a stale modal lock — the page had been left unclickable');
+    };
+    const observer = new MutationObserver(unstick);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['style', 'data-scroll-locked'] });
+    unstick(); // in case we mount into an already-stuck page
+    return () => observer.disconnect();
+  }, []);
+
   // ---- Stripe billing ------------------------------------------------------
   // The plan itself is flipped server-side by the webhook; the app only sends
   // teachers to Stripe and re-reads their balance when they come back.

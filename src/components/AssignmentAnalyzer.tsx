@@ -257,7 +257,15 @@ export function AssignmentAnalyzer({
     } catch (error: any) {
       console.error('Analysis failed:', error);
       toast.error(error?.message || 'Failed to analyze assignment. Please try again.', { duration: 12000 });
-    } finally { setIsAnalyzing(false); }
+    } finally {
+      setIsAnalyzing(false);
+      // Reconcile the counter with what the DATABASE actually holds. The number
+      // shown used to come only from the consume call's own response, so if that
+      // call failed (and it fails open, by design) the counter kept displaying a
+      // stale balance with nothing to indicate otherwise. Re-reading makes the
+      // display always match the server, whatever happened above.
+      refreshCredits();
+    }
   };
 
   const copyToClipboard = (content: string, index: number) => {
