@@ -55,13 +55,15 @@ const TIER_LABELS: Record<TierLevel, string> = {
 export function AssignmentAnalyzer({
   defaultPreference = 'avoid', dimensions = DEFAULT_DIMENSIONS, activeFramework = 'triple-a',
   bloomsLevel = 'Analyze', subject = '', gradeLevel = '', teacherName = '', schoolName = '', onSave, onReset, initialText = '', userId = '',
-  creditsRefreshKey = 0
+  creditsRefreshKey = 0, onCreditsChange
 }: {
   defaultPreference?: AIPreference, dimensions?: FrameworkDimension[], activeFramework?: 'triple-a' | 'blooms',
   bloomsLevel?: BloomsLevel, subject?: string, gradeLevel?: string, teacherName?: string, schoolName?: string,
   onSave?: (assignment: Omit<SavedAssignment, 'id' | 'date'>) => void, onReset?: () => void, initialText?: string, userId?: string,
   /** Bumped by App after a successful upgrade so the counter re-reads the plan. */
-  creditsRefreshKey?: number
+  creditsRefreshKey?: number,
+  /** Lets the header's counter follow credits spent in here. */
+  onCreditsChange?: (c: Credits | null) => void
 }) {
   const [text, setText] = useState(initialText);
   const [aiPreference, setAiPreference] = useState<AIPreference>(defaultPreference);
@@ -148,8 +150,9 @@ export function AssignmentAnalyzer({
   const lastChargedRef = React.useRef<string>('');
   const gated = !!userId && supabaseEnabled;
   const refreshCredits = React.useCallback(async () => {
-    if (!gated) { setCredits(null); return; }
-    setCredits(await getCredits());
+    if (!gated) { setCredits(null); onCreditsChange?.(null); return; }
+    const c = await getCredits();
+    setCredits(c); onCreditsChange?.(c);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gated, creditsRefreshKey]);
   React.useEffect(() => { refreshCredits(); }, [refreshCredits]);
@@ -241,8 +244,8 @@ export function AssignmentAnalyzer({
     const isNewAssignment = !opts?.free && prefix !== lastChargedRef.current;
     if (isNewAssignment && gated) {
       const res = await consumeCredit();
-      if (res && !res.allowed) { setCredits(res.credits); setShowWall(true); return; }
-      if (res) setCredits(res.credits); // null = infra hiccup → fail open, let it through
+      if (res && !res.allowed) { setCredits(res.credits); onCreditsChange?.(res.credits); setShowWall(true); return; }
+      if (res) { setCredits(res.credits); onCreditsChange?.(res.credits); } // null = infra hiccup → fail open, let it through
       lastChargedRef.current = prefix; // this assignment is now paid for this session
     }
     // Scroll to the top so the progress screen is front-and-center, rather
@@ -257,7 +260,15 @@ export function AssignmentAnalyzer({
     } catch (error: any) {
       console.error('Analysis failed:', error);
       toast.error(error?.message || 'Failed to analyze assignment. Please try again.', { duration: 12000 });
-    } finally { setIsAnalyzing(false); }
+    } finally {
+      setIsAnalyzing(false);
+      // Reconcile the counter with what the DATABASE actually holds. The number
+      // shown used to come only from the consume call's own response, so if that
+      // call failed (and it fails open, by design) the counter kept displaying a
+      // stale balance with nothing to indicate otherwise. Re-reading makes the
+      // display always match the server, whatever happened above.
+      refreshCredits();
+    }
   };
 
   const copyToClipboard = (content: string, index: number) => {
@@ -269,6 +280,9 @@ export function AssignmentAnalyzer({
     // Stash the current (original) analysis so the next run can show before→after.
     setPreviousResult(result);
     setText(content); setApplied(index); setResult(null);
+    // The results screen just became the input screen — put the teacher back at
+    // the Analyze box rather than wherever they had scrolled to.
+    window.scrollTo({ top: 0, behavior: 'auto' });
     // Re-analyzing an applied redesign is part of the SAME assignment — free.
     lastChargedRef.current = content.trim().slice(0, 120);
     toast.success('Version applied! Re-analyze to see your score jump.', { action: { label: 'Analyze Now', onClick: () => handleAnalyze(content, { free: true }) } });
@@ -368,7 +382,12 @@ export function AssignmentAnalyzer({
     });
     toast.success('Assignment saved to your library!');
   };
-  const handleNewAssignment = () => { setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null); setLessonPlan(null); setStudentDirections(null); resetVersionState(); lastChargedRef.current = ''; clearDraft(); onReset?.(); };
+  const handleNewAssignment = () => {
+    setResult(null); setText(''); setFeedback({}); setApplied(null); setPreviousResult(null);
+    setLessonPlan(null); setStudentDirections(null); resetVersionState();
+    lastChargedRef.current = ''; clearDraft(); onReset?.();
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
 
   // Which dimensions improved between the original and the redesigned analysis.
   const improvedDimensions = (): string[] => {
@@ -780,6 +799,18 @@ export function AssignmentAnalyzer({
                 <HelpCircle className="w-3 h-3" />How is this scored?
               </button>
             </div>
+            {/* What this analysis was actually tuned to. The commonest question a
+                teacher asks of a score is "did it know what I teach?", and the
+                answer was only visible back in Settings. Chips render only for
+                values we actually have. The framework is deliberately absent —
+                it already has its own panel further down. */}
+            {(subject || gradeLevel || aiPreference) && (
+              <div className="flex flex-wrap justify-center gap-1.5">
+                {subject && <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-secondary/60 text-muted-foreground border border-border">{subject}</span>}
+                {gradeLevel && <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-secondary/60 text-muted-foreground border border-border">{gradeLevel}</span>}
+                <span className="text-[10px] font-semibold px-2 py-1 rounded-full bg-accent/10 text-accent border border-accent/20">{STRATEGY_LABELS[aiPreference]}</span>
+              </div>
+            )}
             {applied !== null && (
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 px-4 py-3 rounded-lg bg-accent/10 border border-accent/20 text-xs text-accent font-medium">
                 <BookOpen className="w-4 h-4 flex-shrink-0" />Version applied. Re-analyze to see updated score.
@@ -817,7 +848,31 @@ export function AssignmentAnalyzer({
                 </AccordionItem>
               </Accordion>
             </div>
-            <Button className="w-full h-12 text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 mt-auto" onClick={handleStrengthen}>Strengthen Assignment</Button>
+            {/* The allowance is on the input screen but nowhere on the results
+                screen, which is where a teacher decides whether to run another.
+                Doubles as the upgrade path now that plans are live. */}
+            {credits && credits.plan !== 'unlimited' && (
+              <div className="rounded-xl border border-border bg-secondary/20 p-4 space-y-2 mt-auto">
+                <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
+                  {credits.plan === 'paid' ? 'This month' : 'Free trial'}
+                </p>
+                <p className="text-xs">
+                  <span className="text-lg font-bold text-foreground">{credits.remaining}</span>
+                  <span className="text-muted-foreground"> of {credits.allowance} {credits.plan === 'trial' ? 'free ' : ''}redesigns left</span>
+                </p>
+                <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                  <div className="h-full bg-accent rounded-full transition-all"
+                    style={{ width: `${Math.max(0, Math.min(100, (credits.remaining / credits.allowance) * 100))}%` }} />
+                </div>
+                {credits.plan === 'trial' && billingEnabled && (
+                  <button onClick={handleUpgrade} disabled={upgrading}
+                    className="text-[11px] font-semibold text-accent hover:underline disabled:opacity-50">
+                    {upgrading ? 'Opening…' : 'Upgrade for $9.99/mo →'}
+                  </button>
+                )}
+              </div>
+            )}
+            <Button className={`w-full h-12 text-sm font-bold bg-primary text-primary-foreground hover:bg-primary/90 ${credits && credits.plan !== 'unlimited' ? '' : 'mt-auto'}`} onClick={handleStrengthen}>Strengthen Assignment</Button>
           </aside>
         </div>
       )}

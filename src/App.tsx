@@ -64,11 +64,42 @@ export default function App() {
   const [cloudSynced, setCloudSynced] = useState(false);
   const [credits, setCredits] = useState<Credits | null>(null);
 
-  // Refresh the assignment-allowance counter when the profile/settings panel
-  // opens, so it reflects any credits spent in the analyzer this session.
+
+  // Every view swap kept the window's scroll position, so following a footer
+  // link (which lives at the BOTTOM of a long page) dropped you into the new
+  // page already scrolled past its heading -- often onto blank space. Same on
+  // every Back button. Put the reader at the top of whatever they just opened.
+  // Instant, not smooth: the content has already changed, so animating a long
+  // scroll through it just looks like a glitch.
   useEffect(() => {
-    if (isSettingsOpen && user?.id && supabaseEnabled) getCredits().then(setCredits);
-  }, [isSettingsOpen, user?.id]);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }, [viewMode, openedReport, openedAssignment]);
+
+  // ---- Recover from a stuck modal lock ---------------------------------------
+  // Radix makes the page inert while a dialog is open: <body> gets
+  // pointer-events:none and data-scroll-locked. It normally cleans that up on
+  // close -- but if the dialog is UNMOUNTED before it can (closing a dialog and
+  // swapping the whole view in the same tick does it, e.g. Settings -> "See
+  // plans" -> pricing), the lock is left behind and every click on the page is
+  // swallowed until a reload. It looks exactly like the app freezing.
+  //
+  // This watches <body> and lifts the lock whenever it is set but no dialog is
+  // actually mounted. A real open dialog always has [role="dialog"] in the DOM,
+  // so a legitimate lock is never touched.
+  useEffect(() => {
+    const unstick = () => {
+      const locked = document.body.style.pointerEvents === 'none' || document.body.hasAttribute('data-scroll-locked');
+      if (!locked) return;
+      if (document.querySelector('[role="dialog"],[role="alertdialog"]')) return; // genuinely open
+      document.body.style.pointerEvents = '';
+      document.body.removeAttribute('data-scroll-locked');
+      console.warn('[ui] cleared a stale modal lock — the page had been left unclickable');
+    };
+    const observer = new MutationObserver(unstick);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['style', 'data-scroll-locked'] });
+    unstick(); // in case we mount into an already-stuck page
+    return () => observer.disconnect();
+  }, []);
 
   // ---- Stripe billing ------------------------------------------------------
   // The plan itself is flipped server-side by the webhook; the app only sends
@@ -76,6 +107,14 @@ export default function App() {
   const [billingBusy, setBillingBusy] = useState(false);
   // Bumped after a confirmed upgrade so the analyzer's own counter re-reads.
   const [creditsRefreshKey, setCreditsRefreshKey] = useState(0);
+
+  // The allowance now shows in the header under the teacher's name, so it has
+  // to load as soon as someone is signed in — not only when Settings opens.
+  // Re-read on sign-in, when Settings opens, and after an upgrade.
+  useEffect(() => {
+    if (user?.id && supabaseEnabled) getCredits().then(setCredits);
+    else setCredits(null);
+  }, [user?.id, isSettingsOpen, creditsRefreshKey]);
 
   const handleCheckout = useCallback(async (plan: 'monthly' | 'annual') => {
     setBillingBusy(true);
@@ -280,6 +319,7 @@ export default function App() {
               this block to bring it back. (cloudSynced state is still maintained.) */}
           {user ? (
             <UserMenu user={user}
+              credits={credits}
               onLogout={handleLogout}
               onViewLibrary={() => setViewMode('library')}
               onViewSettings={() => setIsSettingsOpen(true)}
@@ -316,6 +356,7 @@ export default function App() {
                 initialText={openedAssignment?.fullText || ''}
                 userId={user?.id || ''}
                 creditsRefreshKey={creditsRefreshKey}
+                onCreditsChange={setCredits}
               />
               <section id="how-to-use" className="py-20 md:py-24 px-6 md:px-10 border-t border-border">
                 <div className="max-w-5xl mx-auto space-y-14">

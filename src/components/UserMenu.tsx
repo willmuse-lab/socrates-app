@@ -8,6 +8,9 @@ import { LogOut, Settings, Library, BookOpen, BarChart2 } from 'lucide-react';
 
 interface UserMenuProps {
   user: { name: string; email: string };
+  /** Assignment allowance, shown under the name. Null while it loads, or when
+   *  accounts are off (local/demo mode) — the line simply doesn't render. */
+  credits?: { plan: 'trial' | 'paid' | 'unlimited'; allowance: number; remaining: number } | null;
   onLogout: () => void;
   onViewLibrary: () => void;
   onViewSettings: () => void;
@@ -15,8 +18,16 @@ interface UserMenuProps {
   onViewDashboard?: () => void;
 }
 
-export function UserMenu({ user, onLogout, onViewLibrary, onViewSettings, onViewAdmin, onViewDashboard }: UserMenuProps) {
+export function UserMenu({ user, credits, onLogout, onViewLibrary, onViewSettings, onViewAdmin, onViewDashboard }: UserMenuProps) {
   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase();
+
+  // "1 of 2 free left" while trialling, "11 of 15 left" once paid. Comped
+  // accounts just say Unlimited rather than showing a meaningless 999,999.
+  const creditLabel = !credits ? null
+    : credits.plan === 'unlimited' ? 'Unlimited'
+    : `${credits.remaining} of ${credits.allowance}${credits.plan === 'trial' ? ' free' : ''} left`;
+  const creditTone = credits && credits.plan !== 'unlimited' && credits.remaining === 0
+    ? 'text-amber-600' : 'text-muted-foreground';
 
   const menuItem = (onClick: () => void, Icon: any, label: string, danger = false) => (
     <DropdownMenuItem
@@ -30,7 +41,10 @@ export function UserMenu({ user, onLogout, onViewLibrary, onViewSettings, onView
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-3 outline-none group">
-        <span className="text-sm font-medium hidden sm:inline-block group-hover:text-accent transition-colors">{user.name}</span>
+        <span className="hidden sm:flex flex-col items-end leading-tight">
+          <span className="text-sm font-medium group-hover:text-accent transition-colors">{user.name}</span>
+          {creditLabel && <span className={`text-[10px] font-semibold ${creditTone}`}>{creditLabel}</span>}
+        </span>
         <Avatar className="w-8 h-8 border border-border group-hover:border-accent transition-colors">
           <AvatarImage src="" />
           <AvatarFallback className="bg-secondary text-[10px] font-bold">{getInitials(user.name)}</AvatarFallback>
@@ -42,6 +56,9 @@ export function UserMenu({ user, onLogout, onViewLibrary, onViewSettings, onView
             <div className="flex flex-col gap-1">
               <span className="text-sm font-bold">{user.name}</span>
               <span className="text-xs text-muted-foreground font-normal">{user.email}</span>
+              {/* Repeated here because the trigger's copy is hidden on small
+                  screens, where this menu is the only place it can be seen. */}
+              {creditLabel && <span className={`text-[11px] font-semibold ${creditTone}`}>{creditLabel}</span>}
             </div>
           </DropdownMenuLabel>
         </DropdownMenuGroup>

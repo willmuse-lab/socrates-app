@@ -27,16 +27,34 @@ export interface Credits {
   periodStart?: string;
 }
 
+/**
+ * A set-returning RPC comes back as an array of rows, but PostgREST hands back
+ * a bare object in some setups. Accept either — reading `.length` off an object
+ * silently yields undefined, which used to make a perfectly good response look
+ * like a failure.
+ */
+function firstRow(data: any): any | null {
+  if (data == null) return null;
+  return Array.isArray(data) ? (data[0] ?? null) : data;
+}
+
 /** Read the signed-in teacher's current balance (for the on-screen counter). */
 export async function getCredits(): Promise<Credits | null> {
   try {
     const sb = await getClient();
     if (!sb) return null;
     const { data, error } = await sb.rpc('get_assignment_credits');
-    if (error || !data || !data.length) return null;
-    const r = data[0];
+    if (error) {
+      console.warn('[credits] get_assignment_credits failed:', error.message, error.code || '', error.details || '', error.hint || '');
+      return null;
+    }
+    const r = firstRow(data);
+    if (!r) { console.warn('[credits] get_assignment_credits returned no row — is the session signed in?'); return null; }
     return { plan: r.plan, used: r.used, allowance: r.allowance, remaining: r.remaining, periodStart: r.period_start };
-  } catch { return null; }
+  } catch (e: any) {
+    console.warn('[credits] get_assignment_credits threw:', e?.message || e);
+    return null;
+  }
 }
 
 /**
@@ -49,10 +67,19 @@ export async function consumeCredit(): Promise<{ allowed: boolean; credits: Cred
     const sb = await getClient();
     if (!sb) return null;
     const { data, error } = await sb.rpc('consume_assignment_credit');
-    if (error || !data || !data.length) return null;
-    const r = data[0];
+    if (error) {
+      // This is the money path: failing open is deliberate, failing SILENTLY is
+      // not. A swallowed error here means nobody is charged and nothing says so.
+      console.error('[credits] consume_assignment_credit failed — the teacher was NOT charged:', error.message, error.code || '', error.details || '', error.hint || '');
+      return null;
+    }
+    const r = firstRow(data);
+    if (!r) { console.error('[credits] consume_assignment_credit returned no row — the teacher was NOT charged.'); return null; }
     return { allowed: r.allowed, credits: { plan: r.plan, used: r.used, allowance: r.allowance, remaining: r.remaining, periodStart: r.period_start } };
-  } catch { return null; }
+  } catch (e: any) {
+    console.error('[credits] consume_assignment_credit threw — the teacher was NOT charged:', e?.message || e);
+    return null;
+  }
 }
 
 /** Fire-and-forget client-side usage event (e.g. downloads). Never throws. */
