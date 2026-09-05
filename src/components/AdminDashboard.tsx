@@ -30,8 +30,8 @@ export function AdminDashboard({ onBack }: AdminDashboardProps) {
       setStats({
         totalTeachers: 47, totalAnalyses: 312, avgScore: 61, topSubject: 'English / Language Arts',
         recentActivity: [
-          { name: 'Mrs. Davis', action: 'Analyzed "The Great Gatsby Essay"', time: '2 min ago' },
-          { name: 'Mr. Muse', action: 'Saved Gold redesign to library', time: '14 min ago' },
+          { name: 'Ms. Rivera', action: 'Analyzed "The Great Gatsby Essay"', time: '2 min ago' },
+          { name: 'Mr. Okafor', action: 'Saved Gold redesign to library', time: '14 min ago' },
           { name: 'Dr. Patel', action: 'Uploaded research: Mollick 2024', time: '1 hr ago' },
           { name: 'Ms. Johnson', action: 'Applied Silver version', time: '2 hrs ago' },
           { name: 'Mr. Williams', action: 'Exported analysis to Google Docs', time: '3 hrs ago' },

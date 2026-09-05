@@ -33,10 +33,17 @@ Banning AI is impossible and counterproductive. Instead of fighting AI, Socrates
 - **Fast:** paste an assignment, get a scored redesign in under a minute.
 
 ## Real teacher quotes (use as testimonials)
-- *"Students caught AI giving incorrect information — it became a major teaching moment about critical thinking."* — Mrs. Davis, 10th-grade English
-- *"I no longer use AI as the 'bad guy.' It's now a tool we use to facilitate learning."* — Mr. Muse, math
-- *"A character analysis became a multi-source AI critique project. Huge success, especially for my lower-level classes."* — Mrs. Davis
-- *"It wasn't harder for my students — it just forced them to actually think."* — Mrs. Davis
+
+> **Attribution rule:** these are real quotes from early teachers, used with their
+> permission on the condition that they are **not named**. Attribute by role only.
+> Do not add names, schools, or a specific grade-and-subject combination that would
+> identify someone. If you need a more specific attribution than the ones below,
+> ask before publishing.
+
+- *"Students caught AI giving incorrect information — it became a major teaching moment about critical thinking."* — high school English teacher
+- *"I no longer use AI as the 'bad guy.' It's now a tool we use to facilitate learning."* — high school math teacher
+- *"A character analysis became a multi-source AI critique project. Huge success, especially for my lower-level classes."* — high school English teacher
+- *"It wasn't harder for my students — it just forced them to actually think."* — high school English teacher
 
 ---
 
