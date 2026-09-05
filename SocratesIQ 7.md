@@ -1,15 +1,110 @@
 # SocratesIQ 5: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: August 29 2026.
+session. Read this whole file before making changes. Last updated: September 5 2026.
 
-**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 6.md`
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 7.md`
 now, and the number bumps by one on every update (next update renames it to
-`SocratesIQ 7.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ 8.md`, and so on). To continue in a new session, read the HIGHEST-numbered
 `SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
 handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versioned
 file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
 `SocratesIQ N.md` wins.
+
+## Session status (September 5 2026) — OAuth consent screen: DECISION + a blocker to fix first
+
+**The question:** the Google sign-in screen shows `llvtiuhtjpprtwlvnauu.supabase.co`
+instead of something branded. How do we fix it?
+
+**Diagnosis — the obvious answer is wrong.** Advice found online says this happens
+because Google has not been given branding. That is not our situation: the consent
+screen App name is already `SocratesIQ`, Audience External, Published (In production),
+in project `socratesiq-505023`. Setting the app name again changes nothing.
+
+The Supabase string appears because Google shows the domain the OAuth **callback**
+lands on, and ours is `https://llvtiuhtjpprtwlvnauu.supabase.co/auth/v1/callback`. It
+is structural. No branding setting removes it. Only a Supabase **custom domain**
+(paid add-on on a paid plan, roughly $10/mo on top of Pro — check current pricing)
+changes it, by moving auth to `auth.socratesiq.com`.
+
+**DECISION: do Google app verification first; defer the custom domain.**
+
+Reason: the unverified-app warning hurts more than the odd hostname. Teachers signing
+up currently hit "Google hasn't verified this app" and must click Advanced → continue.
+For a paid product that screen reads as "this might be malware", and it appears at the
+exact moment we are asking a teacher to trust us. A strange hostname reads as
+"infrastructure". Verification is free; the custom domain costs money every month.
+Revisit the custom domain once there is revenue to justify it.
+
+### BLOCKER — must be fixed before verification will pass
+
+**We have no real URL for the privacy policy or terms.** `App.tsx` holds the page in
+React state (`viewMode`), always starts at `'studio'`, and the footer links are
+`<button onClick={setViewMode}>`, not `<a href>`. So:
+
+- `https://socratesiq.com/privacy` loads the app and shows the **studio**, not the
+  privacy policy. (The `/* → /index.html` catch-all in netlify.toml serves the app,
+  but nothing reads the path.)
+- There is no crawlable link to the privacy policy from the home page.
+
+Google verification requires a working, publicly reachable privacy-policy URL on the
+same domain, and reviewers do click it. As things stand the review would be rejected
+after we had waited weeks for it.
+
+**The fix (small, no new dependency):**
+1. On mount, seed `viewMode` from `window.location.pathname` (`/privacy` → `'privacy'`,
+   `/terms` → `'terms'`, and so on — the ViewMode union already matches the slugs).
+2. `history.pushState` when `viewMode` changes, so the URL tracks the page.
+3. Handle `popstate` so the browser Back button works.
+4. Change the footer buttons to real `<a href="/privacy">` elements that
+   `preventDefault()` and navigate in-app, so they are links to Google and to search
+   engines while still feeling instant.
+
+The netlify catch-all already exists, so deep links will serve index.html once the app
+reads the path.
+
+### Then: the verification steps
+
+Everything below is in the Google Cloud console, signed in as **will@socratesiq.com**.
+Use a **private window signed in only as that account** — the browser defaults to the
+personal Gmail and that has eaten time before. Confirm the project selector reads
+**SocratesIQ (`socratesiq-505023`)** before touching anything.
+
+1. Ship the URL fix above and confirm `https://socratesiq.com/privacy` and
+   `/terms` load the right pages in a fresh browser.
+2. Console → **Google Auth Platform → Branding**. Confirm/complete: App name
+   `SocratesIQ`, support email, **App logo** (upload `public/logo.png` — square, and
+   note that changing the logo is itself what triggers brand review), **Application
+   home page** `https://socratesiq.com`, **Privacy policy** `https://socratesiq.com/privacy`,
+   **Terms of service** `https://socratesiq.com/terms`. Save.
+3. **Authorized domains** must list `socratesiq.com`.
+4. Console → **Verification Center**. It states exactly what this app needs for the
+   scopes we request. We use sign-in scopes plus `drive.file`, chosen precisely
+   because it is non-sensitive — so this should be **brand verification** (logo,
+   name, domain ownership) rather than a full security assessment. If the Center asks
+   for a security assessment, stop and re-read which scopes are listed: something is
+   requesting more than we intend.
+5. Verify domain ownership if prompted — `socratesiq.com` is already a Workspace
+   domain on this account, so this is usually already satisfied.
+6. Submit. Expect **days to weeks**, not "a few business days". Google emails
+   will@socratesiq.com; watch for replies asking for a demo video or clarification and
+   answer promptly, since the clock restarts each time they wait on us.
+
+**While it is pending:** nothing breaks. The unverified warning stays until approval.
+Do not change the app name, logo, or client mid-review — it resets the process.
+
+### Deferred: Supabase custom domain
+
+When revenue justifies it, the order matters — done wrong, login breaks:
+1. Enable Supabase Pro + the custom domain add-on.
+2. Add the CNAME for `auth.socratesiq.com`, activate the custom domain in Supabase.
+3. **Add** the new callback `https://auth.socratesiq.com/auth/v1/callback` to the
+   "SocratesIQ Web" OAuth client — **keep the old Supabase URI in place**.
+4. Test login end to end on socratesiq.com.
+5. Only then remove the old URI.
+
+Google allows several authorized redirect URIs. Adding rather than swapping is what
+keeps login alive during the switch.
 
 ## Session status (August 29 2026, later) — Stripe billing BUILT (branch, NOT merged, switched OFF)
 
