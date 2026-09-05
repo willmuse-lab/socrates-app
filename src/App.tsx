@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { AssignmentAnalyzer } from './components/AssignmentAnalyzer';
 import { LandingPage } from './components/LandingPage';
 import { LibraryView } from './components/LibraryView';
@@ -20,6 +20,7 @@ import { SavedReportView } from './components/SavedReportView';
 import { loadAssignments, saveAssignments, loadSettings, saveSettings, loadUser, saveUser, clearUser, AppSettings } from '@/src/lib/storage';
 import { supabaseEnabled, onAuthStateChange, fetchAssignmentsFromCloud, saveAssignmentToCloud, deleteAssignmentFromCloud, signOut, getCredits, Credits, fetchProfileFromCloud, saveProfileToCloud } from '@/src/lib/supabase';
 import { loadProfile, saveProfile, clearProfile, TeacherProfile } from '@/src/lib/profile';
+import { pathForView, viewForPath, isKnownPath, isPlainLeftClick } from '@/src/lib/routes';
 import { billingEnabled, startCheckout, openBillingPortal, consumeCheckoutReturn } from '@/src/lib/billing';
 import { StandardsManager } from './components/StandardsManager';
 import { Settings, ShieldCheck, Zap, Plus, Trash2, CreditCard } from 'lucide-react';
@@ -51,7 +52,9 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [loginMode, setLoginMode] = useState<'login' | 'signup'>('login');
   const [showPasswordReset, setShowPasswordReset] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('studio');
+  const [viewMode, setViewMode] = useState<ViewMode>(
+    () => (typeof window === 'undefined' ? 'studio' : viewForPath(window.location.pathname)) as ViewMode,
+  );
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [openedAssignment, setOpenedAssignment] = useState<SavedAssignment | null>(null);
   const [openedReport, setOpenedReport] = useState<SavedAssignment | null>(null);
@@ -64,6 +67,58 @@ export default function App() {
   const [cloudSynced, setCloudSynced] = useState(false);
   const [credits, setCredits] = useState<Credits | null>(null);
 
+
+  // ---- Keep the URL and the current view in step -----------------------------
+  // The pages Google (and anyone sharing a link) needs to reach live at real
+  // paths now -- see src/lib/routes.ts for why. viewMode is still the single
+  // source of truth; this only mirrors it into the address bar, so all the
+  // existing setViewMode calls keep working untouched.
+  const skipNextPush = useRef(false);
+  const urlSynced = useRef(false);
+
+  useEffect(() => {
+    const path = pathForView(viewMode);
+
+    // First run: the view was just derived FROM the URL, so there is nothing to
+    // push. Only tidy an unrecognised path (/nope -> /), and keep the query and
+    // hash while doing it -- Stripe comes back to ?checkout=success and Supabase
+    // auth uses the hash, and the effects that read those run after this one.
+    if (!urlSynced.current) {
+      urlSynced.current = true;
+      if (!isKnownPath(window.location.pathname) && path) {
+        window.history.replaceState(
+          { view: viewMode }, '', path + window.location.search + window.location.hash,
+        );
+      }
+      return;
+    }
+
+    // Back/Forward already moved the URL; pushing here would fight the button.
+    if (skipNextPush.current) { skipNextPush.current = false; return; }
+
+    if (path && window.location.pathname !== path) {
+      window.history.pushState({ view: viewMode }, '', path);
+    }
+  }, [viewMode]);
+
+  useEffect(() => {
+    const onPop = () => {
+      skipNextPush.current = true;
+      setViewMode(viewForPath(window.location.pathname) as ViewMode);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Nav and footer entries are real <a href> now, so Google and search engines
+  // can see that the home page links to the privacy policy, and so middle- or
+  // cmd-click opens a tab like any other link. A plain left-click is still
+  // handled in-app: let the browser have the modified ones, take the rest.
+  const navLinkClick = useCallback((e: React.MouseEvent, view: ViewMode) => {
+    if (!isPlainLeftClick(e)) return;
+    e.preventDefault();
+    setViewMode(view);
+  }, []);
 
   // Every view swap kept the window's scroll position, so following a footer
   // link (which lives at the BOTTOM of a long page) dropped you into the new
@@ -295,10 +350,10 @@ export default function App() {
                 { label: 'About', view: 'about' },
               ]
           ).map(({ label, view }) => (
-            <button key={view} onClick={() => setViewMode(view as ViewMode)}
-              className={`text-sm font-medium transition-colors ${viewMode === view ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
+            <a key={view} href={pathForView(view) ?? '#'} onClick={(e) => navLinkClick(e, view as ViewMode)}
+              className={`text-sm font-medium transition-colors cursor-pointer ${viewMode === view ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>
               {label}
-            </button>
+            </a>
           ))}
         </nav>
         <div className="flex items-center gap-3">
@@ -394,7 +449,7 @@ export default function App() {
                   <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} SocratesIQ · Built for Educators</p>
                   <div className="flex gap-4">
                     {[['Help', 'help'],['How scoring works', 'scoring'],['Teacher feedback', 'feedback'],['Privacy', 'privacy'],['Terms', 'terms'],['About', 'about'],['Pricing', 'pricing']].map(([l, v]) => (
-                      <button key={v} onClick={() => setViewMode(v as ViewMode)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{l}</button>
+                      <a key={v} href={pathForView(v) ?? '#'} onClick={(e) => navLinkClick(e, v as ViewMode)} className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">{l}</a>
                     ))}
                   </div>
                 </div>

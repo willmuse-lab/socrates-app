@@ -1,4 +1,5 @@
 import React from 'react';
+import { pathForView, isPlainLeftClick } from '@/src/lib/routes';
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ShieldOff, EyeOff, Sparkles, Search, Wand2, GraduationCap, Check } from 'lucide-react';
@@ -192,7 +193,9 @@ export function LandingPage({ onGetStarted, onNavigate }: LandingPageProps) {
           <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} SocratesIQ · Built for educators</p>
           <div className="flex flex-wrap gap-4">
             {[['How scoring works', 'scoring'], ['Pricing', 'pricing'], ['About', 'about'], ['Help', 'help'], ['Privacy', 'privacy'], ['Terms', 'terms']].map(([l, v]) => (
-              <button key={v} onClick={() => onNavigate(v)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{l}</button>
+              <a key={v} href={pathForView(v) ?? '#'}
+                 onClick={(e) => { if (!isPlainLeftClick(e)) return; e.preventDefault(); onNavigate(v); }}
+                 className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer">{l}</a>
             ))}
           </div>
         </div>
