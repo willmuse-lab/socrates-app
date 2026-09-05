@@ -1,11 +1,11 @@
 # SocratesIQ 5: Session Handoff Document
 
 **Purpose:** Complete context for continuing work on this project in a new
-session. Read this whole file before making changes. Last updated: September 5 2026.
+session. Read this whole file before making changes. Last updated: September 5 2026 (later).
 
-**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 7.md`
+**Naming / versioning:** this handoff is versioned by its FILENAME — `SocratesIQ 8.md`
 now, and the number bumps by one on every update (next update renames it to
-`SocratesIQ 8.md`, and so on). To continue in a new session, read the HIGHEST-numbered
+`SocratesIQ 9.md`, and so on). To continue in a new session, read the HIGHEST-numbered
 `SocratesIQ N.md` in the repo root (or just tell the agent "read the latest SocratesIQ
 handoff and continue"). The old top-level `HANDOFF.md` is RETIRED — this versioned
 file replaces it; if you still see a `HANDOFF.md` on `main`, it is stale and this
@@ -84,8 +84,11 @@ personal Gmail and that has eaten time before. Confirm the project selector read
    name, domain ownership) rather than a full security assessment. If the Center asks
    for a security assessment, stop and re-read which scopes are listed: something is
    requesting more than we intend.
-5. Verify domain ownership if prompted — `socratesiq.com` is already a Workspace
-   domain on this account, so this is usually already satisfied.
+5. **Verify `socratesiq.com` in Google Search Console BEFORE submitting**
+   (search.google.com/search-console). Google requires ownership proof for
+   authorized domains, and the Authorized domains box says so itself. As Workspace
+   admin on socratesiq.com this is already satisfied or one DNS TXT record away.
+   See the domain-ownership caveat below — it is the likeliest rejection reason.
 6. Submit. Expect **days to weeks**, not "a few business days". Google emails
    will@socratesiq.com; watch for replies asking for a demo video or clarification and
    answer promptly, since the clock restarts each time they wait on us.
@@ -93,9 +96,38 @@ personal Gmail and that has eaten time before. Confirm the project selector read
 **While it is pending:** nothing breaks. The unverified warning stays until approval.
 Do not change the app name, logo, or client mid-review — it resets the process.
 
-### Deferred: Supabase custom domain
+### CAVEAT — the Supabase domain is the likely rejection point
 
-When revenue justifies it, the order matters — done wrong, login breaks:
+Authorized domains currently holds three entries:
+
+| Domain | Needed? | Can we prove we own it? |
+|---|---|---|
+| `socratesiq.com` | Required — home page, privacy, terms | Yes (Workspace admin) |
+| `brilliant-mandazi-3937f4.netlify.app` | Optional — backs the second JS origin on the OAuth client | Probably (we control what the site serves) |
+| `llvtiuhtjpprtwlvnauu.supabase.co` | **Required** — the OAuth redirect URI lives here; removing it breaks login | **No** |
+
+Verification generally requires proving ownership of authorized domains in Search
+Console. We cannot prove the Supabase one: we do not control that host, so we can
+neither serve a verification file from it nor set DNS on it. This is a known
+friction point for everyone using Supabase, Firebase or Auth0 as their OAuth
+callback.
+
+It may still pass — reviewers do not always press on a third-party auth domain.
+But if verification is rejected, expect this to be why.
+
+**This qualifies the decision above.** Verification first is still the right order,
+because it is free and it may simply work. But the custom domain may turn out to be
+a PREREQUISITE for verification rather than the cosmetic upgrade it looked like: if
+Google asks us to prove ownership of the supabase.co domain, the answer is to move
+auth to `auth.socratesiq.com`, which we do own and can verify. Budget for that
+possibility rather than being surprised by it.
+
+Do NOT remove the supabase.co entry to tidy the list. Login breaks immediately.
+
+### Deferred (unless verification forces it): Supabase custom domain
+
+Do this when revenue justifies it, or sooner if verification demands it. The order
+matters — done wrong, login breaks:
 1. Enable Supabase Pro + the custom domain add-on.
 2. Add the CNAME for `auth.socratesiq.com`, activate the custom domain in Supabase.
 3. **Add** the new callback `https://auth.socratesiq.com/auth/v1/callback` to the
