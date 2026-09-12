@@ -49,6 +49,24 @@ export function billingConfigured(): boolean {
 }
 
 /**
+ * Which pieces are missing, as booleans only — never the values. "Billing is
+ * not configured" on its own sends you hunting through five environment
+ * variables; this names the one that is absent. Note a variable set in Netlify
+ * without the Functions scope reads as missing HERE while looking present in
+ * the dashboard, which is the usual culprit.
+ */
+export function billingConfigStatus(): string {
+  return [
+    `stripeKey=${!!STRIPE_SECRET_KEY}`,
+    `supabaseUrl=${!!SUPABASE_URL}`,
+    `serviceRoleKey=${!!SERVICE_ROLE_KEY}`,
+    `priceMonthly=${!!process.env.STRIPE_PRICE_MONTHLY}`,
+    `priceAnnual=${!!process.env.STRIPE_PRICE_ANNUAL}`,
+    `webhookSecret=${!!process.env.STRIPE_WEBHOOK_SECRET}`,
+  ].join(" ");
+}
+
+/**
  * Identify the caller from their Supabase access token. The token is verified
  * by Supabase itself (a forged one fails), so this is a real authorisation
  * check, not a trust-the-client id.

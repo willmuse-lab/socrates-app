@@ -8,6 +8,13 @@
 --  free. Enforced server-side via SECURITY DEFINER functions so a teacher can
 --  never edit their own counter (they have SELECT only, no direct UPDATE).
 --  Safe to re-run.
+--
+--  Aug 30 2026: fixed the ambiguous `used` reference that had stopped
+--  consume_assignment_credit() from EVER incrementing (see the comment on that
+--  statement). Verified against a local Postgres 16: trial spends twice then
+--  walls without incrementing, paid resets on a rolled-over month, comped
+--  accounts never wall, a new teacher's row is created and charged, and a
+--  signed-out caller is refused without creating a row.
 -- ============================================================================
 create table if not exists public.user_credits (
   user_id      uuid primary key references auth.users(id) on delete cascade,
@@ -52,8 +59,8 @@ begin
     insert into public.user_credits(user_id) values (uid) returning * into rec;
   end if;
   if rec.plan = 'paid' and rec.period_start <= (current_date - interval '1 month')::date then
-    update public.user_credits set used = 0, period_start = current_date, updated_at = now()
-      where user_id = uid returning * into rec;
+    update public.user_credits as uc set used = 0, period_start = current_date, updated_at = now()
+      where uc.user_id = uid returning * into rec;
   end if;
   allow := public.credit_allowance(rec.plan);
   return query select rec.plan, rec.used, allow, greatest(allow - rec.used, 0), rec.period_start;
@@ -78,15 +85,21 @@ begin
     insert into public.user_credits(user_id) values (uid) returning * into rec;
   end if;
   if rec.plan = 'paid' and rec.period_start <= (current_date - interval '1 month')::date then
-    update public.user_credits set used = 0, period_start = current_date, updated_at = now()
-      where user_id = uid returning * into rec;
+    update public.user_credits as uc set used = 0, period_start = current_date, updated_at = now()
+      where uc.user_id = uid returning * into rec;
   end if;
   allow := public.credit_allowance(rec.plan);
   if rec.used >= allow then
     return query select rec.plan, rec.used, allow, 0, false, rec.period_start; return;
   end if;
-  update public.user_credits set used = used + 1, updated_at = now()
-    where user_id = uid returning * into rec;
+  -- The `as uc` alias is NOT decoration. `used` is also an OUT parameter of this
+  -- function, so a bare `set used = used + 1` is ambiguous and Postgres refuses
+  -- it with 42702 -- which is precisely what happened: this statement threw on
+  -- every call from July 20 to August 30 2026, the client fails open by design,
+  -- and so no teacher was ever charged a credit and the trial wall never fired.
+  -- Qualifying the right-hand side with the table alias is the whole fix.
+  update public.user_credits as uc set used = uc.used + 1, updated_at = now()
+    where uc.user_id = uid returning * into rec;
   return query select rec.plan, rec.used, allow, greatest(allow - rec.used, 0), true, rec.period_start;
 end; $$;
 

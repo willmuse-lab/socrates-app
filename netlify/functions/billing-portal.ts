@@ -6,13 +6,14 @@
 //  NOTE: the portal must be turned on once per Stripe mode (test and live) at
 //  Dashboard → Settings → Billing → Customer portal → Save.
 // ============================================================================
-import { stripe, billingConfigured, userFromRequest, creditsByUserId, json, CORS, siteOrigin } from "./_shared/billing";
+import { stripe, billingConfigured, billingConfigStatus, userFromRequest, creditsByUserId, json, CORS, siteOrigin } from "./_shared/billing";
 
 export default async function handler(req: Request) {
   if (req.method === "OPTIONS") return new Response("", { status: 204, headers: CORS });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
   if (!billingConfigured() || !stripe) {
+    console.error(`billing-portal: billing not configured — ${billingConfigStatus()}`);
     return json({ error: "Billing is not configured yet.", code: "billing_disabled" }, 503);
   }
 
