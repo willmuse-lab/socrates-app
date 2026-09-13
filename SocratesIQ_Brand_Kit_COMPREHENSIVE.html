@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocratesIQ Brand Kit – Complete</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Sora', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #17213B;
+            background: #F4EFE4;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 60px 40px; }
+        h1 { font-size: 56px; margin-bottom: 10px; color: #0E1626; font-weight: 600; letter-spacing: -0.02em; }
+        .subtitle { font-size: 20px; color: #3E5C86; margin-bottom: 60px; font-weight: 400; }
+        section { background: #FCFAF4; padding: 50px; margin-bottom: 40px; border-radius: 16px; box-shadow: 0 4px 16px rgba(14, 22, 38, 0.1); }
+        h2 { font-size: 36px; margin-bottom: 30px; color: #0E1626; font-weight: 600; letter-spacing: -0.02em; border-bottom: 3px solid #3E5C86; padding-bottom: 15px; }
+        h3 { font-size: 22px; margin-top: 40px; margin-bottom: 20px; color: #0E1626; font-weight: 600; }
+        p { margin-bottom: 15px; line-height: 1.8; }
+
+        .color-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; margin: 30px 0; }
+        .color-swatch { border-radius: 12px; overflow: hidden; box-shadow: 0 6px 16px rgba(14, 22, 38, 0.15); }
+        .color-box { height: 140px; display: flex; align-items: flex-end; justify-content: center; color: white; font-weight: 600; padding: 15px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); font-size: 14px; }
+        .color-info { padding: 20px; background: #F4EFE4; text-align: center; }
+        .color-info .name { font-weight: 600; margin-bottom: 8px; color: #0E1626; }
+        .color-info .value { font-size: 13px; color: #6B6A63; font-family: 'Monaco', monospace; margin-bottom: 4px; }
+
+        .ink-section { background: #0E1626; color: #ECE7DB; padding: 50px; border-radius: 16px; margin: 40px 0; }
+        .ink-section h2 { border-bottom-color: #A9C1DF; color: #ECE7DB; }
+        .ink-section h3 { color: #A9C1DF; }
+        .ink-section p { color: #9EAFC6; }
+
+        .eyebrow { font-family: 'Sora', sans-serif; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: 700; color: #3E5C86; margin-bottom: 10px; }
+        .highlight-box { background: rgba(192, 137, 46, 0.18); border-bottom: 2px solid #C0892E; padding: 3px 6px; color: #17213B; display: inline-block; }
+
+        .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0; }
+        .do { border-left: 5px solid #2F7D5B; padding: 20px; background: #F0FAF6; }
+        .dont { border-left: 5px solid #B0442E; padding: 20px; background: #FAEAEA; }
+        .do h4, .dont h4 { margin-bottom: 15px; font-size: 16px; font-weight: 600; }
+        .do p, .dont p { font-size: 14px; line-height: 1.6; margin-bottom: 8px; }
+
+        .type-specimen { margin: 25px 0; padding: 20px; background: #F4EFE4; border-radius: 8px; }
+        .type-label { font-size: 12px; color: #6B6A63; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 5px; }
+
+        .component-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin: 25px 0; }
+        .component { padding: 25px; background: #F4EFE4; border-radius: 12px; }
+        .component-label { font-size: 14px; font-weight: 600; color: #0E1626; margin-bottom: 10px; }
+
+        .score-circle { width: 140px; height: 140px; border-radius: 50%; border: 4px solid #E7E0D2; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px auto; background: #FCFAF4; box-shadow: 0 12px 30px -12px rgba(14, 22, 38, 0.25); position: relative; overflow: hidden; }
+        .score-circle::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3E5C86, #0E1626); }
+        .score-label { position: relative; z-index: 1; text-align: center; }
+        .score-number { font-size: 32px; font-weight: 700; color: #0E1626; }
+        .score-text { font-size: 11px; color: #6B6A63; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+
+        .messaging-box { background: #F0F7FF; border-left: 4px solid #3E5C86; padding: 25px; margin: 20px 0; border-radius: 8px; }
+        .messaging-box strong { color: #0E1626; }
+
+        .pillars { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 25px 0; }
+        .pillar { background: #F4EFE4; padding: 25px; border-radius: 12px; border-top: 4px solid #3E5C86; }
+        .pillar-title { font-weight: 600; color: #0E1626; margin-bottom: 10px; font-size: 16px; }
+
+        .strategy-card { background: #EAE3D5; padding: 25px; margin: 20px 0; border-radius: 12px; }
+        .strategy-name { font-size: 18px; font-weight: 600; color: #0E1626; margin-bottom: 10px; }
+        .strategy-desc { color: #4B4F5B; margin-bottom: 15px; }
+        .strategy-rules { font-size: 14px; color: #6B6A63; }
+
+        footer { text-align: center; padding: 60px 20px; color: #9EAFC6; font-size: 13px; }
+        .last-updated { color: #6B6A63; font-size: 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="eyebrow">Brand Guidelines & Strategy</div>
+        <h1>SocratesIQ</h1>
+        <p class="subtitle">Complete brand system, positioning, and design documentation</p>
+
+        <!-- POSITIONING -->
+        <div class="ink-section">
+            <h2>Brand Positioning</h2>
+
+            <h3>What We Own</h3>
+            <p><strong>Category:</strong> Curriculum Transformation Platform</p>
+            <p><strong>Hero Message:</strong> "Transform Yesterday's Assignments into Tomorrow's Learning"</p>
+            <p><strong>Tagline:</strong> "Wisdom in the Age of Artificial Intelligence"</p>
+            <p><strong>Core Insight:</strong> Your curriculum already has value — we strengthen it.</p>
+
+            <h3>Why This Matters</h3>
+            <p>Teachers don't need an AI generator. They need an AI resilience partner.</p>
+            <p>SocratesIQ transforms EXISTING assignments so students learn instead of shortcutting. This is different from lesson generators (which help teachers starting from scratch) or AI detectors (which assume the worst). We amplify good teaching.</p>
+
+            <h3>Competitive Edge</h3>
+            <p><strong>Transformation, not generation.</strong> We work WITH the teacher's existing curriculum, not replace it. We measure resilience (0–100 AI Resilience Score™), diagnose failure modes, and suggest specific changes tied to actual pedagogy — not just "use more critical thinking."</p>
+            <p><strong>Built by a teacher, for teachers.</strong> No startup jargon, no false precision, no invented data. We own the limitations and speak like a peer.</p>
+        </div>
+
+        <!-- VALUES & PRINCIPLES -->
+        <section>
+            <h2>Brand Values & Principles</h2>
+
+            <div class="pillars">
+                <div class="pillar">
+                    <div class="pillar-title">Teacher Trust First</div>
+                    <p>We don't pretend. No invented stats, no fake testimonials, no magic. Teachers are experts; we're a tool.</p>
+                </div>
+                <div class="pillar">
+                    <div class="pillar-title">Honest About AI</div>
+                    <p>We use AI openly. We show what it can and can't do. We're not trying to hide the AI or pretend it's magic.</p>
+                </div>
+                <div class="pillar">
+                    <div class="pillar-title">Practical Not Theoretical</div>
+                    <p>Real assignments, real classrooms, real feedback loops. Grounded in pedagogy, not just research citations.</p>
+                </div>
+                <div class="pillar">
+                    <div class="pillar-title">Teacher-Centered Tone</div>
+                    <p>We speak to the peer, not down to the customer. No marketing hype, no jargon, no false urgency.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MESSAGING HIERARCHY -->
+        <section>
+            <h2>Messaging Hierarchy</h2>
+
+            <h3>Tier 1: Primary Message (Always lead with this)</h3>
+            <div class="messaging-box">
+                <strong>"Redesign assignments so AI can't do the work for students."</strong>
+                <p style="margin-top: 10px; color: #4B4F5B;">Why it works: Clear job-to-be-done, honest about the problem, no fluff.</p>
+            </div>
+
+            <h3>Tier 2: Supporting Messages (Explain the how)</h3>
+            <div class="messaging-box">
+                <strong>Score & Diagnose:</strong> Paste an assignment → get a 0–100 AI Resilience Score and a breakdown of what AI can do to it.
+            </div>
+            <div class="messaging-box">
+                <strong>Three Redesign Levels:</strong> Quick Fix, Rebuild, or full Reinvent—each with concrete changes a teacher can use immediately.
+            </div>
+            <div class="messaging-box">
+                <strong>Align & Plan:</strong> Upload your standards, auto-generate a lesson plan and student directions. All downloadable as PDF, Word, or Google Docs.
+            </div>
+
+            <h3>Tier 3: Proof Points (When asked "does this actually work?")</h3>
+            <div class="messaging-box">
+                <strong>Research-informed:</strong> Approaches informed by pedagogical research on AI's impact and assignment design (Furze et al. 2024 pilot among others).
+            </div>
+            <div class="messaging-box">
+                <strong>Before → After:</strong> Teachers applying a redesign can re-analyze and see the score improvement in real time.
+            </div>
+            <div class="messaging-box">
+                <strong>Free to start:</strong> 2 free assignments in trial mode. Paid plans start at $9.99/month (15 assignments) or $99.99/year. No credit card to try.
+            </div>
+        </section>
+
+        <!-- AI STRATEGY POSITIONING -->
+        <section>
+            <h2>AI Strategy Names & Philosophy</h2>
+            <p>Teachers choose ONE at the start of an analysis. All downstream outputs (redesigns, lesson plan, student directions) flow from this choice.</p>
+
+            <div class="strategy-card">
+                <div class="strategy-name">AI-Free Learning</div>
+                <div class="strategy-desc">"No AI involvement allowed—students prove competence without any generative tool."</div>
+                <div class="strategy-rules">
+                    <strong>Redesign goal:</strong> Remove any human-like output or research task that AI could shortcut. Expect: hands-on activities, presentations, lab work, collaborations, live discussions.
+                    <p style="margin-top: 10px;"><strong>Lesson plan guidance:</strong> Students work independently; teacher focuses on live feedback and real-time problem-solving.</p>
+                </div>
+            </div>
+
+            <div class="strategy-card">
+                <div class="strategy-name">AI-Assisted Learning</div>
+                <div class="strategy-desc">"AI is a tool, not a crutch—students use it under guardrails to speed up research or drafting."</div>
+                <div class="strategy-rules">
+                    <strong>Redesign goal:</strong> Teach students to use AI thoughtfully. Add verification steps, synthesis tasks, and reflection. Expect: students cite AI sources, fact-check outputs, reflect on process.
+                    <p style="margin-top: 10px;"><strong>Lesson plan guidance:</strong> Teacher explicitly teaches AI norms—when it's allowed, what to ask it, how to verify, when to go deeper manually.</p>
+                </div>
+            </div>
+
+            <div class="strategy-card">
+                <div class="strategy-name">AI-Integrated Learning</div>
+                <div class="strategy-desc">"AI is a collaborator—students learn THROUGH working WITH generative tools on complex problems."</div>
+                <div class="strategy-rules">
+                    <strong>Redesign goal:</strong> Tasks that are impossible or impractical without AI. Expect: iterative AI partnerships, comparing AI strategies, prompt engineering, analyzing AI failures.
+                    <p style="margin-top: 10px;"><strong>Lesson plan guidance:</strong> Focus shifts to metacognition—students learn what AI is good/bad at and why. Teacher facilitates, not controls.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TARGET AUDIENCE -->
+        <section>
+            <h2>Target Audience: The Skeptical Teacher</h2>
+
+            <h3>Who We're Talking To</h3>
+            <p><strong>The teacher saying:</strong> "AI is overhyped. My students are already cutting corners. I need to protect rigor and authenticity."</p>
+
+            <p><strong>Pain points:</strong> Assignment quality is dropping; students are using ChatGPT; current tools either ignore AI or surrender to it; no nuance.</p>
+
+            <p><strong>Aspirations:</strong> Stay relevant without losing her standards. Help students learn to work WITH AI, not hide from it. Save time on grading without sacrificing feedback.</p>
+
+            <p><strong>Her framework:</strong> She trusts peer experience more than marketing. She wants honesty about what will and won't work. She's skeptical of "AI transformation" hype but open to practical tools built BY teachers.</p>
+
+            <h3>How to Speak to Her</h3>
+            <ul style="margin: 20px 0; padding-left: 20px;">
+                <li><strong>Lead with classroom truth:</strong> "Here's what AI actually does to your assignments, and how to stop it."</li>
+                <li><strong>Show your work:</strong> Real score examples, real teacher feedback, real before→after assignments.</li>
+                <li><strong>Own the limitations:</strong> "We don't solve everything. Here's what we DO solve."</li>
+                <li><strong>Make it time-free to try:</strong> 2 free assignments, no email harvesting, just instant feedback.</li>
+                <li><strong>Respect her expertise:</strong> We suggest; she decides. We don't prescribe THE answer.</li>
+            </ul>
+        </section>
+
+        <!-- COLOR SYSTEM -->
+        <section>
+            <h2>Color System</h2>
+            <p>A deliberate editorial palette: warm paper, deep-navy ink, slate-blue accents. No corner gradients or AI-default pastels.</p>
+
+            <h3>Primary & Accent</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #0E1626;">Primary</div>
+                    <div class="color-info">
+                        <div class="name">Deep Navy</div>
+                        <div class="value">#0E1626</div>
+                        <div class="value">RGB(14, 33, 38)</div>
+                        <div class="value">Deep text, headers</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #3E5C86;">Accent</div>
+                    <div class="color-info">
+                        <div class="name">Slate Blue</div>
+                        <div class="value">#3E5C86</div>
+                        <div class="value">RGB(62, 92, 134)</div>
+                        <div class="value">Links, CTAs, eyebrows</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Background & Neutrals</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #F4EFE4; color: #17213B; border: 1px solid #DED6C7;">Background</div>
+                    <div class="color-info">
+                        <div class="name">Warm Cream</div>
+                        <div class="value">#F4EFE4</div>
+                        <div class="value">RGB(244, 239, 228)</div>
+                        <div class="value">Page background</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #FCFAF4; color: #17213B; border: 1px solid #DED6C7;">Card</div>
+                    <div class="color-info">
+                        <div class="name">Off-White</div>
+                        <div class="value">#FCFAF4</div>
+                        <div class="value">RGB(252, 250, 244)</div>
+                        <div class="value">Cards, containers</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #EAE3D5; color: #17213B;">Secondary</div>
+                    <div class="color-info">
+                        <div class="name">Light Beige</div>
+                        <div class="value">#EAE3D5</div>
+                        <div class="value">RGB(234, 227, 213)</div>
+                        <div class="value">Muted backgrounds</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #DED6C7; color: #17213B;">Border</div>
+                    <div class="color-info">
+                        <div class="name">Subtle Border</div>
+                        <div class="value">#DED6C7</div>
+                        <div class="value">RGB(222, 214, 199)</div>
+                        <div class="value">Borders, dividers</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Semantic Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #2F7D5B;">Success</div>
+                    <div class="color-info">
+                        <div class="name">Success</div>
+                        <div class="value">#2F7D5B</div>
+                        <div class="value">RGB(47, 125, 91)</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #C0892E;">Warning</div>
+                    <div class="color-info">
+                        <div class="name">Warning</div>
+                        <div class="value">#C0892E</div>
+                        <div class="value">RGB(192, 137, 46)</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #B0442E;">Destructive</div>
+                    <div class="color-info">
+                        <div class="name">Destructive</div>
+                        <div class="value">#B0442E</div>
+                        <div class="value">RGB(176, 68, 46)</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #708D81;">Teal Accent</div>
+                    <div class="color-info">
+                        <div class="name">Teal</div>
+                        <div class="value">#708D81</div>
+                        <div class="value">RGB(112, 141, 129)</div>
+                        <div class="value">High resilience</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Dark Section Palette</h3>
+            <p>For full-bleed editorial "ink" sections that contrast with warm paper:</p>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #0E1626;">Ink Primary</div>
+                    <div class="color-info">
+                        <div class="name">Deep Navy</div>
+                        <div class="value">#0E1626</div>
+                        <div class="value">RGB(14, 22, 38)</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #141E33;">Ink Secondary</div>
+                    <div class="color-info">
+                        <div class="name">Navy Accent</div>
+                        <div class="value">#141E33</div>
+                        <div class="value">RGB(20, 30, 51)</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #ECE7DB; color: #0E1626;">On Ink</div>
+                    <div class="color-info">
+                        <div class="name">On Ink Text</div>
+                        <div class="value">#ECE7DB</div>
+                        <div class="value">RGB(236, 231, 219)</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-box" style="background-color: #A9C1DF;">Ink Accent</div>
+                    <div class="color-info">
+                        <div class="name">Accent on Ink</div>
+                        <div class="value">#A9C1DF</div>
+                        <div class="value">RGB(169, 193, 223)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TYPOGRAPHY -->
+        <section>
+            <h2>Typography</h2>
+
+            <h3>Typeface: Sora</h3>
+            <p><strong>Primary font for all text.</strong> Sora is clean, modern, and works equally well for body copy, eyebrow labels, and headings. Headings retain the `.font-serif` class for treatment (font-weight 600, letter-spacing -0.02em) but render in Sora, not a serif.</p>
+            <p><strong>Fallback stack:</strong> Sora, Inter, Helvetica Neue, Arial, sans-serif</p>
+
+            <h3>Type Scale</h3>
+            <div class="type-specimen">
+                <div class="type-label">Heading 1 (56px, weight 600)</div>
+                <h1 style="margin: 0; font-size: 56px; letter-spacing: -0.02em;">Page title, hero</h1>
+            </div>
+            <div class="type-specimen">
+                <div class="type-label">Heading 2 (36px, weight 600)</div>
+                <h2 style="margin: 0; border: none; color: #0E1626; font-size: 36px; letter-spacing: -0.02em;">Section header</h2>
+            </div>
+            <div class="type-specimen">
+                <div class="type-label">Heading 3 (22px, weight 600)</div>
+                <h3 style="margin: 0; color: #0E1626; font-size: 22px; letter-spacing: -0.02em;">Subsection</h3>
+            </div>
+            <div class="type-specimen">
+                <div class="type-label">Eyebrow (11px, weight 700, uppercase, letter-spaced)</div>
+                <p style="margin: 0; text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: 700; color: #3E5C86;">SECTION LABEL</p>
+            </div>
+            <div class="type-specimen">
+                <div class="type-label">Body (16px, weight 400)</div>
+                <p style="margin: 0; font-size: 16px;">Standard paragraph text with warm, editorial voice. Clean but not clinical.</p>
+            </div>
+            <div class="type-specimen">
+                <div class="type-label">Small (14px, weight 400)</div>
+                <p style="margin: 0; font-size: 14px; color: #6B6A63;">Smaller text for captions, metadata, secondary information.</p>
+            </div>
+
+            <h3>Letter Spacing</h3>
+            <p><strong>Headings:</strong> -0.02em (tight, editorial feel)</p>
+            <p><strong>Eyebrow labels:</strong> 0.2em (open, uppercase)</p>
+            <p><strong>Body:</strong> normal (default)</p>
+        </section>
+
+        <!-- VOICE & TONE -->
+        <section>
+            <h2>Voice & Tone</h2>
+            <p><strong>Teacher-focused, honest, practical.</strong> SocratesIQ speaks like a colleague who teaches, not like a startup. We own the limitations. No invented stats, no marketing hype, no em dashes.</p>
+
+            <div class="do-dont">
+                <div class="do">
+                    <h4>✓ Do This</h4>
+                    <p>Teach first, pitch second</p>
+                    <p>Use real examples from classrooms</p>
+                    <p>Say what the work actually is</p>
+                    <p>Own the limitations</p>
+                    <p>Write like you speak to a peer</p>
+                    <p>Show before → after examples</p>
+                    <p>Cite the research, then own the pedagogy</p>
+                </div>
+                <div class="dont">
+                    <h4>✗ Don't Do This</h4>
+                    <p>Invent statistics or vague studies</p>
+                    <p>Use corporate jargon or em dashes</p>
+                    <p>Promise easy solutions</p>
+                    <p>Pretend you're not using AI</p>
+                    <p>Write like a marketing department</p>
+                    <p>Use fake testimonials or staged photos</p>
+                    <p>Claim we solve everything</p>
+                </div>
+            </div>
+
+            <h3>Terminology</h3>
+            <p><strong>Do say:</strong> redesign, rebuild, AI-resilient, assignment, lesson plan, you decide, transform, authentic</p>
+            <p><strong>Don't say:</strong> leverage, synergy, transform (in startup sense), disruption, game-changer, effortless, revolutionary</p>
+        </section>
+
+        <!-- COMPONENTS -->
+        <section>
+            <h2>Key Components</h2>
+
+            <h3>Score Circle</h3>
+            <p>Displays resilience score (0–100). Used in assignment analyzer. Bordered circle with gradient top stroke.</p>
+            <div style="text-align: center;">
+                <div class="score-circle">
+                    <div class="score-label">
+                        <div class="score-number">72</div>
+                        <div class="score-text">AI Resilient</div>
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top: 25px; color: #6B6A63; font-size: 14px;">140px diameter, 4px solid #E7E0D2 border, gradient stroke: #3E5C86 → #0E1626 at top. Box shadow: 0 12px 30px -12px rgba(14, 22, 38, 0.25).</p>
+
+            <h3>Highlight Box</h3>
+            <p>Used to emphasize key terms or phrases inline:</p>
+            <p style="font-size: 16px; margin: 20px 0;">The <span class="highlight-box">three redesigns</span> show different levels of change — Quick Fix, Rebuild, or full Reinvent.</p>
+            <p style="color: #6B6A63; font-size: 14px;">Background: rgba(192, 137, 46, 0.18). Border-bottom: 2px solid #C0892E. Padding: 3px 6px. Inline element.</p>
+
+            <h3>Eyebrow Label</h3>
+            <p style="text-transform: uppercase; letter-spacing: 0.2em; font-size: 11px; font-weight: 700; color: #3E5C86; margin: 20px 0;">REDESIGN STRATEGIES</p>
+            <p style="color: #6B6A63; font-size: 14px;">All caps, letter-spaced 0.2em, color #3E5C86. Used above section headings to signal category.</p>
+
+            <h3>Borders & Radii</h3>
+            <p><strong>Border radius lg:</strong> 16px (cards, major components)</p>
+            <p><strong>Border radius md:</strong> 12px (buttons, input fields)</p>
+            <p><strong>Border radius sm:</strong> 6px (small elements)</p>
+            <p><strong>Border color:</strong> #DED6C7 (subtly warm, not harsh)</p>
+        </section>
+
+        <!-- DARK SECTION EXAMPLE -->
+        <div class="ink-section">
+            <h2>Dark Section Pattern (Editorial Rhythm)</h2>
+            <p>Full-bleed sections with deep navy background create visual rhythm on the page. Use sparingly for emphasis.</p>
+            <h3>Color Overrides for Dark Sections</h3>
+            <p>Background: #0E1626 (Deep Navy)</p>
+            <p>Text: #ECE7DB (On Ink)</p>
+            <p>Accents: #A9C1DF (Ink Accent)</p>
+            <p>Cards on ink (.ink-card): #141E33 with 1px rgba(255,255,255,0.07) border</p>
+        </div>
+
+        <!-- MARKETING GUARDRAILS -->
+        <section>
+            <h2>Marketing & Copy Guardrails</h2>
+            <p>These are critical for teacher trust. Breach them and the whole brand erodes.</p>
+
+            <div class="do-dont">
+                <div class="do">
+                    <h4>✓ Always Do</h4>
+                    <p>Use real teacher testimonials (anonymized by role/grade only)</p>
+                    <p>Show actual assignment before→after examples</p>
+                    <p>Credit research you reference (even if not a formal citation on the site)</p>
+                    <p>Explain what the score measures and how</p>
+                    <p>Acknowledge AI's actual strengths and limits</p>
+                    <p>Speak to pedagogy, not just tech</p>
+                </div>
+                <div class="dont">
+                    <h4>✗ Never Do This</h4>
+                    <p>Invent statistics ("87% of teachers say...", "300+ institutions")</p>
+                    <p>Use AI-generated fake people or staged classroom photos</p>
+                    <p>Claim we solve AI problems that we don't</p>
+                    <p>Name specific researchers or studies we don't cite</p>
+                    <p>Promise "easy" solutions or "effortless" teaching</p>
+                    <p>Position as a replacement for teacher judgment</p>
+                    <p>Use em dashes or overwrought marketing copy</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOGO & IMAGERY -->
+        <section>
+            <h2>Logo & Imagery</h2>
+
+            <h3>Logo Usage</h3>
+            <p>The owl mark (Abstract Owl design) is the primary logo. Use consistently across all platforms. Never stretch, skew, rotate, or change colors.</p>
+            <p><strong>Minimum size:</strong> 48px (digital), 1 inch (print)</p>
+            <p><strong>Clear space:</strong> Maintain 20px breathing room on all sides</p>
+
+            <h3>Imagery Style</h3>
+            <p><strong>Aesthetic:</strong> Editorial, warm paper, real classrooms. Think handwritten notes, pencil sketches, actual assignments.</p>
+            <p><strong>Do:</strong> Use real teachers, real student work (anonymized), actual classroom settings, authentic moments</p>
+            <p><strong>Don't:</strong> Stock photos of smiling people, staged corporate settings, bright artificial colors, AI-generated people</p>
+
+            <h3>Photography Overrides</h3>
+            <p>When layering text over images: use #3E5C86 (slate blue) or #0E1626 (navy) semi-transparent overlays for readability. Avoid harsh contrast.</p>
+        </section>
+
+        <!-- FINAL DO'S & DON'TS -->
+        <section>
+            <h2>Do's & Don'ts Summary</h2>
+            <div class="do-dont">
+                <div class="do">
+                    <h4>✓ Do This</h4>
+                    <p>Use the owl consistently (Abstract design)</p>
+                    <p>Pair #0E1626 (navy) with #3E5C86 (slate blue)</p>
+                    <p>Keep layouts clean, warm, editorial</p>
+                    <p>Center the teacher's voice and expertise</p>
+                    <p>Show real work and real classrooms</p>
+                    <p>Use Sora throughout</p>
+                    <p>Maintain warm paper aesthetic</p>
+                    <p>Lead with transformation, not generation</p>
+                    <p>Speak to the skeptical teacher</p>
+                </div>
+                <div class="dont">
+                    <h4>✗ Don't Do This</h4>
+                    <p>Change, stretch, or rotate logo</p>
+                    <p>Use Geometric Owl design</p>
+                    <p>Mix with bright, unrelated colors</p>
+                    <p>Crowd content or over-decorate</p>
+                    <p>Use marketing hype or corporate speak</p>
+                    <p>Use fake or staged imagery</p>
+                    <p>Add custom fonts unnecessarily</p>
+                    <p>Add corner gradients or AI-default pastels</p>
+                    <p>Invent data or testimonials</p>
+                    <p>Claim we solve everything</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section>
+            <h2>Brand Assets & Contact</h2>
+            <p><strong>Logo files:</strong> PNG (transparent), SVG, PDF</p>
+            <p><strong>Color palette:</strong> All hex and RGB values above</p>
+            <p><strong>Typography:</strong> Sora (via Google Fonts)</p>
+            <p><strong>This document:</strong> Single source of truth for brand guidelines</p>
+            <p style="margin-top: 30px;"><strong>Questions?</strong> Contact <strong>hello@socratesiq.com</strong></p>
+        </section>
+    </div>
+
+    <footer>
+        SocratesIQ Brand Kit | Editorial, warm, honest | Built by a teacher, for teachers
+        <div class="last-updated">Last updated September 2026 | Extracted from live codebase + SocratesIQ 6.md strategy</div>
+    </footer>
+</body>
+</html>
